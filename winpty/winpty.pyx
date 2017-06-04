@@ -25,7 +25,7 @@ cdef class Agent:
         if config is NULL:
             raise MemoryError(winpty.winpty_error_msg(err_pointer))
 
-        if err is not NULL:
+        if err_pointer is not NULL:
             msg = 'An error has ocurred: {0} - Code: {1}'.format(
                 winpty.winpty_error_msg(err_pointer),
                 winpty.winpty_error_code(err_pointer))

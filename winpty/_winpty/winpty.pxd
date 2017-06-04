@@ -1,7 +1,16 @@
 
+cdef extern from "Windows.h":
+    ctypedef Py_UNICODE WCHAR
+    ctypedef const WCHAR* LPCWSTR
+    ctypedef void* HWND
+    ctypedef void* HANDLE
+    ctypedef int UINT64
+
+
 cdef extern from 'winpty.h':
     # Error constants and structs
-    ctypedef struct winpty_error_s winpty_error_t
+    # ctypedef struct winpty_error_s winpty_error_t
+    ctypedef struct winpty_error_t
     ctypedef winpty_error_t *winpty_error_ptr_t
     ctypedef DWORD winpty_result_t
 
@@ -11,7 +20,8 @@ cdef extern from 'winpty.h':
     void winpty_error_free(winpty_error_ptr_t err)
 
     # Winpty agent configuration settings
-    ctypedef struct winpty_config_s winpty_config_t
+    # ctypedef struct winpty_config_s winpty_config_t
+    ctypedef struct winpty_config_t
 
     # Winpty agent configuration functions
     winpty_config_t* winpty_config_new(UINT64 agentFlags, winpty_error_ptr_t *err)
@@ -21,7 +31,8 @@ cdef extern from 'winpty.h':
     void winpty_config_set_agent_timeout(winpty_config_t *cfg, DWORD timeoutMs)
 
     # Agent start related structs
-    ctypedef struct winpty_s winpty_t
+    # ctypedef struct winpty_s winpty_t
+    ctypedef struct winpty_t
 
     # Start a new agent
     winpty_t * winpty_open(const winpty_config_t *cfg, winpty_error_ptr_t *err)
@@ -34,7 +45,8 @@ cdef extern from 'winpty.h':
 
 
     # Process creation configuration struct
-    ctypedef struct winpty_spawn_config_s winpty_spawn_config_t
+    # ctypedef struct winpty_spawn_config_s winpty_spawn_config_t
+    ctypedef struct winpty_spawn_config_t
 
     # Process creation functions
     winpty_spawn_config_t * winpty_spawn_config_new(UINT64 spawnFlags,
