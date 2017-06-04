@@ -1,12 +1,12 @@
 
 cimport cython
-from _winpty cimport winpty, winpty_constants
+from winpty._winpty cimport winpty, winpty_constants
 
-cdef enum AgentConstants:
-   WINPTY_FLAG_CONERR = winpty_constants._WINPTY_FLAG_CONERR
-   WINPTY_FLAG_PLAIN_OUTPUT = winpty_constants._WINPTY_FLAG_PLAIN_OUTPUT
-   WINPTY_FLAG_COLOR_ESCAPES = winpty_constants._WINPTY_FLAG_COLOR_ESCAPES
-   WINPTY_FLAG_ALLOW_CURPROC_DESKTOP_CREATION = winpty_constants._WINPTY_FLAG_ALLOW_CURPROC_DESKTOP_CREATION
+# cdef enum AgentConstants:
+#    WINPTY_FLAG_CONERR = winpty_constants._WINPTY_FLAG_CONERR
+#    WINPTY_FLAG_PLAIN_OUTPUT = winpty_constants._WINPTY_FLAG_PLAIN_OUTPUT
+#    WINPTY_FLAG_COLOR_ESCAPES = winpty_constants._WINPTY_FLAG_COLOR_ESCAPES
+#    WINPTY_FLAG_ALLOW_CURPROC_DESKTOP_CREATION = winpty_constants._WINPTY_FLAG_ALLOW_CURPROC_DESKTOP_CREATION
 
 
 cdef class Agent:
