@@ -8,6 +8,13 @@ from winpty._winpty cimport winpty, winpty_constants
 #    WINPTY_FLAG_COLOR_ESCAPES = winpty_constants._WINPTY_FLAG_COLOR_ESCAPES
 #    WINPTY_FLAG_ALLOW_CURPROC_DESKTOP_CREATION = winpty_constants._WINPTY_FLAG_ALLOW_CURPROC_DESKTOP_CREATION
 
+cdef extern from "Windows.h":
+    ctypedef Py_UNICODE WCHAR
+    ctypedef const WCHAR* LPCWSTR
+    ctypedef void* HWND
+    ctypedef void* HANDLE
+    ctypedef unsigned long long UINT64
+    ctypedef unsigned long DWORD
 
 cdef class Agent:
     cdef winpty.winpty_t* _c_winpty_t
@@ -19,17 +26,17 @@ cdef class Agent:
     def __cinit__(self, int cols, int rows,
                   int mouse_mode=winpty_constants._WINPTY_MOUSE_MODE_AUTO,
                   int timeout=3000, int agent_config=winpty_constants._WINPTY_FLAG_MASK):
-        cdef winpty.winpty_error_t err_pointer
+        cdef winpty.winpty_error_ptr_t* err_pointer
         cdef winpty.winpty_config_t* config = winpty.winpty_config_new(agent_config, err_pointer)
 
         if config is NULL:
-            raise MemoryError(winpty.winpty_error_msg(err_pointer))
+            raise MemoryError(winpty.winpty_error_msg(err_pointer[0]))
 
         if err_pointer is not NULL:
             msg = 'An error has ocurred: {0} - Code: {1}'.format(
-                winpty.winpty_error_msg(err_pointer),
-                winpty.winpty_error_code(err_pointer))
-            winpty.winpty_error_free(err_pointer)
+                winpty.winpty_error_msg(err_pointer[0]),
+                winpty.winpty_error_code(err_pointer[0]))
+            winpty.winpty_error_free(err_pointer[0])
             raise RuntimeError(msg)
 
         winpty.winpty_config_set_initial_size(config, cols, rows)
@@ -42,9 +49,9 @@ cdef class Agent:
 
         if err_pointer is not NULL:
             msg = 'An error has ocurred: {0} - Code: {1}'.format(
-                winpty.winpty_error_msg(err_pointer),
-                winpty.winpty_error_code(err_pointer))
-            winpty.winpty_error_free(err_pointer)
+                winpty.winpty_error_msg(err_pointer[0]),
+                winpty.winpty_error_code(err_pointer[0]))
+            winpty.winpty_error_free(err_pointer[0])
             raise RuntimeError(msg)
 
         self._agent_process = winpty.winpty_agent_process(self._c_winpty_t)

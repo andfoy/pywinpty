@@ -1,17 +1,19 @@
+cimport cython
 
 cdef extern from "Windows.h":
     ctypedef Py_UNICODE WCHAR
     ctypedef const WCHAR* LPCWSTR
     ctypedef void* HWND
     ctypedef void* HANDLE
-    ctypedef int UINT64
+    ctypedef unsigned long long UINT64
+    ctypedef unsigned long DWORD
 
 
 cdef extern from 'winpty.h':
     # Error constants and structs
     # ctypedef struct winpty_error_s winpty_error_t
     ctypedef struct winpty_error_t
-    ctypedef winpty_error_t *winpty_error_ptr_t
+    ctypedef winpty_error_t* winpty_error_ptr_t
     ctypedef DWORD winpty_result_t
 
     # Error related functions
