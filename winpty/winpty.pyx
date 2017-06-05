@@ -63,7 +63,7 @@ cdef class Agent:
         cdef winpty.winpty_spawn_config_t* spawn_config = NULL
         cdef winpty.winpty_error_ptr_t* spawn_conf_err = NULL
         spawn_config = winpty.winpty_spawn_config_new(winpty_constants._WINPTY_SPAWN_FLAG_MASK,
-                                                      appname, cmdline, NULL, NULL, spawn_conf_err)
+                                                      appname, cmdline, cwd, env, spawn_conf_err)
         if spawn_conf_err is not NULL:
             msg = 'An error has ocurred: {0} - Code: {1}'.format(
                 winpty.winpty_error_msg(spawn_conf_err[0]),
@@ -71,18 +71,18 @@ cdef class Agent:
             winpty.winpty_error_free(spawn_conf_err[0])
             raise RuntimeError(msg)
 
-        cdef winpty.winpty_error_ptr_t* spawn_err = NULL
-        cdef bint succ = winpty.winpty_spawn(self._c_winpty_t, spawn_config, NULL,
-                                             NULL, NULL, spawn_err)
+        # cdef winpty.winpty_error_ptr_t* spawn_err = NULL
+        # cdef bint succ = winpty.winpty_spawn(self._c_winpty_t, spawn_config, NULL,
+        #                                      NULL, NULL, spawn_err)
 
-        winpty.winpty_spawn_config_free(spawn_config)
+        # winpty.winpty_spawn_config_free(spawn_config)
 
-        if not succ:
-            msg = 'An error has ocurred: {0} - Code: {1}'.format(
-                winpty.winpty_error_msg(spawn_err[0]),
-                winpty.winpty_error_code(spawn_err[0]))
-            winpty.winpty_error_free(spawn_err[0])
-            raise RuntimeError(msg)
+        # if not succ:
+        #     msg = 'An error has ocurred: {0} - Code: {1}'.format(
+        #         winpty.winpty_error_msg(spawn_err[0]),
+        #         winpty.winpty_error_code(spawn_err[0]))
+        #     winpty.winpty_error_free(spawn_err[0])
+        #     raise RuntimeError(msg)
 
     def set_size(self, int cols, int rows):
         cdef winpty.winpty_error_ptr_t* err_pointer = NULL
