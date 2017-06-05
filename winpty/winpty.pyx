@@ -76,6 +76,7 @@ cdef class Agent:
                                              NULL, NULL, spawn_err)
 
         winpty.winpty_spawn_config_free(spawn_config)
+        print(spawn_err is NULL)
         print(succ)
         # if not succ:
         #     msg = 'An error has ocurred: {0} - Code: {1}'.format(
