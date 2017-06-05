@@ -29,30 +29,30 @@ cdef class Agent:
         cdef winpty.winpty_error_ptr_t* err_pointer
         cdef winpty.winpty_config_t* config = winpty.winpty_config_new(agent_config, err_pointer)
 
-        if config is NULL:
-            raise MemoryError(winpty.winpty_error_msg(err_pointer[0]))
+        # if config is NULL:
+        #     raise MemoryError(winpty.winpty_error_msg(err_pointer[0]))
 
-        if err_pointer is not NULL:
-            msg = 'An error has ocurred: {0} - Code: {1}'.format(
-                winpty.winpty_error_msg(err_pointer[0]),
-                winpty.winpty_error_code(err_pointer[0]))
-            winpty.winpty_error_free(err_pointer[0])
-            raise RuntimeError(msg)
+        # if err_pointer is not NULL:
+        #     msg = 'An error has ocurred: {0} - Code: {1}'.format(
+        #         winpty.winpty_error_msg(err_pointer[0]),
+        #         winpty.winpty_error_code(err_pointer[0]))
+        #     winpty.winpty_error_free(err_pointer[0])
+        #     raise RuntimeError(msg)
 
-        winpty.winpty_config_set_initial_size(config, cols, rows)
-        winpty.winpty_config_set_mouse_mode(config, mouse_mode)
-        winpty.winpty_config_set_agent_timeout(config, timeout)
+        # winpty.winpty_config_set_initial_size(config, cols, rows)
+        # winpty.winpty_config_set_mouse_mode(config, mouse_mode)
+        # winpty.winpty_config_set_agent_timeout(config, timeout)
 
-        err_pointer = NULL
-        self._c_winpty_t = winpty.winpty_open(config, err_pointer)
-        winpty.winpty_config_free(config)
+        # err_pointer = NULL
+        # self._c_winpty_t = winpty.winpty_open(config, err_pointer)
+        # winpty.winpty_config_free(config)
 
-        if err_pointer is not NULL:
-            msg = 'An error has ocurred: {0} - Code: {1}'.format(
-                winpty.winpty_error_msg(err_pointer[0]),
-                winpty.winpty_error_code(err_pointer[0]))
-            winpty.winpty_error_free(err_pointer[0])
-            raise RuntimeError(msg)
+        # if err_pointer is not NULL:
+        #     msg = 'An error has ocurred: {0} - Code: {1}'.format(
+        #         winpty.winpty_error_msg(err_pointer[0]),
+        #         winpty.winpty_error_code(err_pointer[0]))
+        #     winpty.winpty_error_free(err_pointer[0])
+        #     raise RuntimeError(msg)
 
         # self._agent_process = winpty.winpty_agent_process(self._c_winpty_t)
         # self._conin_pipe_name = winpty.winpty_conin_name(self._c_winpty_t)
