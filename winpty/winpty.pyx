@@ -71,11 +71,11 @@ cdef class Agent:
             winpty.winpty_error_free(spawn_conf_err[0])
             raise RuntimeError(msg)
 
-        # cdef winpty.winpty_error_ptr_t* spawn_err = NULL
-        # cdef bint succ = winpty.winpty_spawn(self._c_winpty_t, spawn_config, NULL,
-        #                                      NULL, NULL, spawn_err)
+        cdef winpty.winpty_error_ptr_t* spawn_err = NULL
+        cdef bint succ = winpty.winpty_spawn(self._c_winpty_t, spawn_config, NULL,
+                                             NULL, NULL, spawn_err)
 
-        # winpty.winpty_spawn_config_free(spawn_config)
+        winpty.winpty_spawn_config_free(spawn_config)
 
         # if not succ:
         #     msg = 'An error has ocurred: {0} - Code: {1}'.format(
