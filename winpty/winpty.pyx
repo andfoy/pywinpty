@@ -54,10 +54,10 @@ cdef class Agent:
             winpty.winpty_error_free(err_pointer[0])
             raise RuntimeError(msg)
 
-        self._agent_process = winpty.winpty_agent_process(self._c_winpty_t)
-        self._conin_pipe_name = winpty.winpty_conin_name(self._c_winpty_t)
-        self._conout_pipe_name = winpty.winpty_conout_name(self._c_winpty_t)
-        self._conerr_pipe_name = winpty.winpty_conerr_name(self._c_winpty_t)
+        # self._agent_process = winpty.winpty_agent_process(self._c_winpty_t)
+        # self._conin_pipe_name = winpty.winpty_conin_name(self._c_winpty_t)
+        # self._conout_pipe_name = winpty.winpty_conout_name(self._c_winpty_t)
+        # self._conerr_pipe_name = winpty.winpty_conerr_name(self._c_winpty_t)
 
     def spawn(self, LPCWSTR appname, LPCWSTR cmdline, LPCWSTR cwd, LPCWSTR env):
         cdef winpty.winpty_spawn_config_t* spawn_config
