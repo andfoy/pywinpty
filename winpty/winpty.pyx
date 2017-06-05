@@ -62,10 +62,8 @@ cdef class Agent:
     def spawn(self, LPCWSTR appname, LPCWSTR cmdline, LPCWSTR cwd, LPCWSTR env):
         cdef winpty.winpty_spawn_config_t* spawn_config
         cdef winpty.winpty_error_ptr_t* spawn_conf_err
-        print("I'm about to spawn...")
         spawn_config = winpty.winpty_spawn_config_new(winpty_constants._WINPTY_SPAWN_FLAG_MASK,
                                                       appname, cmdline, cwd, env, spawn_conf_err)
-        print("Spawned!")
         if spawn_conf_err is not NULL:
             msg = 'An error has ocurred: {0} - Code: {1}'.format(
                 winpty.winpty_error_msg(spawn_conf_err[0]),
