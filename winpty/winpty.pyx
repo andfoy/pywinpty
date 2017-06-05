@@ -15,13 +15,33 @@ cdef extern from "Windows.h":
     ctypedef void* HANDLE
     ctypedef unsigned long long UINT64
     ctypedef unsigned long DWORD
+    ctypedef DWORD *LPDWORD
+    ctypedef struct SECURITY_ATTRIBUTES
+    ctypedef LPCWSTR LPCTSTR
+    ctypedef SECURITY_ATTRIBUTES* LPSECURITY_ATTRIBUTES
+    ctypedef struct OVERLAPPED
+    ctypedef OVERLAPPED* LPOVERLAPPED
+    ctypedef void *LPVOID
+
+    HANDLE CreateFileW(LPCTSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode,
+                       LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD dwCreationDisposition,
+                       DWORD dwFlagsAndAttributes, HANDLE hTemplateFile)
+
+    bint ReadFile(HANDLE hFile, LPVOID lpBuffer, DWORD nNumberOfBytesToRead,
+                  LPDWORD lpNumberOfBytesRead, LPOVERLAPPED lpOverlapped)
+
+    bint CloseHandle(HANDLE hObject)
+
+    cdef int GENERIC_WRITE
+    cdef int GENERIC_READ
+    cdef int OPEN_EXISTING
 
 cdef class Agent:
     cdef winpty.winpty_t* _c_winpty_t
     cdef HANDLE _agent_process
-    cdef LPCWSTR _conin_pipe_name
-    cdef LPCWSTR _conout_pipe_name
-    cdef LPCWSTR _conerr_pipe_name
+    cdef HANDLE _conin_pipe
+    cdef HANDLE _conout_pipe
+    cdef HANDLE _conerr_pipe
 
     def __cinit__(self, int cols, int rows,
                   int mouse_mode=winpty_constants._WINPTY_MOUSE_MODE_AUTO,
@@ -55,9 +75,15 @@ cdef class Agent:
             raise RuntimeError(msg)
 
         self._agent_process = winpty.winpty_agent_process(self._c_winpty_t)
-        self._conin_pipe_name = winpty.winpty_conin_name(self._c_winpty_t)
-        self._conout_pipe_name = winpty.winpty_conout_name(self._c_winpty_t)
-        self._conerr_pipe_name = winpty.winpty_conerr_name(self._c_winpty_t)
+        conin_pipe_name = winpty.winpty_conin_name(self._c_winpty_t)
+        conout_pipe_name = winpty.winpty_conout_name(self._c_winpty_t)
+        conerr_pipe_name = winpty.winpty_conerr_name(self._c_winpty_t)
+
+        self._conin_pipe = CreateFileW(conin_pipe_name, GENERIC_WRITE,
+                                       0, NULL, OPEN_EXISTING, 0, NULL)
+        self._conout_pipe = CreateFileW(conout_pipe_name, GENERIC_WRITE,
+                                       0, NULL, OPEN_EXISTING, 0, NULL)
+
 
     def spawn(self, LPCWSTR appname, LPCWSTR cmdline, LPCWSTR cwd, LPCWSTR env):
         cdef winpty.winpty_spawn_config_t* spawn_config = NULL
@@ -71,13 +97,12 @@ cdef class Agent:
             winpty.winpty_error_free(spawn_conf_err[0])
             raise RuntimeError(msg)
 
-        cdef winpty.winpty_error_ptr_t* spawn_err = NULL
+        cdef winpty.winpty_error_ptr_t* spawn_err = &winpty.winpty_error_ptr_t()
         cdef bint succ = winpty.winpty_spawn(self._c_winpty_t, spawn_config, NULL,
                                              NULL, NULL, spawn_err)
 
         winpty.winpty_spawn_config_free(spawn_config)
-        print(spawn_err is NULL)
-        print(succ)
+
         # if not succ:
         #     msg = 'An error has ocurred: {0} - Code: {1}'.format(
         #         winpty.winpty_error_msg(spawn_err[0]),
