@@ -132,10 +132,12 @@ cdef class Agent:
     def read(self, int amount=1000):
         cdef unsigned char buf[1024]
         cdef vector[unsigned char] result
+        cdef DWORD amount = 0
+        cdef bint ret = False
         while True:
-            cdef DWORD amount = 0
-            cdef bint ret = ReadFile(self._conout_pipe, buf, sizeof(buf),
-                                     &amount, NULL)
+            amount = 0
+            ret = ReadFile(self._conout_pipe, buf, sizeof(buf),
+                           &amount, NULL)
             if not ret or amount == 0:
                 break
 
