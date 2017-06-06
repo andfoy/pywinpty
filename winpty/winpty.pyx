@@ -23,7 +23,8 @@ cdef extern from "Windows.h":
     ctypedef struct SECURITY_ATTRIBUTES
     ctypedef LPCWSTR LPCTSTR
     ctypedef SECURITY_ATTRIBUTES* LPSECURITY_ATTRIBUTES
-    ctypedef struct OVERLAPPED
+    ctypedef struct OVERLAPPED:
+        pass
     ctypedef OVERLAPPED* LPOVERLAPPED
     ctypedef void *LPVOID
     ctypedef const void* LPCVOID
