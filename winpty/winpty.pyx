@@ -182,7 +182,7 @@ cdef class Agent:
         return buf
 
     def read(self, DWORD length=1000):
-        def callback(DWORD err, DWORD bytes, LPVOID ovlp):
+        cpdef void callback(DWORD err, DWORD bytes, LPVOID ovlp):
             cdef OVLP* temp = <OVLP*> ovlp
             print(temp.buf)
 
