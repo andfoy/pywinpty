@@ -68,10 +68,11 @@ cdef extern from "Windows.h":
     cdef int WAIT_IO_COMPLETION
 
 
+ctypedef unsigned char UCHAR
 
 ctypedef struct OVLP:
     OVERLAPPED readOvlp
-    unsigned char buf[1024]
+    UCHAR buf[1024]
 
 cdef void callback(DWORD err, DWORD bytes, LPVOID ovlp):
     cdef OVLP* temp = <OVLP*> ovlp
@@ -176,7 +177,7 @@ cdef class Agent:
         cdef bint ret = ReadFileEx(self._conout_pipe, ovlp_read.buf, sizeof(ovlp_read.buf),
                                    <LPOVERLAPPED>(&ovlp_read), callback)
         cdef DWORD status = SleepEx(timeout, True)
-        cdef char* ret = ''
+        cdef UCHAR* ret = ''
         if status == WAIT_IO_COMPLETION:
             ret = ovlp_read.buf
         return ret
