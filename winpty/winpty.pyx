@@ -166,10 +166,11 @@ cdef class Agent:
             lines = ovlp_read.buf
         return lines
 
-    def write(self, char* char_in):
+    def write(self, str in_str):
         cdef DWORD bytes_written = 0
-        print(char_in)
-        cdef bint ret = WriteFile(self._conin_pipe, char_in, sizeof(char_in),
+        cdef bytes py_bytes = in_str.encode()
+        cdef char* char_in = py_bytes
+        cdef bint ret = WriteFile(self._conin_pipe, char_in, len(in_str),
                                   &bytes_written, NULL)
         cdef DWORD err_code = GetLastError()
         print(err_code)
