@@ -1,11 +1,10 @@
 
 cimport cython
-from libcpp.vector cimport vector
+# from libcpp.vector cimport vector
 # from libcpp.string cimport string
-# from libc.stdlib cimport malloc, free
+from libc.stdlib cimport malloc, free, calloc
 # from libcpp.cast import reinterpret_cast
-from _winpty cimport winpty_constants
-from _winpty cimport winpty_lib as winpty
+from winpty._winpty cimport winpty, winpty_constants
 
 # cdef enum AgentConstants:
 #    WINPTY_FLAG_CONERR = winpty_constants._WINPTY_FLAG_CONERR
@@ -132,22 +131,23 @@ cdef class Agent:
             winpty.winpty_error_free(err_pointer[0])
             raise RuntimeError(msg)
 
-    def read(self, DWORD amount=1000):
-        cdef unsigned char buf[1024]
-        cdef vector[unsigned char] result
+    def read(self, int amount=1000):
+        # cdef unsigned char buf[1024]
+        cdef WCHAR* buf = calloc(amount, sizeof(WCHAR))
+        # cdef vector[unsigned char] result
         # cdef DWORD amount = 0
         cdef bint ret = False
-        while True:
-            # amount = 0
-            ret = ReadFile(self._conout_pipe, buf, sizeof(buf),
-                           &amount, NULL)
-            if not ret or amount == 0:
-                break
+        # while True:
+        #     # amount = 0
+        ret = ReadFile(self._conout_pipe, buf, sizeof(buf),
+                      &amount, NULL)
+        # if not ret or amount == 0:
+        #     break
 
-            result.insert(result.end(), buf, buf + amount)
+        # result.insert(result.end(), buf, buf + amount)
 
-        cdef char* str_result = <char*>(result.data());
-        return str_result
+        # cdef char* str_result = <char*>(result.data());
+        return buf
 
 
     def __dealloc__(self):
