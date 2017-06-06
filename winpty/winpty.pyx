@@ -109,7 +109,7 @@ cdef class Agent:
         conout_pipe_name = winpty.winpty_conout_name(self._c_winpty_t)
         conerr_pipe_name = winpty.winpty_conerr_name(self._c_winpty_t)
 
-        self._conin_pipe = CreateFileW(conin_pipe_name, FILE_APPEND_DATA,
+        self._conin_pipe = CreateFileW(conin_pipe_name, GENERIC_WRITE,
                                        0, NULL, OPEN_EXISTING, 0, NULL)
         self._conout_pipe = CreateFileW(conout_pipe_name, GENERIC_READ,
                                        0, NULL, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL)
@@ -166,9 +166,9 @@ cdef class Agent:
             lines = ovlp_read.buf
         return lines
 
-    def write(self, char* char_in):
+    def write(self, bytes char_in):
         cdef DWORD bytes_written = 0
-        print(char_in)
+        print(len(char_in))
         cdef bint ret = WriteFile(self._conin_pipe, char_in, sizeof(char_in),
                                   &bytes_written, NULL)
         cdef DWORD err_code = GetLastError()
