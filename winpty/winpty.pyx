@@ -59,6 +59,7 @@ cdef extern from "Windows.h":
     bint SetCommTimeouts(HANDLE hFile, LPCOMMTIMEOUTS lpCommTimeouts)
 
     DWORD GetLastError()
+    DWORD SleepEx(DWORD dwMilliseconds, bint bAlertable)
 
     cdef int GENERIC_WRITE
     cdef int GENERIC_READ
@@ -189,6 +190,7 @@ cdef class Agent:
         cdef OVLP ovlp_read
         cdef bint ret = ReadFileEx(self._conout_pipe, ovlp_read.buf, sizeof(ovlp_read.buf),
                                    <LPOVERLAPPED>(&ovlp_read), callback)
+        SleepEx(1000, True)
 
 
 
