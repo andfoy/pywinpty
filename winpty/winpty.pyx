@@ -65,6 +65,7 @@ cdef extern from "Windows.h":
     cdef int GENERIC_READ
     cdef int OPEN_EXISTING
     cdef int FILE_FLAG_OVERLAPPED
+    cdef int WAIT_IO_COMPLETION
 
 
 
@@ -165,33 +166,19 @@ cdef class Agent:
 
     def read_blocking(self, DWORD length=1000):
         cdef unsigned char buf[1024]
-        # cdef COMMTIMEOUTS timeouts
-        # timeouts.ReadTotalTimeoutConstant = 0
-        # cdef char* result = <char*>calloc(length, sizeof(char))
-        # cdef vector[unsigned char] result
-        # SetCommTimeouts(self._conout_pipe, &timeouts)
-        cdef DWORD amount = 0
         cdef bint ret = False
-        # while True:
-        amount = 0
+
         ret = ReadFile(self._conout_pipe, buf, sizeof(buf),
-                       &amount, NULL)
-        # cdef DWORD error = GetLastError()
-        # print(error)
-        # if not ret or amount == 0:
-        #     break
-
-        # result.insert(result.end(), buf, buf + amount)
-
-        # cdef char* str_result = <char*>(result.data());
+                       &length, NULL)
         return buf
 
     def read(self, DWORD length=1000):
         cdef OVLP ovlp_read
         cdef bint ret = ReadFileEx(self._conout_pipe, ovlp_read.buf, sizeof(ovlp_read.buf),
                                    <LPOVERLAPPED>(&ovlp_read), callback)
-        SleepEx(1000, True)
-
+        cdef DWORD status = SleepEx(1000, True)
+        if status == WAIT_IO_COMPLETION:
+            print(ovlp_read.buf)
 
 
     def __dealloc__(self):
