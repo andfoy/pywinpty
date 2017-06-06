@@ -1,16 +1,7 @@
 
 cimport cython
-# from libcpp.vector cimport vector
-# from libcpp.string cimport string
 from libc.stdlib cimport malloc, free, calloc
-# from libcpp.cast import reinterpret_cast
 from winpty._winpty cimport winpty, winpty_constants
-
-# cdef enum AgentConstants:
-#    WINPTY_FLAG_CONERR = winpty_constants._WINPTY_FLAG_CONERR
-#    WINPTY_FLAG_PLAIN_OUTPUT = winpty_constants._WINPTY_FLAG_PLAIN_OUTPUT
-#    WINPTY_FLAG_COLOR_ESCAPES = winpty_constants._WINPTY_FLAG_COLOR_ESCAPES
-#    WINPTY_FLAG_ALLOW_CURPROC_DESKTOP_CREATION = winpty_constants._WINPTY_FLAG_ALLOW_CURPROC_DESKTOP_CREATION
 
 cdef extern from "Windows.h":
     ctypedef Py_UNICODE WCHAR
@@ -36,9 +27,7 @@ cdef extern from "Windows.h":
         DWORD WriteTotalTimeoutMultiplier
         DWORD WriteTotalTimeoutConstant
 
-    # ctypedef struct COMMTIMEOUTS
     ctypedef COMMTIMEOUTS* LPCOMMTIMEOUTS
-    # ctypedef __stdcall CALLBACK
     ctypedef void (*LPOVERLAPPED_COMPLETION_ROUTINE) (DWORD, DWORD, LPVOID)
 
 
@@ -146,12 +135,6 @@ cdef class Agent:
         winpty.winpty_spawn_config_free(spawn_config)
 
         return succ
-        # if not succ:
-        #     msg = 'An error has ocurred: {0} - Code: {1}'.format(
-        #         winpty.winpty_error_msg(spawn_err[0]),
-        #         winpty.winpty_error_code(spawn_err[0]))
-        #     winpty.winpty_error_free(spawn_err[0])
-        #     raise RuntimeError(msg)
 
     def set_size(self, int cols, int rows):
         cdef winpty.winpty_error_ptr_t* err_pointer = NULL
@@ -181,6 +164,12 @@ cdef class Agent:
         if status == WAIT_IO_COMPLETION:
             lines = ovlp_read.buf
         return lines
+
+    def write(self, LPCWSTR char_in):
+        cdef DWORD bytes_written = 0
+        cdef bint ret = WriteFile(self._conin_pipe, char_in, sizeof(char_in),
+                                  &bytes_written, NULL)
+        return bytes_written
 
 
     def __dealloc__(self):
