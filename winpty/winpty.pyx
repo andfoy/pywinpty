@@ -70,6 +70,9 @@ ctypedef struct OVLP:
     OVERLAPPED readOvlp
     unsigned char buf[1024]
 
+cpdef void callback(DWORD err, DWORD bytes, LPVOID ovlp):
+    cdef OVLP* temp = <OVLP*> ovlp
+    print(temp.buf)
 
 cdef class Agent:
     cdef winpty.winpty_t* _c_winpty_t
@@ -182,10 +185,6 @@ cdef class Agent:
         return buf
 
     def read(self, DWORD length=1000):
-        cpdef void callback(DWORD err, DWORD bytes, LPVOID ovlp):
-            cdef OVLP* temp = <OVLP*> ovlp
-            print(temp.buf)
-
         cdef OVLP ovlp_read
         cdef bint ret = ReadFileEx(self._conout_pipe, ovlp_read.buf, sizeof(ovlp_read.buf),
                                    <LPOVERLAPPED>(&ovlp_read), callback)
