@@ -37,6 +37,7 @@ cdef extern from "Windows.h":
 
     # ctypedef struct COMMTIMEOUTS
     ctypedef COMMTIMEOUTS* LPCOMMTIMEOUTS
+    ctypedef __stdcall CALLBACK
 
     HANDLE CreateFileW(LPCTSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode,
                        LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD dwCreationDisposition,
@@ -44,6 +45,9 @@ cdef extern from "Windows.h":
 
     bint ReadFile(HANDLE hFile, LPVOID lpBuffer, DWORD nNumberOfBytesToRead,
                   LPDWORD lpNumberOfBytesRead, LPOVERLAPPED lpOverlapped)
+
+    bint ReadFileEx(HANDLE hFile, LPVOID lpBuffer, DWORD nNumberOfBytesToRead,
+                    LPDWORD lpNumberOfBytesRead, LPOVERLAPPED lpOverlapped)
 
     bint WriteFile(HANDLE hfile, LPCVOID lpBuffer, DWORD nNumberOfBytesToWrite,
                    LPDWORD lpNumberOfBytesWritten, LPOVERLAPPED lpOverlapped)
@@ -56,6 +60,15 @@ cdef extern from "Windows.h":
     cdef int GENERIC_WRITE
     cdef int GENERIC_READ
     cdef int OPEN_EXISTING
+    cdef int FILE_FLAG_OVERLAPPED
+
+    ctypedef void (*LPOVERLAPPED_COMPLETION_ROUTINE) (DWORD, DWORD, LPVOID)
+
+
+ctypedef struct OVLP:
+    OVERLAPPED readOvlp
+    unsigned char buf[1024]
+
 
 cdef class Agent:
     cdef winpty.winpty_t* _c_winpty_t
@@ -103,7 +116,7 @@ cdef class Agent:
         self._conin_pipe = CreateFileW(conin_pipe_name, GENERIC_WRITE,
                                        0, NULL, OPEN_EXISTING, 0, NULL)
         self._conout_pipe = CreateFileW(conout_pipe_name, GENERIC_READ,
-                                       0, NULL, OPEN_EXISTING, 0, NULL)
+                                       0, NULL, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL)
 
 
     def spawn(self, LPCWSTR appname, LPCWSTR cmdline=NULL,
@@ -144,13 +157,13 @@ cdef class Agent:
             winpty.winpty_error_free(err_pointer[0])
             raise RuntimeError(msg)
 
-    def read(self, DWORD length=1000):
+    def read_blocking(self, DWORD length=1000):
         cdef unsigned char buf[1024]
-        cdef COMMTIMEOUTS timeouts
-        timeouts.ReadTotalTimeoutConstant = 0
+        # cdef COMMTIMEOUTS timeouts
+        # timeouts.ReadTotalTimeoutConstant = 0
         # cdef char* result = <char*>calloc(length, sizeof(char))
         # cdef vector[unsigned char] result
-        SetCommTimeouts(self._conout_pipe, &timeouts)
+        # SetCommTimeouts(self._conout_pipe, &timeouts)
         cdef DWORD amount = 0
         cdef bint ret = False
         # while True:
@@ -166,6 +179,16 @@ cdef class Agent:
 
         # cdef char* str_result = <char*>(result.data());
         return buf
+
+    def read(self, DWORD length=1000):
+        def callback(DWORD err, DWORD bytes, LPVOID ovlp):
+            cdef OVLP* temp = <OVLP*> ovlp
+            print(temp -> buf)
+
+        cdef OVLP ovlp_read
+        cdef bint ret = ReadFileEx(self._conout_pipe, ovlp_read.buf, sizeof(ovlp_read.buf),
+                                   <LPOVERLAPPED>(&ovlp_read), callback)
+
 
 
     def __dealloc__(self):
