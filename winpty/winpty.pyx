@@ -40,6 +40,8 @@ cdef extern from "Windows.h":
 
     bint CloseHandle(HANDLE hObject)
 
+    DWORD GetLastError(void)
+
     cdef int GENERIC_WRITE
     cdef int GENERIC_READ
     cdef int OPEN_EXISTING
@@ -141,7 +143,8 @@ cdef class Agent:
         #     # amount = 0
         ret = ReadFile(self._conout_pipe, buf, sizeof(buf),
                       &amount, NULL)
-        print(ret)
+        cdef DWORD error = GetLastError()
+        print(error)
         # if not ret or amount == 0:
         #     break
 
