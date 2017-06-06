@@ -183,7 +183,7 @@ cdef class Agent:
     def read(self, DWORD length=1000):
         def callback(DWORD err, DWORD bytes, LPVOID ovlp):
             cdef OVLP* temp = <OVLP*> ovlp
-            print(temp -> buf)
+            print(temp.buf)
 
         cdef OVLP ovlp_read
         cdef bint ret = ReadFileEx(self._conout_pipe, ovlp_read.buf, sizeof(ovlp_read.buf),
