@@ -27,7 +27,15 @@ cdef extern from "Windows.h":
     ctypedef OVERLAPPED* LPOVERLAPPED
     ctypedef void *LPVOID
     ctypedef const void* LPCVOID
-    ctypedef struct COMMTIMEOUTS
+
+    ctypedef struct COMMTIMEOUTS:
+        DWORD ReadIntervalTimeout
+        DWORD ReadTotalTimeoutMultiplier
+        DWORD ReadTotalTimeoutConstant
+        DWORD WriteTotalTimeoutMultiplier
+        DWORD WriteTotalTimeoutConstant
+
+    # ctypedef struct COMMTIMEOUTS
     ctypedef COMMTIMEOUTS* LPCOMMTIMEOUTS
 
     HANDLE CreateFileW(LPCTSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode,
@@ -138,7 +146,8 @@ cdef class Agent:
 
     def read(self, DWORD length=1000):
         cdef unsigned char buf[1024]
-        cdef COMMTIMEOUTS timeouts = {0, 0, 10, 0, 0}
+        cdef COMMTIMEOUTS timeouts
+        timeouts.ReadTotalTimeoutConstant = 0
         # cdef char* result = <char*>calloc(length, sizeof(char))
         # cdef vector[unsigned char] result
         SetCommTimeouts(defaultSTDIN, &timeouts)
