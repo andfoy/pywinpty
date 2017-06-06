@@ -133,18 +133,18 @@ cdef class Agent:
             winpty.winpty_error_free(err_pointer[0])
             raise RuntimeError(msg)
 
-    def read(self, DWORD amount=1000):
-        # cdef unsigned char buf[1024]
-        cdef WCHAR* buf = <WCHAR*>calloc(amount, sizeof(WCHAR))
+    def read(self, DWORD length=1000):
+        cdef unsigned char buf[1024]
+        # cdef char* result = <char*>calloc(length, sizeof(char))
         # cdef vector[unsigned char] result
-        # cdef DWORD amount = 0
+        cdef DWORD amount = 0
         cdef bint ret = False
         # while True:
-        #     # amount = 0
+        amount = 0
         ret = ReadFile(self._conout_pipe, buf, sizeof(buf),
-                      &amount, NULL)
-        cdef DWORD error = GetLastError()
-        print(error)
+                       &amount, NULL)
+        # cdef DWORD error = GetLastError()
+        # print(error)
         # if not ret or amount == 0:
         #     break
 
