@@ -40,7 +40,7 @@ cdef extern from "Windows.h":
 
     bint CloseHandle(HANDLE hObject)
 
-    DWORD GetLastError(void)
+    DWORD GetLastError()
 
     cdef int GENERIC_WRITE
     cdef int GENERIC_READ
