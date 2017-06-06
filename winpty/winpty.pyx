@@ -2,6 +2,8 @@
 cimport cython
 from libcpp.vector cimport vector
 from libcpp.string cimport string
+from libc.stdlib cimport malloc, free
+from libcpp.cast import reinterpret_cast
 from winpty._winpty cimport winpty, winpty_constants
 
 # cdef enum AgentConstants:
@@ -143,7 +145,8 @@ cdef class Agent:
 
             result.insert(result.end(), buf, buf + amount)
 
-        return string(result)
+        return reinterpret_cast[char*] (&result[0]);
+        # return sresult
 
 
     def __dealloc__(self):
