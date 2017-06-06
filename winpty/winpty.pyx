@@ -61,7 +61,7 @@ ctypedef unsigned char UCHAR
 
 ctypedef struct OVLP:
     OVERLAPPED readOvlp
-    UCHAR buf[1024]
+    UCHAR buf[4096]
 
 cdef void callback(DWORD err, DWORD bytes, LPVOID ovlp):
     cdef OVLP* temp = <OVLP*> ovlp
@@ -165,7 +165,7 @@ cdef class Agent:
             lines = ovlp_read.buf
         return lines
 
-    def write(self, LPCWSTR char_in):
+    def write(self, UCHAR* char_in):
         cdef DWORD bytes_written = 0
         cdef bint ret = WriteFile(self._conin_pipe, char_in, sizeof(char_in),
                                   &bytes_written, NULL)
