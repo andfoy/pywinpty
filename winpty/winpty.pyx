@@ -38,6 +38,8 @@ cdef extern from "Windows.h":
     # ctypedef struct COMMTIMEOUTS
     ctypedef COMMTIMEOUTS* LPCOMMTIMEOUTS
     ctypedef __stdcall CALLBACK
+    ctypedef void (*LPOVERLAPPED_COMPLETION_ROUTINE) (DWORD, DWORD, LPVOID)
+
 
     HANDLE CreateFileW(LPCTSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode,
                        LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD dwCreationDisposition,
@@ -47,7 +49,7 @@ cdef extern from "Windows.h":
                   LPDWORD lpNumberOfBytesRead, LPOVERLAPPED lpOverlapped)
 
     bint ReadFileEx(HANDLE hFile, LPVOID lpBuffer, DWORD nNumberOfBytesToRead,
-                    LPDWORD lpNumberOfBytesRead, LPOVERLAPPED lpOverlapped)
+                    LPOVERLAPPED lpNumberOfBytesRead, LPOVERLAPPED_COMPLETION_ROUTINE lpOverlapped)
 
     bint WriteFile(HANDLE hfile, LPCVOID lpBuffer, DWORD nNumberOfBytesToWrite,
                    LPDWORD lpNumberOfBytesWritten, LPOVERLAPPED lpOverlapped)
@@ -62,7 +64,6 @@ cdef extern from "Windows.h":
     cdef int OPEN_EXISTING
     cdef int FILE_FLAG_OVERLAPPED
 
-    ctypedef void (*LPOVERLAPPED_COMPLETION_ROUTINE) (DWORD, DWORD, LPVOID)
 
 
 ctypedef struct OVLP:
