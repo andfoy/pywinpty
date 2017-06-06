@@ -145,8 +145,8 @@ cdef class Agent:
 
             result.insert(result.end(), buf, buf + amount)
 
-        return reinterpret_cast[char*] (&result[0]);
-        # return sresult
+        cdef char* str_result = reinterpret_cast<char*>(&result[0]);
+        return str_result
 
 
     def __dealloc__(self):
