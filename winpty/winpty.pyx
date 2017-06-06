@@ -61,7 +61,7 @@ ctypedef unsigned char UCHAR
 
 ctypedef struct OVLP:
     OVERLAPPED readOvlp
-    UCHAR buf[4096]
+    UCHAR* buf
 
 cdef void callback(DWORD err, DWORD bytes, LPVOID ovlp):
     cdef OVLP* temp = <OVLP*> ovlp
@@ -155,8 +155,9 @@ cdef class Agent:
                        &length, NULL)
         return buf
 
-    def read(self, DWORD length=1000, DWORD timeout=1000):
+    def read(self, int length=1000, DWORD timeout=1000):
         cdef OVLP ovlp_read
+        ovlp_read.buf = <UCHAR*>calloc(length, sizeof(UCHAR))
         cdef bint ret = ReadFileEx(self._conout_pipe, ovlp_read.buf, sizeof(ovlp_read.buf),
                                    <LPOVERLAPPED>(&ovlp_read), callback)
         cdef DWORD status = SleepEx(timeout, True)
