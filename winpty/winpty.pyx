@@ -27,6 +27,8 @@ cdef extern from "Windows.h":
     ctypedef OVERLAPPED* LPOVERLAPPED
     ctypedef void *LPVOID
     ctypedef const void* LPCVOID
+    ctypedef struct COMMTIMEOUTS
+    ctypedef COMMTIMEOUTS* LPCOMMTIMEOUTS
 
     HANDLE CreateFileW(LPCTSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode,
                        LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD dwCreationDisposition,
@@ -39,6 +41,7 @@ cdef extern from "Windows.h":
                    LPDWORD lpNumberOfBytesWritten, LPOVERLAPPED lpOverlapped)
 
     bint CloseHandle(HANDLE hObject)
+    bint SetCommTimeouts(HANDLE hFile, LPCOMMTIMEOUTS lpCommTimeouts)
 
     DWORD GetLastError()
 
@@ -135,8 +138,10 @@ cdef class Agent:
 
     def read(self, DWORD length=1000):
         cdef unsigned char buf[1024]
+        COMMTIMEOUTS timeouts = {0, 0, 10, 0, 0}
         # cdef char* result = <char*>calloc(length, sizeof(char))
         # cdef vector[unsigned char] result
+        SetCommTimeouts(defaultSTDIN, &timeouts)
         cdef DWORD amount = 0
         cdef bint ret = False
         # while True:
