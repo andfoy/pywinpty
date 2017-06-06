@@ -70,7 +70,7 @@ ctypedef struct OVLP:
     OVERLAPPED readOvlp
     unsigned char buf[1024]
 
-cpdef void callback(DWORD err, DWORD bytes, LPVOID ovlp):
+cdef void callback(DWORD err, DWORD bytes, LPVOID ovlp):
     cdef OVLP* temp = <OVLP*> ovlp
     print(temp.buf)
 
