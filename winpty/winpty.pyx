@@ -177,10 +177,10 @@ cdef class Agent:
         cdef bint ret = ReadFileEx(self._conout_pipe, ovlp_read.buf, sizeof(ovlp_read.buf),
                                    <LPOVERLAPPED>(&ovlp_read), callback)
         cdef DWORD status = SleepEx(timeout, True)
-        cdef UCHAR* ret = ''
+        cdef UCHAR* lines = ''
         if status == WAIT_IO_COMPLETION:
-            ret = ovlp_read.buf
-        return ret
+            lines = ovlp_read.buf
+        return lines
 
 
     def __dealloc__(self):
