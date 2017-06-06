@@ -141,6 +141,7 @@ cdef class Agent:
         #     # amount = 0
         ret = ReadFile(self._conout_pipe, buf, sizeof(buf),
                       &amount, NULL)
+        print(ret)
         # if not ret or amount == 0:
         #     break
 
