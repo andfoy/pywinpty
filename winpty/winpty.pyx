@@ -38,7 +38,7 @@ cdef extern from "Windows.h":
 
     # ctypedef struct COMMTIMEOUTS
     ctypedef COMMTIMEOUTS* LPCOMMTIMEOUTS
-    ctypedef __stdcall CALLBACK
+    # ctypedef __stdcall CALLBACK
     ctypedef void (*LPOVERLAPPED_COMPLETION_ROUTINE) (DWORD, DWORD, LPVOID)
 
 
