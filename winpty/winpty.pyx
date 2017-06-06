@@ -166,7 +166,7 @@ cdef class Agent:
             lines = ovlp_read.buf
         return lines
 
-    def write(self, UCHAR* char_in):
+    def write(self, char* char_in):
         cdef DWORD bytes_written = 0
         cdef bint ret = WriteFile(self._conin_pipe, char_in, sizeof(char_in),
                                   &bytes_written, NULL)
