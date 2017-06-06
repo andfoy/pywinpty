@@ -138,7 +138,7 @@ cdef class Agent:
 
     def read(self, DWORD length=1000):
         cdef unsigned char buf[1024]
-        COMMTIMEOUTS timeouts = {0, 0, 10, 0, 0}
+        cdef COMMTIMEOUTS timeouts = {0, 0, 10, 0, 0}
         # cdef char* result = <char*>calloc(length, sizeof(char))
         # cdef vector[unsigned char] result
         SetCommTimeouts(defaultSTDIN, &timeouts)
