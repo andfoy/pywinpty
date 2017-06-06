@@ -91,7 +91,7 @@ cdef class Agent:
 
         self._conin_pipe = CreateFileW(conin_pipe_name, GENERIC_WRITE,
                                        0, NULL, OPEN_EXISTING, 0, NULL)
-        self._conout_pipe = CreateFileW(conout_pipe_name, GENERIC_WRITE,
+        self._conout_pipe = CreateFileW(conout_pipe_name, GENERIC_READ,
                                        0, NULL, OPEN_EXISTING, 0, NULL)
 
 
