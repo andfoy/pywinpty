@@ -150,7 +150,7 @@ cdef class Agent:
         timeouts.ReadTotalTimeoutConstant = 0
         # cdef char* result = <char*>calloc(length, sizeof(char))
         # cdef vector[unsigned char] result
-        SetCommTimeouts(defaultSTDIN, &timeouts)
+        SetCommTimeouts(self._conout_pipe, &timeouts)
         cdef DWORD amount = 0
         cdef bint ret = False
         # while True:
