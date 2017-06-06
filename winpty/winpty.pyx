@@ -131,7 +131,7 @@ cdef class Agent:
             winpty.winpty_error_free(err_pointer[0])
             raise RuntimeError(msg)
 
-    def read(self, int amount=1000):
+    def read(self, DWORD amount=1000):
         cdef unsigned char buf[1024]
         cdef vector[unsigned char] result
         # cdef DWORD amount = 0
