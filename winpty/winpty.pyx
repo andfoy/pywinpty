@@ -1,11 +1,11 @@
 
 cimport cython
 from libcpp.vector cimport vector
-from libcpp.string cimport string
-from libc.stdlib cimport malloc, free
-from libcpp.cast import reinterpret_cast
-from winpty._winpty cimport winpty_constants
-from winpty._winpty cimport winpty_lib as winpty
+# from libcpp.string cimport string
+# from libc.stdlib cimport malloc, free
+# from libcpp.cast import reinterpret_cast
+from _winpty cimport winpty_constants
+from _winpty cimport winpty_lib as winpty
 
 # cdef enum AgentConstants:
 #    WINPTY_FLAG_CONERR = winpty_constants._WINPTY_FLAG_CONERR
