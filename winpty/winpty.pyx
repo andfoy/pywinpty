@@ -75,7 +75,6 @@ ctypedef struct OVLP:
 
 cdef void callback(DWORD err, DWORD bytes, LPVOID ovlp):
     cdef OVLP* temp = <OVLP*> ovlp
-    print(temp.buf)
 
 cdef class Agent:
     cdef winpty.winpty_t* _c_winpty_t
@@ -172,13 +171,15 @@ cdef class Agent:
                        &length, NULL)
         return buf
 
-    def read(self, DWORD length=1000):
+    def read(self, DWORD length=1000, DWORD timeout=1000):
         cdef OVLP ovlp_read
         cdef bint ret = ReadFileEx(self._conout_pipe, ovlp_read.buf, sizeof(ovlp_read.buf),
                                    <LPOVERLAPPED>(&ovlp_read), callback)
-        cdef DWORD status = SleepEx(1000, True)
+        cdef DWORD status = SleepEx(timeout, True)
+        cdef char* ret = ''
         if status == WAIT_IO_COMPLETION:
-            print(ovlp_read.buf)
+            ret = ovlp_read.buf
+        return ret
 
 
     def __dealloc__(self):
