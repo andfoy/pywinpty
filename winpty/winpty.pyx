@@ -169,6 +169,8 @@ cdef class Agent:
         cdef DWORD bytes_written = 0
         cdef bint ret = WriteFile(self._conin_pipe, char_in, sizeof(char_in),
                                   &bytes_written, NULL)
+        cdef DWORD err_code = GetLastError()
+        print(err_code)
         return bytes_written
 
 
