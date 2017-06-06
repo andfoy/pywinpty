@@ -1,5 +1,7 @@
 
 cimport cython
+from libcpp.vector cimport vector
+from libcpp.string cimport string
 from winpty._winpty cimport winpty, winpty_constants
 
 # cdef enum AgentConstants:
@@ -22,6 +24,7 @@ cdef extern from "Windows.h":
     ctypedef struct OVERLAPPED
     ctypedef OVERLAPPED* LPOVERLAPPED
     ctypedef void *LPVOID
+    ctypedef const void* LPCVOID
 
     HANDLE CreateFileW(LPCTSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode,
                        LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD dwCreationDisposition,
@@ -29,6 +32,9 @@ cdef extern from "Windows.h":
 
     bint ReadFile(HANDLE hFile, LPVOID lpBuffer, DWORD nNumberOfBytesToRead,
                   LPDWORD lpNumberOfBytesRead, LPOVERLAPPED lpOverlapped)
+
+    bint WriteFile(HANDLE hfile, LPCVOID lpBuffer, DWORD nNumberOfBytesToWrite,
+                   LPDWORD lpNumberOfBytesWritten, LPOVERLAPPED lpOverlapped)
 
     bint CloseHandle(HANDLE hObject)
 
@@ -122,6 +128,21 @@ cdef class Agent:
                 winpty.winpty_error_code(err_pointer[0]))
             winpty.winpty_error_free(err_pointer[0])
             raise RuntimeError(msg)
+
+    def read(self, int amount=1000):
+        cdef unsigned char buf[1024]
+        cdef vector[unsigned char] result
+        while True:
+            cdef DWORD amount = 0
+            cdef bint ret = ReadFile(self._conout_pipe, buf, sizeof(buf),
+                                     &amount, NULL)
+            if not ret or amount == 0:
+                break
+
+            result.insert(result.end(), buf, buf + amount)
+
+        return string(result)
+
 
     def __dealloc__(self):
         if self._c_winpty_t is not NULL:
