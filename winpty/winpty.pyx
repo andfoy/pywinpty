@@ -145,7 +145,7 @@ cdef class Agent:
 
             result.insert(result.end(), buf, buf + amount)
 
-        cdef char* str_result = reinterpret_cast<char*>(&result[0]);
+        cdef char* str_result = <char*>(result.data());
         return str_result
 
 
