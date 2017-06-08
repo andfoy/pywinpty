@@ -158,7 +158,7 @@ cdef class Agent:
 
     def read(self, int length=1000, DWORD timeout=1000):
         cdef OVLP ovlp_read
-        memset(ovlp_read.buf, 0, 8096)
+        # memset(ovlp_read.buf, 0, 8096)
         cdef bint ret = ReadFileEx(self._conout_pipe, ovlp_read.buf, length,
                                    <LPOVERLAPPED>(&ovlp_read), callback)
         cdef DWORD status = SleepEx(timeout, True)
