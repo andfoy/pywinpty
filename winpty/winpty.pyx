@@ -1,6 +1,7 @@
 
 cimport cython
-from libc.stdlib cimport malloc, free, calloc, memset
+from libc.string cimport memset
+from libc.stdlib cimport malloc, free, calloc
 from winpty._winpty cimport winpty, winpty_constants
 
 cdef extern from "Windows.h":
