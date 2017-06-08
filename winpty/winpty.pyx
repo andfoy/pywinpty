@@ -68,8 +68,7 @@ cdef void callback(DWORD err, DWORD in_bytes, LPVOID ovlp):
     cdef OVLP* temp = <OVLP*> ovlp
     cdef UCHAR* buf = temp.buf
     if in_bytes < 8096:
-        buf[in_bytes + 1] = '\0'
-    # print(in_bytes)
+        buf[in_bytes] = '\0'
 
 cdef class Agent:
     cdef winpty.winpty_t* _c_winpty_t
@@ -172,9 +171,9 @@ cdef class Agent:
 
     def write(self, str in_str):
         cdef DWORD bytes_written = 0
-        cdef bytes py_bytes = in_str.encode()
-        cdef char* char_in = py_bytes
-        cdef bint ret = WriteFile(self._conin_pipe, char_in, len(in_str),
+        cdef bytes py_bytes = bytes(in_str, 'utf-8')
+        cdef UCHAR* char_in = py_bytes
+        cdef bint ret = WriteFile(self._conin_pipe, char_in, len(py_bytes),
                                   &bytes_written, NULL)
         cdef DWORD err_code = GetLastError()
         # print(err_code)
