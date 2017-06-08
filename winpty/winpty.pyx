@@ -45,6 +45,9 @@ cdef extern from "Windows.h":
     bint WriteFile(HANDLE hfile, LPCVOID lpBuffer, DWORD nNumberOfBytesToWrite,
                    LPDWORD lpNumberOfBytesWritten, LPOVERLAPPED lpOverlapped)
 
+    bint WriteFileEx(HANDLE hFile, LPVOID lpBuffer, DWORD nNumberOfBytesToWrite,
+                     LPOVERLAPPED lpOverlapped, LPOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine)
+
     bint CloseHandle(HANDLE hObject)
     bint SetCommTimeouts(HANDLE hFile, LPCOMMTIMEOUTS lpCommTimeouts)
 
