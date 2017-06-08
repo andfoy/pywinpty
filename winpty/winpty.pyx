@@ -61,7 +61,7 @@ cdef extern from "Windows.h":
 ctypedef unsigned char UCHAR
 
 ctypedef struct OVLP:
-    OVERLAPPED readOvlp
+    OVERLAPPED ovlpPointer
     UCHAR buf[8096]
 
 cdef void callback(DWORD err, DWORD in_bytes, LPVOID ovlp):
@@ -114,7 +114,7 @@ cdef class Agent:
         conerr_pipe_name = winpty.winpty_conerr_name(self._c_winpty_t)
 
         self._conin_pipe = CreateFileW(conin_pipe_name, GENERIC_WRITE,
-                                       0, NULL, OPEN_EXISTING, 0, NULL)
+                                       0, NULL, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL)
         self._conout_pipe = CreateFileW(conout_pipe_name, GENERIC_READ,
                                        0, NULL, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL)
 
@@ -170,13 +170,14 @@ cdef class Agent:
         return lines
 
     def write(self, str in_str):
+        cdef OVLP ovlp_write
         cdef DWORD bytes_written = 0
         cdef bytes py_bytes = bytes(in_str, 'utf-8')
         cdef UCHAR* char_in = py_bytes
-        cdef bint ret = WriteFile(self._conin_pipe, char_in, len(py_bytes),
-                                  &bytes_written, NULL)
-        cdef DWORD err_code = GetLastError()
-        return bytes_written
+        cdef bint ret = WriteFileEx(self._conin_pipe, char_in, len(py_bytes),
+                                    <LPOVERLAPPED>(&ovlp_write), callback)
+        # cdef DWORD err_code = GetLastError()
+        # return bytes_written
 
 
     def __dealloc__(self):
