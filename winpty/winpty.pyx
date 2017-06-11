@@ -1,6 +1,5 @@
 
 cimport cython
-import win32file
 from libc.string cimport memset
 from libc.stdlib cimport malloc, free, calloc
 from winpty._winpty cimport winpty, winpty_constants
