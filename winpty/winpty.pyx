@@ -1,6 +1,7 @@
 
 cimport cython
 import win32file
+import pywintypes
 from libc.string cimport memset
 from libc.stdlib cimport malloc, free, calloc
 from winpty._winpty cimport winpty, winpty_constants
@@ -171,7 +172,8 @@ cdef class Agent:
         # cdef UCHAR* lines = ''
         # if status == WAIT_IO_COMPLETION:
         #     lines = ovlp_read.buf
-        code, lines = win32file.ReadFile(self._conout_pipe, length)
+        wrap_handle = pywintypes.HANDLE(self._conout_pipe)
+        code, lines = win32file.ReadFile(wrap_handle, length)
         print(code)
         return lines
 
