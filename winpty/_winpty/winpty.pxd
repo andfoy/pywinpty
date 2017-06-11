@@ -12,8 +12,7 @@ cdef extern from "Windows.h":
 cdef extern from 'winpty.h':
     # Error constants and structs
     # ctypedef struct winpty_error_s winpty_error_t
-    ctypedef struct winpty_error_t:
-        pass
+    ctypedef struct winpty_error_t
     ctypedef winpty_error_t* winpty_error_ptr_t
     ctypedef DWORD winpty_result_t
 
