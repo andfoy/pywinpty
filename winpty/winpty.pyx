@@ -172,7 +172,7 @@ cdef class Agent:
         # cdef UCHAR* lines = ''
         # if status == WAIT_IO_COMPLETION:
         #     lines = ovlp_read.buf
-        wrap_handle = pywintypes.HANDLE(self._conout_pipe)
+        wrap_handle = pywintypes.HANDLE(<int>self._conout_pipe)
         code, lines = win32file.ReadFile(wrap_handle, length)
         print(code)
         return lines
