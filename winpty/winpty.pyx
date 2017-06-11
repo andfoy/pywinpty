@@ -78,8 +78,8 @@ cdef class Agent:
     cdef HANDLE _conerr_pipe
 
     def __cinit__(self, int cols, int rows,
-                  int mouse_mode=winpty_constants._WINPTY_MOUSE_MODE_AUTO,
-                  int timeout=3000, int agent_config=winpty_constants._WINPTY_FLAG_MASK):
+                  int mouse_mode=winpty_constants._WINPTY_MOUSE_MODE_NONE,
+                  int timeout=30000, int agent_config=winpty_constants._WINPTY_FLAG_PLAIN_OUTPUT|winpty_constants._WINPTY_FLAG_COLOR_ESCAPES):
         cdef winpty.winpty_error_ptr_t err
         cdef winpty.winpty_config_t* config = winpty.winpty_config_new(agent_config, &err)
 
