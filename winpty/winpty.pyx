@@ -1,7 +1,6 @@
 
 cimport cython
 import win32file
-import pywintypes
 from libc.string cimport memset
 from libc.stdlib cimport malloc, free, calloc
 from winpty._winpty cimport winpty, winpty_constants
@@ -116,7 +115,7 @@ cdef class Agent:
         self._conin_pipe = CreateFileW(conin_pipe_name, GENERIC_WRITE,
                                        0, NULL, OPEN_EXISTING, 0, NULL)
         self._conout_pipe = CreateFileW(conout_pipe_name, GENERIC_READ,
-                                       0, NULL, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL)
+                                       0, NULL, OPEN_EXISTING, 0, NULL)
 
 
     def spawn(self, LPCWSTR appname, LPCWSTR cmdline=NULL,
@@ -165,16 +164,13 @@ cdef class Agent:
         return buf
 
     def read(self, int length=1000, DWORD timeout=1000):
-        # cdef OVLP ovlp_read
-        # cdef bint ret = ReadFileEx(self._conout_pipe, ovlp_read.buf, length,
-        #                            <LPOVERLAPPED>(&ovlp_read), callback)
-        # cdef DWORD status = SleepEx(timeout, True)
-        # cdef UCHAR* lines = ''
-        # if status == WAIT_IO_COMPLETION:
-        #     lines = ovlp_read.buf
-        wrap_handle = pywintypes.HANDLE(<int>self._conout_pipe)
-        code, lines = win32file.ReadFile(wrap_handle, length)
-        print(code)
+        cdef OVLP ovlp_read
+        cdef bint ret = ReadFileEx(self._conout_pipe, ovlp_read.buf, length,
+                                   <LPOVERLAPPED>(&ovlp_read), callback)
+        cdef DWORD status = SleepEx(timeout, True)
+        cdef UCHAR* lines = ''
+        if status == WAIT_IO_COMPLETION:
+            lines = ovlp_read.buf
         return lines
 
     def write(self, str in_str):
