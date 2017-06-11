@@ -6,6 +6,8 @@ from Cython.Build import cythonize
 setup(
     ext_modules=cythonize([
         Extension("winpty", sources=["winpty/winpty.pyx"],
-                  libraries=["winpty"])
+                  libraries=["winpty"],
+                  extra_compile_args=["-Zi", "/Od"],
+                  extra_link_args=["-debug"])
     ]),
 )

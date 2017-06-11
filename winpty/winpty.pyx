@@ -57,6 +57,8 @@ cdef extern from "Windows.h":
     cdef int FILE_FLAG_OVERLAPPED
     cdef int WAIT_IO_COMPLETION
 
+    void DebugBreak()
+
 
 ctypedef unsigned char UCHAR
 
@@ -164,14 +166,14 @@ cdef class Agent:
 
     def read(self, int length=1000, DWORD timeout=1000):
         cdef OVLP ovlp_read
+        DebugBreak()
         cdef bint ret = ReadFileEx(self._conout_pipe, ovlp_read.buf, length,
                                    <LPOVERLAPPED>(&ovlp_read), callback)
         cdef DWORD status = SleepEx(timeout, True)
         cdef UCHAR* lines = ''
-        cdef DWORD err_code = GetLastError()
+        # cdef DWORD err_code = GetLastError()
         if status == WAIT_IO_COMPLETION:
             lines = ovlp_read.buf
-        print(err_code)
         return lines
 
     def write(self, str in_str):
@@ -180,8 +182,7 @@ cdef class Agent:
         cdef UCHAR* char_in = py_bytes
         cdef bint ret = WriteFile(self._conin_pipe, char_in, len(py_bytes),
                                   &bytes_written, NULL)
-        cdef DWORD err_code = GetLastError()
-        print(err_code)
+        # cdef DWORD err_code = GetLastError()
         return bytes_written
 
 
