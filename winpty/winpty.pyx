@@ -1,5 +1,6 @@
 
 cimport cython
+import win32file
 from libc.string cimport memset
 from libc.stdlib cimport malloc, free, calloc
 from winpty._winpty cimport winpty, winpty_constants
@@ -163,13 +164,15 @@ cdef class Agent:
         return buf
 
     def read(self, int length=1000, DWORD timeout=1000):
-        cdef OVLP ovlp_read
-        cdef bint ret = ReadFileEx(self._conout_pipe, ovlp_read.buf, length,
-                                   <LPOVERLAPPED>(&ovlp_read), callback)
-        cdef DWORD status = SleepEx(timeout, True)
-        cdef UCHAR* lines = ''
-        if status == WAIT_IO_COMPLETION:
-            lines = ovlp_read.buf
+        # cdef OVLP ovlp_read
+        # cdef bint ret = ReadFileEx(self._conout_pipe, ovlp_read.buf, length,
+        #                            <LPOVERLAPPED>(&ovlp_read), callback)
+        # cdef DWORD status = SleepEx(timeout, True)
+        # cdef UCHAR* lines = ''
+        # if status == WAIT_IO_COMPLETION:
+        #     lines = ovlp_read.buf
+        code, lines = win32file.ReadFile(self._conout_pipe, length)
+        print(code)
         return lines
 
     def write(self, str in_str):
