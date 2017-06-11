@@ -67,8 +67,8 @@ ctypedef struct OVLP:
 cdef void callback(DWORD err, DWORD in_bytes, LPVOID ovlp):
     cdef OVLP* temp = <OVLP*> ovlp
     cdef UCHAR* buf = temp.buf
-    if in_bytes < 8096:
-        buf[in_bytes] = '\0'
+    # if in_bytes < 8096:
+        # buf[in_bytes] = '\0'
 
 cdef class Agent:
     cdef winpty.winpty_t* _c_winpty_t
