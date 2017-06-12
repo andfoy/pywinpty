@@ -57,7 +57,6 @@ cdef extern from "Windows.h":
     cdef int FILE_FLAG_OVERLAPPED
     cdef int WAIT_IO_COMPLETION
 
-
 ctypedef unsigned char UCHAR
 
 ctypedef struct OVLP:
