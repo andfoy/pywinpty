@@ -7,7 +7,7 @@ setup(
     name='winpty',
     version='1.0',
     ext_modules=cythonize([
-        Extension("winpty.cy_winpty", sources=["winpty/winpty.pyx"],
+        Extension("winpty.winpty", sources=["winpty/winpty.pyx"],
                   libraries=["winpty"])
     ]),
 )
