@@ -12,7 +12,7 @@ class PTY(Agent):
                                                 win32file.OPEN_EXISTING,
                                                 0, None)
         self.conout_pipe = win32file.CreateFileW(self.conout_pipe_name,
-                                                 win32file.GENERIC_WRITE,
+                                                 win32file.GENERIC_READ,
                                                  0, None,
                                                  win32file.OPEN_EXISTING,
                                                  0, None)
