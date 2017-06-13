@@ -5,7 +5,7 @@ from Cython.Build import cythonize
 
 setup(
     ext_modules=cythonize([
-        Extension("winpty", sources=["winpty/winpty.pyx"],
+        Extension("winpty", sources=["winpty/cy_winpty.pyx"],
                   libraries=["winpty"])
     ]),
 )
