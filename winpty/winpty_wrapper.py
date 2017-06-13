@@ -1,5 +1,5 @@
 
-from winpty.winpty import Agent
+from winpty.cywinpty import Agent
 import win32file
 
 
