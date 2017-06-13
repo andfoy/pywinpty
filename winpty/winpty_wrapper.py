@@ -5,7 +5,7 @@ import win32file
 
 class PTY(Agent):
     def __init__(self, cols, rows):
-        Agent.__cinit__(self, cols, rows, overrride_pipes=True)
+        Agent.__init__(self, cols, rows, overrride_pipes=True)
         self.conin_pipe = win32file.CreateFileW(self.conin_pipe_name,
                                                 win32file.GENERIC_WRITE,
                                                 0, None,

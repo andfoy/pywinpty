@@ -79,10 +79,10 @@ cdef class Agent:
     cdef LPCWSTR conout_pipe_name
     # cdef LPCWSTR conerr_pipe_name
 
-    def __cinit__(self, int cols, int rows,
-                  int mouse_mode=winpty_constants._WINPTY_MOUSE_MODE_NONE,
-                  int timeout=30000, int agent_config=winpty_constants._WINPTY_FLAG_PLAIN_OUTPUT|winpty_constants._WINPTY_FLAG_COLOR_ESCAPES,
-                  bint override_pipes=False):
+    def __init__(self, int cols, int rows,
+                 int mouse_mode=winpty_constants._WINPTY_MOUSE_MODE_NONE,
+                 int timeout=30000, int agent_config=winpty_constants._WINPTY_FLAG_PLAIN_OUTPUT|winpty_constants._WINPTY_FLAG_COLOR_ESCAPES,
+                 bint override_pipes=False):
         cdef winpty.winpty_error_ptr_t err
         cdef winpty.winpty_config_t* config = winpty.winpty_config_new(agent_config, &err)
 
