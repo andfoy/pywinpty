@@ -119,6 +119,13 @@ cdef class Agent:
             self._conout_pipe = CreateFileW(self.conout_pipe_name, GENERIC_READ,
                                             0, NULL, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL)
 
+    property conin_pipe_name:
+        def __get__(self):
+            return self.conin_pipe_name
+
+    property conout_pipe_name:
+        def __get__(self):
+            return self.conout_pipe_name
 
     def spawn(self, LPCWSTR appname, LPCWSTR cmdline=NULL,
               LPCWSTR cwd=NULL, LPCWSTR env=NULL):
