@@ -4,7 +4,7 @@ from Cython.Build import cythonize
 # import os.path as osp
 
 setup(
-    name='pywinpty',
+    name='winpty',
     version='1.0',
     ext_modules=cythonize([
         Extension("winpty", sources=["winpty/winpty.pyx"],
