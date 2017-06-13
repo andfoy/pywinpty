@@ -115,10 +115,10 @@ cdef class Agent:
         # self.conerr_pipe_name = winpty.winpty_conerr_name(self._c_winpty_t)
 
         if not override_pipes:
-            self._conin_pipe = CreateFileW(conin_pipe_name, GENERIC_WRITE,
+            self._conin_pipe = CreateFileW(self.conin_pipe_name, GENERIC_WRITE,
                                            0, NULL, OPEN_EXISTING, 0, NULL)
-            self._conout_pipe = CreateFileW(conout_pipe_name, GENERIC_READ,
-                                           0, NULL, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL)
+            self._conout_pipe = CreateFileW(self.conout_pipe_name, GENERIC_READ,
+                                            0, NULL, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL)
 
 
     def spawn(self, LPCWSTR appname, LPCWSTR cmdline=NULL,
