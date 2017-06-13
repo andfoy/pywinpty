@@ -1,4 +1,4 @@
-from cy_winpty import Agent
+from .winpty import Agent
 
 import win32file
 
