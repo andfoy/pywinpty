@@ -25,6 +25,7 @@ class PTY(Agent):
         return data
 
     def write(self, data):
+        data = bytes(data, 'utf-8')
         _, num_bytes = win32file.WriteFile(self.conin_pipe, data)
         return num_bytes
 
