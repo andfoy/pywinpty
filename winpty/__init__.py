@@ -1,5 +1,3 @@
 # from .winpty import Agent
-from winpty_wrapper import PTY
-from winpty import Agent
-
-import win32file
+from .winpty_wrapper import PTY
+from .winpty import Agent
