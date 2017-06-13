@@ -18,8 +18,10 @@ class PTY(Agent):
                                                  0, None)
 
     def read(self, length=1000):
-        buf = win32file.AllocateReadBuffer(4096)
-        _, data = win32file.ReadFile(self.conout_pipe, length, buf)
+        size = win32file.GetFileSize(self.conout_pipe)
+        data = ''
+        if size > 0:
+            _, data = win32file.ReadFile(self.conout_pipe, length)
         return data
 
     def write(self, data):
