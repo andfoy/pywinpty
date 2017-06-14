@@ -1,9 +1,14 @@
 
+"""
+Cython wrapper around Winpty and Windows functions.
+"""
+
 cimport cython
 from libc.string cimport memset
 from libc.stdlib cimport malloc, free, calloc
 from winpty._winpty cimport winpty, winpty_constants
 
+# Windows API types and I/O functions
 cdef extern from "Windows.h":
     ctypedef Py_UNICODE WCHAR
     ctypedef const WCHAR* LPCWSTR
@@ -57,8 +62,10 @@ cdef extern from "Windows.h":
     cdef int FILE_FLAG_OVERLAPPED
     cdef int WAIT_IO_COMPLETION
 
+# unsigned char shorthand
 ctypedef unsigned char UCHAR
 
+# Overlapped structure definition to retrieve Async I/O results
 ctypedef struct OVLP:
     OVERLAPPED readOvlp
     UCHAR buf[8096]
@@ -70,23 +77,27 @@ cdef void callback(DWORD err, DWORD in_bytes, LPVOID ovlp):
         buf[in_bytes] = '\0'
 
 cdef class Agent:
+    """
+    This class wraps a winpty agent and offers communication with
+    a winpty-agent process.
+    """
     cdef winpty.winpty_t* _c_winpty_t
     cdef HANDLE _agent_process
     cdef HANDLE _conin_pipe
     cdef HANDLE _conout_pipe
-    # cdef HANDLE _conerr_pipe
     cdef LPCWSTR conin_pipe_name
     cdef LPCWSTR conout_pipe_name
-    # cdef LPCWSTR conerr_pipe_name
 
     def __init__(self, int cols, int rows, bint override_pipes=False,
                  int mouse_mode=winpty_constants._WINPTY_MOUSE_MODE_NONE,
                  int timeout=30000, int agent_config=winpty_constants._WINPTY_FLAG_PLAIN_OUTPUT|winpty_constants._WINPTY_FLAG_COLOR_ESCAPES):
+        """
+        Initialize a winpty agent wrapper of size ``(cols, rows)``.
+        """
         cdef winpty.winpty_error_ptr_t err
         cdef winpty.winpty_config_t* config = winpty.winpty_config_new(agent_config, &err)
 
         if config is NULL:
-            # raise MemoryError(winpty.winpty_error_msg(err))
             msg = 'An error has ocurred: {0} - Code: {1}'.format(
                 winpty.winpty_error_msg(err),
                 winpty.winpty_error_code(err))
@@ -111,7 +122,6 @@ cdef class Agent:
         self._agent_process = winpty.winpty_agent_process(self._c_winpty_t)
         self.conin_pipe_name = winpty.winpty_conin_name(self._c_winpty_t)
         self.conout_pipe_name = winpty.winpty_conout_name(self._c_winpty_t)
-        # self.conerr_pipe_name = winpty.winpty_conerr_name(self._c_winpty_t)
 
         if not override_pipes:
             self._conin_pipe = CreateFileW(self.conin_pipe_name, GENERIC_WRITE,
@@ -129,6 +139,9 @@ cdef class Agent:
 
     def spawn(self, LPCWSTR appname, LPCWSTR cmdline=NULL,
               LPCWSTR cwd=NULL, LPCWSTR env=NULL):
+        """
+        Start a windows process that communicates through a winpty-agent process.
+        """
         cdef winpty.winpty_error_ptr_t spawn_conf_err
         cdef winpty.winpty_spawn_config_t* spawn_config = winpty.winpty_spawn_config_new(winpty_constants._WINPTY_SPAWN_FLAG_MASK,
                                                                                          appname, cmdline, cwd, env, &spawn_conf_err)
@@ -154,6 +167,9 @@ cdef class Agent:
         return succ
 
     def set_size(self, int cols, int rows):
+        """
+        Resize the console size of current agent process.
+        """
         cdef winpty.winpty_error_ptr_t err_pointer = NULL
         cdef bint succ = winpty.winpty_set_size(self._c_winpty_t, cols, rows, &err_pointer)
 
@@ -165,6 +181,12 @@ cdef class Agent:
             raise RuntimeError(msg)
 
     def read_blocking(self, DWORD length=1000):
+        """
+        Read at least ``length`` characters from current process conout stream.
+
+        Warning: This implementation blocks the current process until
+        the output stream has more data available.
+        """
         cdef unsigned char buf[1024]
         cdef bint ret = False
 
@@ -173,6 +195,12 @@ cdef class Agent:
         return buf
 
     def read(self, int length=1000, DWORD timeout=1000):
+        """
+        Read at least ``length`` characters with a time limit of ``timeout``.
+
+        Experimental: This non-blocking implementation present several flaws
+        that could lead to segmentation faults, use it with extreme care.
+        """
         cdef OVLP ovlp_read
         cdef bint ret = ReadFileEx(self._conout_pipe, ovlp_read.buf, length,
                                    <LPOVERLAPPED>(&ovlp_read), callback)
@@ -186,6 +214,9 @@ cdef class Agent:
         return lines
 
     def write(self, str in_str):
+        """
+        Write data to current process input stream.
+        """
         cdef DWORD bytes_written = 0
         cdef bytes py_bytes = bytes(in_str, 'utf-8')
         cdef UCHAR* char_in = py_bytes
@@ -197,9 +228,11 @@ cdef class Agent:
         return bytes_written
 
     def close(self):
+        """
+        Close all communication process streams.
+        """
         CloseHandle(self._conin_pipe)
         CloseHandle(self._conout_pipe)
-        # CloseHandle(self._conerr_pipe)
 
     def __dealloc__(self):
         if self._c_winpty_t is not NULL:
