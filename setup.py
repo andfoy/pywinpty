@@ -1,15 +1,38 @@
+# -*- coding: utf-8 -*-
+
+"""Setup script for pywinpty."""
+
+# Setuptools imports
 from setuptools import setup, Extension, find_packages
-# from distutils.extension import Extension
 from Cython.Build import cythonize
-# import os.path as osp
+
+# Local imports
+from winpty import __version__
+
+REQUIREMENTS = ['cython']
 
 setup(
     name='winpty',
-    version='1.0',
+    version=__version__,
+    keywords=['winpty'],
+    url='https://github.com/spyder-ide/pywinpty',
+    license='MIT',
+    author='Spyder Project Contributors',
+    author_email='admin@spyder-ide.org',
+    description='Python bindings for the winpty library',
     ext_modules=cythonize([
         Extension("winpty.cywinpty", sources=["winpty/cywinpty.pyx"],
                   libraries=["winpty"])
     ]),
     packages=find_packages(exclude=['contrib', 'docs', 'tests*']),
-    include_package_data=True
+    include_package_data=True,
+    install_requires=REQUIREMENTS,
+    classifiers=[
+        'Development Status :: 4 - Beta',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: MIT License',
+        'Operating System :: Microsoft :: Windows',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6'
+    ]
 )
