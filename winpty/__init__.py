@@ -5,9 +5,11 @@ Pywinpty
 ========
 This package provides a Cython wrapper around winpty C++ library.
 """
+try:
+    from .cywinpty import Agent
+    from .winpty_wrapper import PTY
+except ImportError:
+    pass
 
-from .cywinpty import Agent
-from .winpty_wrapper import PTY
-
-VERSION_INFO = (1, 0, "dev0")
+VERSION_INFO = (0, 1, 0)
 __version__ = '.'.join(map(str, VERSION_INFO))

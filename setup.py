@@ -9,7 +9,7 @@ from Cython.Build import cythonize
 # Local imports
 from winpty import __version__
 
-REQUIREMENTS = ['cython']
+REQUIREMENTS = ['cython', 'pypiwin32']
 
 setup(
     name='winpty',
