@@ -74,11 +74,14 @@ cdef class Agent:
     cdef HANDLE _agent_process
     cdef HANDLE _conin_pipe
     cdef HANDLE _conout_pipe
-    cdef HANDLE _conerr_pipe
+    # cdef HANDLE _conerr_pipe
+    cdef LPCWSTR conin_pipe_name
+    cdef LPCWSTR conout_pipe_name
+    # cdef LPCWSTR conerr_pipe_name
 
-    def __cinit__(self, int cols, int rows,
-                  int mouse_mode=winpty_constants._WINPTY_MOUSE_MODE_NONE,
-                  int timeout=30000, int agent_config=winpty_constants._WINPTY_FLAG_PLAIN_OUTPUT|winpty_constants._WINPTY_FLAG_COLOR_ESCAPES):
+    def __init__(self, int cols, int rows, bint override_pipes=False,
+                 int mouse_mode=winpty_constants._WINPTY_MOUSE_MODE_NONE,
+                 int timeout=30000, int agent_config=winpty_constants._WINPTY_FLAG_PLAIN_OUTPUT|winpty_constants._WINPTY_FLAG_COLOR_ESCAPES):
         cdef winpty.winpty_error_ptr_t err
         cdef winpty.winpty_config_t* config = winpty.winpty_config_new(agent_config, &err)
 
@@ -106,15 +109,23 @@ cdef class Agent:
             raise RuntimeError(msg)
 
         self._agent_process = winpty.winpty_agent_process(self._c_winpty_t)
-        conin_pipe_name = winpty.winpty_conin_name(self._c_winpty_t)
-        conout_pipe_name = winpty.winpty_conout_name(self._c_winpty_t)
-        conerr_pipe_name = winpty.winpty_conerr_name(self._c_winpty_t)
+        self.conin_pipe_name = winpty.winpty_conin_name(self._c_winpty_t)
+        self.conout_pipe_name = winpty.winpty_conout_name(self._c_winpty_t)
+        # self.conerr_pipe_name = winpty.winpty_conerr_name(self._c_winpty_t)
 
-        self._conin_pipe = CreateFileW(conin_pipe_name, GENERIC_WRITE,
-                                       0, NULL, OPEN_EXISTING, 0, NULL)
-        self._conout_pipe = CreateFileW(conout_pipe_name, GENERIC_READ,
-                                       0, NULL, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL)
+        if not override_pipes:
+            self._conin_pipe = CreateFileW(self.conin_pipe_name, GENERIC_WRITE,
+                                           0, NULL, OPEN_EXISTING, 0, NULL)
+            self._conout_pipe = CreateFileW(self.conout_pipe_name, GENERIC_READ,
+                                            0, NULL, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL)
 
+    property conin_pipe_name:
+        def __get__(self):
+            return self.conin_pipe_name
+
+    property conout_pipe_name:
+        def __get__(self):
+            return self.conout_pipe_name
 
     def spawn(self, LPCWSTR appname, LPCWSTR cmdline=NULL,
               LPCWSTR cwd=NULL, LPCWSTR env=NULL):
@@ -185,6 +196,10 @@ cdef class Agent:
             raise RuntimeError(err_code)
         return bytes_written
 
+    def close(self):
+        CloseHandle(self._conin_pipe)
+        CloseHandle(self._conout_pipe)
+        # CloseHandle(self._conerr_pipe)
 
     def __dealloc__(self):
         if self._c_winpty_t is not NULL:
