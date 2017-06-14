@@ -1,4 +1,4 @@
-from setuptools import setup, Extension
+from setuptools import setup, Extension, find_packages
 # from distutils.extension import Extension
 from Cython.Build import cythonize
 # import os.path as osp
@@ -10,4 +10,6 @@ setup(
         Extension("winpty.cywinpty", sources=["winpty/cywinpty.pyx"],
                   libraries=["winpty"])
     ]),
+    packages=find_packages(exclude=['contrib', 'docs', 'tests*']),
+    include_package_data=True
 )
