@@ -17,8 +17,8 @@ setup(
     keywords=['winpty'],
     url='https://github.com/spyder-ide/pywinpty',
     license='MIT',
-    author='Spyder Project Contributors',
-    author_email='admin@spyder-ide.org',
+    author='Edgar Andrés Margffoy Tuay',
+    author_email='andfoy@gmail.com',
     description='Python bindings for the winpty library',
     ext_modules=cythonize([
         Extension("winpty.cywinpty", sources=["winpty/cywinpty.pyx"],
