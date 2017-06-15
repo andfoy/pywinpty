@@ -90,7 +90,7 @@ cdef class Agent:
 
     def __init__(self, int cols, int rows, bint override_pipes=False,
                  int mouse_mode=winpty_constants._WINPTY_MOUSE_MODE_NONE,
-                 int timeout=30000, int agent_config=winpty_constants._WINPTY_FLAG_PLAIN_OUTPUT|winpty_constants._WINPTY_FLAG_COLOR_ESCAPES):
+                 int timeout=30000, int agent_config=winpty_constants._WINPTY_FLAG_COLOR_ESCAPES):
         """
         Initialize a winpty agent wrapper of size ``(cols, rows)``.
         """
