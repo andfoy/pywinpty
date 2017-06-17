@@ -11,5 +11,5 @@ try:
 except ImportError:
     pass
 
-VERSION_INFO = (0, 1, 0)
+VERSION_INFO = (0, 1, 0, 'post1')
 __version__ = '.'.join(map(str, VERSION_INFO))

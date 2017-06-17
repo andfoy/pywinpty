@@ -2,12 +2,25 @@
 
 """Setup script for pywinpty."""
 
+# Standard Library imports
+import os
+
 # Setuptools imports
 from setuptools import setup, Extension, find_packages
 from Cython.Build import cythonize
 
 # Local imports
 from winpty import __version__
+
+try:
+    include_dirs = [os.environ['LIBRARY_INC']]
+except KeyError:
+    include_dirs = []
+try:
+    library_dirs = [os.environ['LIBRARY_LIB']]
+except KeyError:
+    library_dirs = []
+
 
 REQUIREMENTS = ['cython', 'pypiwin32']
 
@@ -22,7 +35,8 @@ setup(
     description='Python bindings for the winpty library',
     ext_modules=cythonize([
         Extension("winpty.cywinpty", sources=["winpty/cywinpty.pyx"],
-                  libraries=["winpty"])
+                  libraries=["winpty"], include_dirs=include_dirs,
+                  library_dirs=library_dirs)
     ]),
     packages=find_packages(exclude=['contrib', 'docs', 'tests*']),
     include_package_data=True,
