@@ -4,11 +4,9 @@ Cython wrapper around Winpty and Windows functions.
 """
 
 cimport cython
-from libc.string cimport memset
-from libc.stdlib cimport malloc, free, calloc
 from winpty._winpty cimport winpty, winpty_constants
 
-# Windows API types and I/O functions
+# Windows API types
 cdef extern from "Windows.h":
     ctypedef Py_UNICODE WCHAR
     ctypedef const WCHAR* LPCWSTR
@@ -17,64 +15,8 @@ cdef extern from "Windows.h":
     ctypedef unsigned long long UINT64
     ctypedef unsigned long DWORD
     ctypedef DWORD *LPDWORD
-    ctypedef struct SECURITY_ATTRIBUTES
     ctypedef LPCWSTR LPCTSTR
-    ctypedef SECURITY_ATTRIBUTES* LPSECURITY_ATTRIBUTES
-    ctypedef struct OVERLAPPED:
-        pass
-    ctypedef OVERLAPPED* LPOVERLAPPED
-    ctypedef void *LPVOID
-    ctypedef const void* LPCVOID
 
-    ctypedef struct COMMTIMEOUTS:
-        DWORD ReadIntervalTimeout
-        DWORD ReadTotalTimeoutMultiplier
-        DWORD ReadTotalTimeoutConstant
-        DWORD WriteTotalTimeoutMultiplier
-        DWORD WriteTotalTimeoutConstant
-
-    ctypedef COMMTIMEOUTS* LPCOMMTIMEOUTS
-    ctypedef void (*LPOVERLAPPED_COMPLETION_ROUTINE) (DWORD, DWORD, LPVOID)
-
-
-    HANDLE CreateFileW(LPCTSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode,
-                       LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD dwCreationDisposition,
-                       DWORD dwFlagsAndAttributes, HANDLE hTemplateFile)
-
-    bint ReadFile(HANDLE hFile, LPVOID lpBuffer, DWORD nNumberOfBytesToRead,
-                  LPDWORD lpNumberOfBytesRead, LPOVERLAPPED lpOverlapped)
-
-    bint ReadFileEx(HANDLE hFile, LPVOID lpBuffer, DWORD nNumberOfBytesToRead,
-                    LPOVERLAPPED lpNumberOfBytesRead, LPOVERLAPPED_COMPLETION_ROUTINE lpOverlapped)
-
-    bint WriteFile(HANDLE hfile, LPCVOID lpBuffer, DWORD nNumberOfBytesToWrite,
-                   LPDWORD lpNumberOfBytesWritten, LPOVERLAPPED lpOverlapped)
-
-    bint CloseHandle(HANDLE hObject)
-    bint SetCommTimeouts(HANDLE hFile, LPCOMMTIMEOUTS lpCommTimeouts)
-
-    DWORD GetLastError()
-    DWORD SleepEx(DWORD dwMilliseconds, bint bAlertable)
-
-    cdef int GENERIC_WRITE
-    cdef int GENERIC_READ
-    cdef int OPEN_EXISTING
-    cdef int FILE_FLAG_OVERLAPPED
-    cdef int WAIT_IO_COMPLETION
-
-# unsigned char shorthand
-ctypedef unsigned char UCHAR
-
-# Overlapped structure definition to retrieve Async I/O results
-ctypedef struct OVLP:
-    OVERLAPPED readOvlp
-    UCHAR buf[8096]
-
-cdef void callback(DWORD err, DWORD in_bytes, LPVOID ovlp):
-    cdef OVLP* temp = <OVLP*> ovlp
-    cdef UCHAR* buf = temp.buf
-    if in_bytes < 8096:
-        buf[in_bytes] = '\0'
 
 cdef class Agent:
     """
@@ -83,12 +25,10 @@ cdef class Agent:
     """
     cdef winpty.winpty_t* _c_winpty_t
     cdef HANDLE _agent_process
-    cdef HANDLE _conin_pipe
-    cdef HANDLE _conout_pipe
     cdef LPCWSTR conin_pipe_name
     cdef LPCWSTR conout_pipe_name
 
-    def __init__(self, int cols, int rows, bint override_pipes=False,
+    def __init__(self, int cols, int rows, bint override_pipes=True,
                  int mouse_mode=winpty_constants._WINPTY_MOUSE_MODE_NONE,
                  int timeout=30000, int agent_config=winpty_constants._WINPTY_FLAG_COLOR_ESCAPES):
         """
@@ -122,12 +62,6 @@ cdef class Agent:
         self._agent_process = winpty.winpty_agent_process(self._c_winpty_t)
         self.conin_pipe_name = winpty.winpty_conin_name(self._c_winpty_t)
         self.conout_pipe_name = winpty.winpty_conout_name(self._c_winpty_t)
-
-        if not override_pipes:
-            self._conin_pipe = CreateFileW(self.conin_pipe_name, GENERIC_WRITE,
-                                           0, NULL, OPEN_EXISTING, 0, NULL)
-            self._conout_pipe = CreateFileW(self.conout_pipe_name, GENERIC_READ,
-                                            0, NULL, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL)
 
     property conin_pipe_name:
         def __get__(self):
@@ -170,7 +104,7 @@ cdef class Agent:
         """
         Resize the console size of current agent process.
         """
-        cdef winpty.winpty_error_ptr_t err_pointer = NULL
+        cdef winpty.winpty_error_ptr_t err_pointer
         cdef bint succ = winpty.winpty_set_size(self._c_winpty_t, cols, rows, &err_pointer)
 
         if not succ:
@@ -180,63 +114,6 @@ cdef class Agent:
             winpty.winpty_error_free(err_pointer)
             raise RuntimeError(msg)
 
-    def read_blocking(self, DWORD length=1000):
-        """
-        Read at least ``length`` characters from current process conout stream.
-
-        Warning: This implementation blocks the current process until
-        the output stream has more data available.
-        """
-        cdef unsigned char buf[1024]
-        cdef bint ret = False
-
-        ret = ReadFile(self._conout_pipe, buf, sizeof(buf),
-                       &length, NULL)
-        return buf
-
-    def read(self, int length=1000, DWORD timeout=1000):
-        """
-        Read at least ``length`` characters with a time limit of ``timeout``.
-
-        Experimental: This non-blocking implementation present several flaws
-        that could lead to segmentation faults, use it with extreme care.
-        """
-        cdef OVLP ovlp_read
-        cdef bint ret = ReadFileEx(self._conout_pipe, ovlp_read.buf, length,
-                                   <LPOVERLAPPED>(&ovlp_read), callback)
-        cdef DWORD status = SleepEx(timeout, True)
-        cdef UCHAR* lines = ''
-        cdef DWORD err_code = GetLastError()
-        if err_code != 0:
-            raise RuntimeError(err_code)
-        if status == WAIT_IO_COMPLETION:
-            lines = ovlp_read.buf
-        return lines
-
-    def write(self, str in_str):
-        """
-        Write data to current process input stream.
-        """
-        cdef DWORD bytes_written = 0
-        cdef bytes py_bytes = bytes(in_str, 'utf-8')
-        cdef UCHAR* char_in = py_bytes
-        cdef bint ret = WriteFile(self._conin_pipe, char_in, len(py_bytes),
-                                  &bytes_written, NULL)
-        cdef DWORD err_code = GetLastError()
-        if err_code != 0:
-            raise RuntimeError(err_code)
-        return bytes_written
-
-    def close(self):
-        """
-        Close all communication process streams.
-        """
-        CloseHandle(self._conin_pipe)
-        CloseHandle(self._conout_pipe)
-
     def __dealloc__(self):
         if self._c_winpty_t is not NULL:
             winpty.winpty_free(self._c_winpty_t)
-
-
-
