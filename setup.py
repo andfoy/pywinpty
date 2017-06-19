@@ -22,7 +22,13 @@ except KeyError:
     library_dirs = []
 
 
-REQUIREMENTS = ['cython', 'pypiwin32']
+REQUIREMENTS = ['cython']
+
+try:
+    import win32file
+except ImportError:
+    REQUIREMENTS += ['pypiwin32']
+
 
 setup(
     name='winpty',
