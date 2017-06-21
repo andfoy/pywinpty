@@ -31,7 +31,7 @@ except ImportError:
 
 
 setup(
-    name='winpty',
+    name='pywinpty',
     version=__version__,
     keywords=['winpty'],
     url='https://github.com/spyder-ide/pywinpty',
