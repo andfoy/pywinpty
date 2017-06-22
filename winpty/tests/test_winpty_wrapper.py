@@ -13,14 +13,14 @@ def pty_fixture(cols, rows):
     return pty
 
 
-def read_test():
+def test_read():
     pty = pty_fixture(80, 25)
     line = pty.read()
     assert 'Microsoft' in line
     del pty
 
 
-def write_test():
+def test_write():
     pty = pty_fixture(80, 25)
     pty.read()
     text = 'Eggs, ham and spam ünicode'

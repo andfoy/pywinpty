@@ -12,14 +12,14 @@ def agent_fixture(cols, rows):
     return agent
 
 
-def agent_spawn_test():
+def test_agent_spawn():
     agent = agent_fixture(80, 25)
     succ = agent.spawn(CMD)
     assert succ
     del agent
 
 
-def agent_resize_test():
+def test_agent_resize():
     agent = agent_fixture(80, 25)
     agent.set_size(80, 70)
     del agent
