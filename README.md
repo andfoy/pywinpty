@@ -2,8 +2,8 @@
 Python bindings for the [winpty](https://github.com/rprichard/winpty) pseudo terminal library. It allows to create and communicate with Windows processes that print outputs and recieve inputs via console input and output pipes.
 
 ## Project info
-[![Project License](https://img.shields.io/pypi/l/winpty.svg)](./LICENSE.txt)
-[![pypi version](https://img.shields.io/pypi/v/winpty.svg)](https://pypi.python.org/pypi/winpty)
+[![Project License](https://img.shields.io/pypi/l/pywinpty.svg)](./LICENSE.txt)
+[![pypi version](https://img.shields.io/pypi/v/pywinpty.svg)](https://pypi.python.org/pypi/winpty)
 
 ## Build status
 [![AppVeyor status](https://ci.appveyor.com/api/projects/status/tvjcqa4kf53br8s0/branch/master?svg=true)](https://ci.appveyor.com/project/spyder-ide/pywinpty/branch/master)
