@@ -1,6 +1,8 @@
 [run]
 plugins = Cython.Coverage
-omit = *.pxd
+omit =
+    *.pxd
+    */tests/*
 
 [report]
 fail_under=0
