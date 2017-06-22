@@ -22,9 +22,8 @@ def test_read():
     line = pty.read()
     while len(line) < 30:
         line = pty.read()
-    line = str(line)
-    loc = LOCATION.replace('\\', '\\\\')
-    assert loc in line
+    line = str(line, 'utf-8')
+    assert LOCATION in line
     del pty
 
 
