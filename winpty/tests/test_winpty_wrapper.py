@@ -2,12 +2,9 @@
 
 import os
 import pytest
-import os.path as osp
 from winpty.winpty_wrapper import PTY
 
 CMD = r'C:\windows\system32\cmd.exe'
-LOCATION = osp.realpath(osp.join(os.getcwd(),
-                                 osp.dirname(__file__)))
 
 
 @pytest.fixture(scope='module')
@@ -23,7 +20,8 @@ def test_read():
     while len(line) < 30:
         line = pty.read()
     line = str(line, 'utf-8')
-    assert LOCATION in line
+    loc = os.getcwd()
+    assert loc in line
     del pty
 
 
@@ -32,10 +30,16 @@ def test_write():
     line = pty.read()
     while len(line) < 10:
         line = pty.read()
+
     text = 'Eggs, ham and spam ünicode'
     pty.write(text)
+
     line = pty.read()
     while len(line) < 10:
         line = pty.read()
     line = str(line, 'utf-8')
+
     assert text in line
+
+    pty.close()
+    del pty
