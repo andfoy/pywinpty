@@ -20,16 +20,23 @@ def pty_fixture(cols, rows):
 def test_read():
     pty = pty_fixture(80, 25)
     line = pty.read()
-    while len(line) == 1:
+    while len(line) < 30:
         line = pty.read()
-    assert LOCATION in str(line, 'utf-8')
+    line = str(line)
+    loc = LOCATION.replace('\\', '\\\\')
+    assert loc in line
     del pty
 
 
 def test_write():
     pty = pty_fixture(80, 25)
-    pty.read()
+    line = pty.read()
+    while len(line) < 10:
+        line = pty.read()
     text = 'Eggs, ham and spam ünicode'
     pty.write(text)
     line = pty.read()
+    while len(line) < 10:
+        line = pty.read()
+    line = str(line, 'utf-8')
     assert text in line
