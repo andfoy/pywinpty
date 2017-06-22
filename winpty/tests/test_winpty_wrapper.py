@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 
+import os
 import pytest
+import os.path as osp
 from winpty.winpty_wrapper import PTY
 
 CMD = r'C:\windows\system32\cmd.exe'
+LOCATION = osp.realpath(osp.join(os.getcwd(),
+                                 osp.dirname(__file__)))
 
 
 @pytest.fixture(scope='module')
@@ -16,7 +20,9 @@ def pty_fixture(cols, rows):
 def test_read():
     pty = pty_fixture(80, 25)
     line = pty.read()
-    assert 'Microsoft' in line
+    while len(line) == 1:
+        line = pty.read()
+    assert LOCATION in str(line, 'utf-8')
     del pty
 
 
