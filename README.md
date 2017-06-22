@@ -50,7 +50,7 @@ process.spawn(r'C:\windows\system32\cmd.exe')
 process.read()
 
 # Write input to console (Unicode)
-process.write()
+process.write('Text')
 
 # Resize console size
 new_cols, new_rows = 90, 30
