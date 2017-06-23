@@ -1,4 +1,2 @@
-
-"""
-Winpty.h 
-"""
+# -*- coding: utf-8 -*-
+"""Winpty headers."""

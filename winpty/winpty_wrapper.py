@@ -1,11 +1,14 @@
+# -*- coding: utf-8 -*-
+"""Wrap process I/O pipe communication using pywin32."""
 
-"""
-Wrap process I/O pipe communication using pywin32 instead of using
-native C Windows API calls.
-"""
+# yapf: disable
 
+# Third party imports
 from winpty.cywinpty import Agent
 import win32file
+
+
+# yapf: enable
 
 
 class PTY(Agent):
@@ -15,19 +18,18 @@ class PTY(Agent):
 
     Inherits all Cython winpty agent functionality and properties.
     """
+
     def __init__(self, cols, rows):
         """Initialize a new Pseudo Terminal of size ``(cols, rows)``."""
         Agent.__init__(self, cols, rows, True)
-        self.conin_pipe = win32file.CreateFileW(self.conin_pipe_name,
-                                                win32file.GENERIC_WRITE,
-                                                0, None,
-                                                win32file.OPEN_EXISTING,
-                                                0, None)
-        self.conout_pipe = win32file.CreateFileW(self.conout_pipe_name,
-                                                 win32file.GENERIC_READ,
-                                                 0, None,
-                                                 win32file.OPEN_EXISTING,
-                                                 0, None)
+        self.conin_pipe = win32file.CreateFileW(
+            self.conin_pipe_name, win32file.GENERIC_WRITE, 0, None,
+            win32file.OPEN_EXISTING, 0, None
+        )
+        self.conout_pipe = win32file.CreateFileW(
+            self.conout_pipe_name, win32file.GENERIC_READ, 0, None,
+            win32file.OPEN_EXISTING, 0, None
+        )
 
     def read(self, length=1000):
         """

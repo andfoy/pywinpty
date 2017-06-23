@@ -1,10 +1,18 @@
 # -*- coding: utf-8 -*-
+"""winpty wrapper tests."""
 
+# yapf: disable
+
+# Standard library imports
 import os
-import pytest
 
+# Third party imports
 from flaky import flaky
 from winpty.winpty_wrapper import PTY
+import pytest
+
+
+# yapf: enable
 
 CMD = r'C:\windows\system32\cmd.exe'
 
