@@ -1,7 +1,14 @@
 # -*- coding: utf-8 -*-
+"""Cywinpty tests."""
 
-import pytest
+# yapf: disable
+
+# Third party imports
 from winpty.cywinpty import Agent
+import pytest
+
+
+# yapf: disable
 
 CMD = r'C:\windows\system32\cmd.exe'
 
