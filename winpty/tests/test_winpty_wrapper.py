@@ -2,6 +2,8 @@
 
 import os
 import pytest
+
+from flaky import flaky
 from winpty.winpty_wrapper import PTY
 
 CMD = r'C:\windows\system32\cmd.exe'
@@ -14,6 +16,7 @@ def pty_fixture(cols, rows):
     return pty
 
 
+@flaky(max_runs=4, min_passes=1)
 def test_read():
     pty = pty_fixture(80, 25)
     line = pty.read()

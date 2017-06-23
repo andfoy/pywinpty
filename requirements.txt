@@ -8,3 +8,4 @@ winpty
 # Test requirements
 ciocheck
 coveralls
+flaky
