@@ -7,3 +7,4 @@ winpty
 
 # Test requirements
 ciocheck
+coveralls

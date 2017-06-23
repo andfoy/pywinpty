@@ -1,23 +1,33 @@
-https://ci.appveyor.com/project/spyder-ide/pywinpty/
+# https://ci.appveyor.com/project/spyder-ide/pywinpty/
 
 matrix:
   fast_finish: true
 
 environment:
   global:
-    # Used by qthelpers to close widgets after a defined time
-    TEST_CI: True
+    # Used by setup.py to use trace when compiling cython for coverage stats
     CYTHON_COVERAGE: 1
+    # Build variables
+    LIBRARY_INC: "C:\\conda\\envs\\test\\Library\\include"
+    LIBRARY_LIB: "C:\\conda\\envs\\test\\Library\\lib"
+    DISTUTILS_USE_SDK: 1
     # Environment variables used by astropy helpers
     PYTHON: "C:\\conda"
     CMD_IN_ENV: "cmd /E:ON /V:ON /C .\\ci-helpers\\appveyor\\windows_sdk.cmd"
-    PYTHON_ARCH: "64" # needs to be set for CMD_IN_ENV to succeed. If a mix
-                      # of 32 bit and 64 bit builds are needed, move this
-                      # to the matrix section.
 
   matrix:
     - PYTHON_VERSION: "3.6"
+      PYTHON_ARCH: "64"
+      ARCH: "amd64"
     - PYTHON_VERSION: "3.5"
+      PYTHON_ARCH: "64"
+      ARCH: "amd64"
+    - PYTHON_VERSION: "3.6"
+      PYTHON_ARCH: "32"
+      ARCH: "x86"
+    - PYTHON_VERSION: "3.5"
+      PYTHON_ARCH: "32"
+      ARCH: "x86"
 
 platform:
   -x64
@@ -27,15 +37,17 @@ install:
   - "git clone git://github.com/astropy/ci-helpers.git"
   - "powershell ci-helpers/appveyor/install-miniconda.ps1"
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
+  # Use test conda environment
   - "activate test"
-  # Install the selected Qt version
-  - "conda install --file requirements.txt -c spyder-ide"
-  - "python setup.py develop"
+  - CALL "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\vcvarsall.bat" %ARCH%
+  - "conda install --file requirements.txt -c conda-forge"
+  - "%CMD_IN_ENV% python setup.py build_ext -i --compiler=msvc"
 
 # Not a .NET project, we build in the install step instead
 build: false
 
 test_script:
-  - ciocheck winpty --disable-tests
-  - conda remove -n test pytest-xdist
-  - pytest winppty
+  - "%CMD_IN_ENV% ciocheck winpty --disable-tests"
+  - "conda remove pytest-xdist"
+  - "%CMD_IN_ENV% pytest winpty --cov=winpty --cov-report term-missing"
+  - "%CMD_IN_ENV% coveralls"
