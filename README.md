@@ -3,7 +3,7 @@ Python bindings for the [winpty](https://github.com/rprichard/winpty) pseudo ter
 
 ## Build status
 [![Build status](https://ci.appveyor.com/api/projects/status/cowkuaebgeeq45v1?svg=true)](https://ci.appveyor.com/project/spyder-ide/pywinpty)
-[![Coverage Status](https://coveralls.io/repos/github/spyder-ide/pywinpty/badge.svg?branch=master)](https://coveralls.io/github/spyder-ide/pywinpty?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/spyder-ide/pywinpty/badge.svg?branch=HEAD)](https://coveralls.io/github/spyder-ide/pywinpty?branch=HEAD)
 
 ## Project info
 [![Project License](https://img.shields.io/pypi/l/pywinpty.svg)](./LICENSE.txt)
