@@ -16,19 +16,19 @@ To compile pywinpty sources, you must have [Cython](https://github.com/cython/cy
 To install this library, you must have the winpty libraries available on your system path. To install them, you can either compile from winpty source or you can install them using conda (Recommended):
 
 ```bash
-conda install winpty -c conda-forge
+conda install winpty -c spyder-ide
 ```
 
 Then, you can install this library by using conda or pip package managers, as it follows:
 
 Using conda (Recommended):
 ```bash
-conda install pywinpty -c conda-forge
+conda install pywinpty -c spyder-ide
 ```
 
 Using pip:
 ```
-pip install winpty
+pip install pywinpty
 ```
 
 Due to Visual Studio version incompatibilities, we currently only support Python 3.5 and 3.6 versions.
