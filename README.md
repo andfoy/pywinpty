@@ -33,6 +33,26 @@ pip install winpty
 
 Due to Visual Studio version incompatibilities, we currently only support Python 3.5 and 3.6 versions.
 
+## Building from sources
+To build from sources you will need to open either a Visual Studio development prompt or execute the ``vcvarsall.bat`` script from a CMD/Powershell console, then you will need to setup the following environment variables:
+
+```batch
+set DISTUTILS_USE_SDK=1
+set LIBRARY_INC=<Path to the folder that contains wintpty headers>
+set LIBRARY_LIB=<Path to the folder that contains wintpty library files>
+```
+
+To test your compilation environment settings, you can build pywinpty Cython sources locally, by executing:
+
+```bash
+python setup.py build_ext -i --compiler=msvc
+```
+
+If everything works correctly, you can install winpty by using ``pip``:
+
+```bash
+pip install -U .
+```
 
 ## Package usage
 Pywinpty offers a single python wrapper around winpty library functions. This implies that using a single object (``winpty.PTY``) it is possible to access to all functionallity, as it follows:
@@ -56,6 +76,9 @@ process.write('Text')
 # Resize console size
 new_cols, new_rows = 90, 30
 process.set_size(new_cols, new_rows)
+
+# Know if the process is alive
+alive = process.isalive()
 
 # Close console pipes
 process.close()
