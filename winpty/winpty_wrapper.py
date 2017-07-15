@@ -6,7 +6,6 @@
 # Third party imports
 from winpty.cywinpty import Agent
 
-import win32api
 import win32file
 import winerror
 
@@ -59,6 +58,10 @@ class PTY(Agent):
 
     def isalive(self):
         """Check if current process streams are still open."""
-        win32file.GetFileSize(self.conout_pipe)
-        err = win32api.GetLastError()
-        return err != winerror.ERROR_BROKEN_PIPE
+        alive = True
+        try:
+            self.write('')
+        except pywintypes.error as err:
+            if err[0] != winerror.ERROR_BROKEN_PIPE:
+                alive = False
+        return alive
