@@ -5,8 +5,9 @@
 
 # Third party imports
 from winpty.cywinpty import Agent
-import win32file
 
+import win32file
+import pywintypes
 
 # yapf: enable
 
@@ -54,3 +55,12 @@ class PTY(Agent):
         """Close all communication process streams."""
         win32file.CloseHandle(self.conout_pipe)
         win32file.CloseHandle(self.conin_pipe)
+
+    def isalive(self):
+        """Check if current process streams are still open."""
+        alive = True
+        try:
+            self.write('')
+        except pywintypes.error:
+            alive = False
+        return alive
