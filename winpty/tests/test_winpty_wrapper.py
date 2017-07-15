@@ -54,3 +54,11 @@ def test_write():
 
     pty.close()
     del pty
+
+
+def test_isalive():
+    pty = pty_fixture(80, 25)
+    pty.write('exit\r\n')
+    assert not pty.isalive()
+    pty.close()
+    del pty
