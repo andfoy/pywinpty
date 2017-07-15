@@ -63,6 +63,6 @@ class PTY(Agent):
         try:
             self.write('')
         except pywintypes.error as err:
-            if err[0] != winerror.ERROR_BROKEN_PIPE:
+            if err.excepinfo[0] != winerror.ERROR_BROKEN_PIPE:
                 alive = False
         return alive
