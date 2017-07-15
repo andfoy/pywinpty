@@ -1,5 +1,11 @@
+
+"""
+Import winpty.h struct and function definitions.
+"""
+
 cimport cython
 
+# Import some windows.h type shorthands
 cdef extern from "Windows.h":
     ctypedef Py_UNICODE WCHAR
     ctypedef const WCHAR* LPCWSTR
@@ -9,9 +15,9 @@ cdef extern from "Windows.h":
     ctypedef unsigned long DWORD
 
 
+# Import winpty.h C++ definitions
 cdef extern from 'winpty.h':
     # Error constants and structs
-    # ctypedef struct winpty_error_s winpty_error_t
     ctypedef struct winpty_error_t
     ctypedef winpty_error_t* winpty_error_ptr_t
     ctypedef DWORD winpty_result_t
@@ -47,7 +53,6 @@ cdef extern from 'winpty.h':
 
 
     # Process creation configuration struct
-    # ctypedef struct winpty_spawn_config_s winpty_spawn_config_t
     ctypedef struct winpty_spawn_config_t
 
     # Process creation functions
@@ -58,9 +63,9 @@ cdef extern from 'winpty.h':
                                                     LPCWSTR env,
                                                     winpty_error_ptr_t *err)
 
-    # Spawn new processes
     void winpty_spawn_config_free(winpty_spawn_config_t *cfg)
 
+    # Spawn new processes
     bint winpty_spawn(winpty_t *wp,
                       const winpty_spawn_config_t *cfg,
                       HANDLE *process_handle,
@@ -72,4 +77,5 @@ cdef extern from 'winpty.h':
     bint winpty_set_size(winpty_t *wp, int cols, int rows,
                          winpty_error_ptr_t *err)
 
+    # Free winpty_t pointer
     void winpty_free(winpty_t *wp)

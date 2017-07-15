@@ -1,5 +1,10 @@
 
+"""
+Winpty header constants.
+"""
+
 cdef extern from 'winpty_constants.h':
+    # Agent error constants
     cdef int _WINPTY_ERROR_SUCCESS "WINPTY_ERROR_SUCCESS"
     cdef int _WINPTY_ERROR_OUT_OF_MEMORY "WINPTY_ERROR_OUT_OF_MEMORY"
     cdef int _WINPTY_ERROR_SPAWN_CREATE_PROCESS_FAILED "WINPTY_ERROR_SPAWN_CREATE_PROCESS_FAILED"
@@ -16,12 +21,15 @@ cdef extern from 'winpty_constants.h':
     cdef int _WINPTY_FLAG_COLOR_ESCAPES "WINPTY_FLAG_COLOR_ESCAPES"
     cdef int _WINPTY_FLAG_ALLOW_CURPROC_DESKTOP_CREATION "WINPTY_FLAG_ALLOW_CURPROC_DESKTOP_CREATION"
 
+    # All agent configuration constants enabled
     cdef int _WINPTY_FLAG_MASK "WINPTY_FLAG_MASK"
 
+    # Disable/Enable mouse input capture
     cdef int _WINPTY_MOUSE_MODE_NONE "WINPTY_MOUSE_MODE_NONE"
     cdef int _WINPTY_MOUSE_MODE_AUTO "WINPTY_MOUSE_MODE_AUTO"
     cdef int _WINPTY_MOUSE_MODE_FORCE "WINPTY_MOUSE_MODE_FORCE"
 
+    # General winpty-agent process behaviour constants
     cdef int _WINPTY_SPAWN_FLAG_AUTO_SHUTDOWN "WINPTY_SPAWN_FLAG_AUTO_SHUTDOWN"
     cdef int _WINPTY_SPAWN_FLAG_EXIT_AFTER_SHUTDOWN "WINPTY_SPAWN_FLAG_EXIT_AFTER_SHUTDOWN"
     cdef int _WINPTY_SPAWN_FLAG_MASK "WINPTY_SPAWN_FLAG_MASK"
