@@ -7,7 +7,6 @@
 from winpty.cywinpty import Agent
 
 import win32file
-import winerror
 import pywintypes
 
 # yapf: enable
@@ -62,7 +61,6 @@ class PTY(Agent):
         alive = True
         try:
             self.write('')
-        except pywintypes.error as err:
-            if err.excepinfo[0] != winerror.ERROR_BROKEN_PIPE:
-                alive = False
+        except pywintypes.error:
+            alive = False
         return alive
