@@ -58,7 +58,20 @@ def test_write():
 
 def test_isalive():
     pty = pty_fixture(80, 25)
+    line = pty.read()
+    while len(line) < 10:
+        line = pty.read()
+
     pty.write('exit\r\n')
+    line = pty.read()
+
+    while len(line) < 10:
+        line = pty.read()
+    line = str(line, 'utf-8')
+
+    assert 'exit' in line
+
     assert not pty.isalive()
+
     pty.close()
     del pty
