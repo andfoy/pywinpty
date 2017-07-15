@@ -1,15 +1,37 @@
-## Version 0.1.1 (2017/07/15)
+## Version 0.1.2 (2017/07/15)
 
 ### Issues Closed
 
+* [Issue 41](https://github.com/spyder-ide/pywinpty/issues/41) - Release 0.1.2
+* [Issue 35](https://github.com/spyder-ide/pywinpty/issues/35) - Add a RELEASE.md
+* [Issue 34](https://github.com/spyder-ide/pywinpty/issues/34) - Add a CHANGELOG.md
+* [Issue 33](https://github.com/spyder-ide/pywinpty/issues/33) - Get to know if a process is alive or not
+* [Issue 30](https://github.com/spyder-ide/pywinpty/issues/30) - Improve external build documentation
+
+In this release 5 issues were closed.
+
+### Pull Requests Merged
+
+* [PR 40](https://github.com/spyder-ide/pywinpty/pull/40) - PR: Improve README building from source section
+* [PR 39](https://github.com/spyder-ide/pywinpty/pull/39) - PR: Add release instructions
+* [PR 38](https://github.com/spyder-ide/pywinpty/pull/38) - PR: Check if a process is alive
+
+In this release 3 pull requests were closed.
+
+
+## Version 0.1.1 (2017-07-15)
+
+### Issues Closed
+
+* [Issue 36](https://github.com/spyder-ide/pywinpty/issues/36) - Release v0.1.1
 * [Issue 32](https://github.com/spyder-ide/pywinpty/issues/32) - Add code autoformatter
-* [Issue 27](https://github.com/spyder-ide/pywinpty/issues/27) - Update README usage documentation 
+* [Issue 27](https://github.com/spyder-ide/pywinpty/issues/27) - Update README usage documentation
 * [Issue 22](https://github.com/spyder-ide/pywinpty/issues/22) - Add basic tests
 * [Issue 21](https://github.com/spyder-ide/pywinpty/issues/21) - add .txt to LICENSE to be windows friendly
 * [Issue 20](https://github.com/spyder-ide/pywinpty/issues/20) - Add LICENSE to Manifest.in
 * [Issue 4](https://github.com/spyder-ide/pywinpty/issues/4) - Add CI integration
 
-In this release 6 issues were closed.
+In this release 7 issues were closed.
 
 ### Pull Requests Merged
 
