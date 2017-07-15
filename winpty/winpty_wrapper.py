@@ -8,6 +8,7 @@ from winpty.cywinpty import Agent
 
 import win32file
 import winerror
+import pywintypes
 
 # yapf: enable
 
