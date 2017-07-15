@@ -5,8 +5,10 @@
 
 # Third party imports
 from winpty.cywinpty import Agent
-import win32file
 
+import win32api
+import win32file
+import winerror
 
 # yapf: enable
 
@@ -54,3 +56,9 @@ class PTY(Agent):
         """Close all communication process streams."""
         win32file.CloseHandle(self.conout_pipe)
         win32file.CloseHandle(self.conin_pipe)
+
+    def isalive(self):
+        """Check if current process streams are still open."""
+        win32file.GetFileSize(self.conout_pipe)
+        err = win32api.GetLastError()
+        return err != winerror.ERROR_BROKEN_PIPE
