@@ -102,3 +102,8 @@ ENV/
 
 # Cython C generated files
 cywinpty.c
+
+# Winpty binaries
+.exe
+.dll
+.h
