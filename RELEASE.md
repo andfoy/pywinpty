@@ -26,6 +26,8 @@ To release a new version of pywinpty:
 
 * set LIBRARY_LIB=<CONDA_ENV_PATH>\Library\lib
 
+* Copy binary files ``winpty-agent.exe`` and ``winpty.dll`` to winpty folder
+
 * python setup.py bdist_wheel
 
 ## Uploading wheels
