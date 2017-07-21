@@ -13,7 +13,7 @@ Python bindings for the [winpty](https://github.com/rprichard/winpty) pseudo ter
 To compile pywinpty sources, you must have [Cython](https://github.com/cython/cython) and Visual Studio (2013 or later) installed. You must also have Winpty's C header and library files available on your include path.
 
 ## Installation
-To install this library, you can install this library by using conda or pip package managers, as it follows:
+You can install this library by using conda or pip package managers, as it follows:
 
 Using conda (Recommended):
 ```bash
