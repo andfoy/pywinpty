@@ -1,3 +1,18 @@
+## Version 0.1.3 (2017/07/20)
+
+### Issues Closed
+
+* [Issue 43](https://github.com/spyder-ide/pywinpty/issues/43) - Bundle winpty binaries with Python wheels
+
+In this release 1 issue was closed.
+
+### Pull Requests Merged
+
+* [PR 44](https://github.com/spyder-ide/pywinpty/pull/44) - PR: Update RELEASE.md file to mention winpty binaries inclusion before creating our wheels
+
+In this release 1 pull request was closed.
+
+
 ## Version 0.1.2 (2017/07/15)
 
 ### Issues Closed
