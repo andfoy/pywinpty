@@ -10,16 +10,10 @@ Python bindings for the [winpty](https://github.com/rprichard/winpty) pseudo ter
 [![pypi version](https://img.shields.io/pypi/v/pywinpty.svg)](https://pypi.python.org/pypi/pywinpty)
 
 ## Dependencies
-To compile pywinpty sources, you must have [Cython](https://github.com/cython/cython) and Visual Studio (2013 or later) installed. You must also have Winpty's C header files available on your include path.
+To compile pywinpty sources, you must have [Cython](https://github.com/cython/cython) and Visual Studio (2013 or later) installed. You must also have Winpty's C header and library files available on your include path.
 
 ## Installation
-To install this library, you must have the winpty libraries available on your system path. To install them, you can either compile from winpty source or you can install them using conda (Recommended):
-
-```bash
-conda install winpty -c spyder-ide
-```
-
-Then, you can install this library by using conda or pip package managers, as it follows:
+To install this library, you can install this library by using conda or pip package managers, as it follows:
 
 Using conda (Recommended):
 ```bash
@@ -27,11 +21,11 @@ conda install pywinpty -c spyder-ide
 ```
 
 Using pip:
-```
+```bash
 pip install pywinpty
 ```
 
-Due to Visual Studio version incompatibilities, we currently only support Python 3.5 and 3.6 versions.
+Due to Visual Studio version incompatibilities, we currently only support Python 3.5 and 3.6 versions. Both installation packages include the required winpty binaries.
 
 ## Building from sources
 To build from sources you will need to open either a Visual Studio development prompt or execute the ``vcvarsall.bat`` script from a CMD/Powershell console, then you will need to setup the following environment variables:
