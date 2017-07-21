@@ -14,5 +14,5 @@ from .winpty_wrapper import PTY
 # yapf: enable
 
 PTY
-VERSION_INFO = (0, 1, 3)
+VERSION_INFO = (0, 1, 4, 'dev0')
 __version__ = '.'.join(map(str, VERSION_INFO))
