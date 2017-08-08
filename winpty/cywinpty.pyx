@@ -109,13 +109,14 @@ cdef class Agent:
         """
         Resize the console size of current agent process.
         """
-        cdef winpty.winpty_error_ptr_t err_pointer
-        cdef bint succ = winpty.winpty_set_size(self._c_winpty_t, cols, rows, &err_pointer)
-
         if cols <= 0 or rows <= 0:
             msg = 'PTY cols and rows must be positive and non-zero. Got: ({0}, {1})'.format(
                 cols, rows)
             raise RuntimeError(msg)
+
+        cdef winpty.winpty_error_ptr_t err_pointer
+        cdef bint succ = winpty.winpty_set_size(self._c_winpty_t, cols, rows, &err_pointer)
+
 
         if not succ:
             msg = 'An error has ocurred: {0} - Code: {1}'.format(
