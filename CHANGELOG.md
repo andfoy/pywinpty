@@ -1,3 +1,21 @@
+## Version 0.1.4 (2017/08/08)
+
+### Issues Closed
+
+* [Issue 50](https://github.com/spyder-ide/pywinpty/issues/50) - Release v0.1.4
+* [Issue 47](https://github.com/spyder-ide/pywinpty/issues/47) - Include pypiwin32 dependency using an env variable
+* [Issue 46](https://github.com/spyder-ide/pywinpty/issues/46) - Check if terminal dimensions are positive integers
+
+In this release 3 issues were closed.
+
+### Pull Requests Merged
+
+* [PR 49](https://github.com/spyder-ide/pywinpty/pull/49) - Include pypiwin32 dependency only if PYWINPTY_WHL environment variable is present
+* [PR 48](https://github.com/spyder-ide/pywinpty/pull/48) - Check if size/resize dimensions are non-negative/zero
+
+In this release 2 pull requests were closed.
+
+
 ## Version 0.1.3 (2017/07/20)
 
 ### Issues Closed
