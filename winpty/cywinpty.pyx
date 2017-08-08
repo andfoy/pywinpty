@@ -117,7 +117,6 @@ cdef class Agent:
         cdef winpty.winpty_error_ptr_t err_pointer
         cdef bint succ = winpty.winpty_set_size(self._c_winpty_t, cols, rows, &err_pointer)
 
-
         if not succ:
             msg = 'An error has ocurred: {0} - Code: {1}'.format(
                 winpty.winpty_error_msg(err_pointer),
