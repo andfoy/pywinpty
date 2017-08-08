@@ -22,7 +22,7 @@ To release a new version of pywinpty:
 
 * conda install winpty -c spyder-ide
 
-* set PYWINPTY_WHEELS=1
+* set PYWINPTY_WHL=1
 
 * set LIBRARY_INC=<CONDA_ENV_PATH>\Library\include
 

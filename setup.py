@@ -41,7 +41,7 @@ except KeyError:
 
 REQUIREMENTS = ['cython']
 
-if os.environ.get('PYWINPTY_WHEELS'):
+if os.environ.get('PYWINPTY_WHL'):
     # If packaging PyPi wheels
     REQUIREMENTS += ['pypiwin32']
 
