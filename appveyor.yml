@@ -50,5 +50,5 @@ build: false
 test_script:
   - "%CMD_IN_ENV% ciocheck winpty --disable-tests"
   - "conda remove pytest-xdist"
-  - "%CMD_IN_ENV% pytest winpty --cov=winpty --cov-report term-missing"
+  - "%CMD_IN_ENV% pytest winpty --cov=winpty --cov-report term-missing -v"
   - "%CMD_IN_ENV% coveralls"
