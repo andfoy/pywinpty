@@ -41,13 +41,10 @@ except KeyError:
 
 REQUIREMENTS = ['cython']
 
-try:
-    # Only if building on conda-build
-    import win32file
-    win32file
-except ImportError:
-    # Add to pip requirements
+if os.environ.get('PYWINPTY_WHEELS'):
+    # If packaging PyPi wheels
     REQUIREMENTS += ['pypiwin32']
+
 
 ext_options = {}
 cythonize_options = {}
