@@ -1,7 +1,6 @@
 # Build requirements
 cython
 python
-pywin32
 setuptools
 winpty
 
