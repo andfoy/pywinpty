@@ -68,9 +68,9 @@ class PTY(Agent):
         data_p = ctypes.create_string_buffer(data)
         num_bytes = PLARGE_INTEGER(LARGE_INTEGER(0))
         bytes_to_write = ctypes.sizeof(data_p)
-        windll.kernel32.WriteFile(self.conin_pipe, data_p, bytes_to_write,
-                                  num_bytes, None)
-        return num_bytes[0]
+        err = windll.kernel32.WriteFile(self.conin_pipe, data_p,
+                                        bytes_to_write, num_bytes, None)
+        return err, num_bytes[0]
 
     def close(self):
         """Close all communication process streams."""
@@ -80,9 +80,6 @@ class PTY(Agent):
     def isalive(self):
         """Check if current process streams are still open."""
         alive = True
-        self.read()
-        GetLastError = windll.kernel32.GetLastError
-        GetLastError.restype = DWORD
-        err = GetLastError()
-        alive = err != 0
+        err, _ = self.write('')
+        alive = err == 0
         return alive
