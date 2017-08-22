@@ -8,9 +8,6 @@ import ctypes
 from ctypes import windll
 from winpty.cywinpty import Agent
 
-# import win32file
-# import pywintypes
-
 # yapf: enable
 
 OPEN_EXISTING = 3
@@ -33,10 +30,6 @@ class PTY(Agent):
     def __init__(self, cols, rows):
         """Initialize a new Pseudo Terminal of size ``(cols, rows)``."""
         Agent.__init__(self, cols, rows, True)
-        # # self.conin_pipe = win32file.CreateFileW(
-        #     self.conin_pipe_name, win32file.GENERIC_WRITE, 0, None,
-        #     win32file.OPEN_EXISTING, 0, None
-        # # )
         self.conin_pipe = windll.kernel32.CreateFileW(
             self.conin_pipe_name, GENERIC_WRITE, 0, None,
             OPEN_EXISTING, 0, None)
