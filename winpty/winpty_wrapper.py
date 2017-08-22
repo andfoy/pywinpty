@@ -54,7 +54,7 @@ class PTY(Agent):
         """
         size_p = PLARGE_INTEGER(LARGE_INTEGER(0))
         windll.kernel32.GetFileSizeEx(self.conout_pipe, size_p)
-        size = size_p[0].value
+        size = size_p[0]
         data = ctypes.create_string_buffer(b'\000' * length)
         if size > 0:
             windll.kernel32.ReadFile(self.conout_pipe, data, length,
@@ -69,7 +69,7 @@ class PTY(Agent):
         bytes_to_write = ctypes.sizeof(data_p)
         windll.kernel32.WriteFile(self.conin_pipe, data_p, bytes_to_write,
                                   num_bytes, None)
-        return num_bytes[0].value
+        return num_bytes[0]
 
     def close(self):
         """Close all communication process streams."""
@@ -83,5 +83,5 @@ class PTY(Agent):
         GetLastError = windll.kernel32.GetLastError
         GetLastError.restype = DWORD
         err = GetLastError()
-        alive = err.value != 0
+        alive = err != 0
         return alive
