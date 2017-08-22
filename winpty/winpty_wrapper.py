@@ -52,7 +52,7 @@ class PTY(Agent):
         Note: This method is not fully non-blocking, however it
         behaves like one.
         """
-        size_p = PLARGE_INTEGER(0)
+        size_p = PLARGE_INTEGER(LARGE_INTEGER(0))
         windll.kernel32.GetFileSizeEx(self.conout_pipe, size_p)
         size = size_p[0].value
         data = ctypes.create_string_buffer(b'\000' * length)
@@ -65,7 +65,7 @@ class PTY(Agent):
         """Write data to current process input stream."""
         data = bytes(data, 'utf-8')
         data_p = ctypes.create_string_buffer(data)
-        num_bytes = PLARGE_INTEGER(0)
+        num_bytes = PLARGE_INTEGER(LARGE_INTEGER(0))
         bytes_to_write = ctypes.sizeof(data_p)
         windll.kernel32.WriteFile(self.conin_pipe, data_p, bytes_to_write,
                                   num_bytes, None)
