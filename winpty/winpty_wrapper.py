@@ -65,11 +65,9 @@ class PTY(Agent):
         """Write data to current process input stream."""
         data = bytes(data, 'utf-8')
         data_p = ctypes.create_string_buffer(data)
-        num_bytes = PLARGE_INTEGER(LARGE_INTEGER(0))
         bytes_to_write = ctypes.sizeof(data_p)
         windll.kernel32.WriteFile(self.conin_pipe, data_p, bytes_to_write,
-                                  num_bytes, None)
-        return num_bytes[0]
+                                  None, None)
 
     def close(self):
         """Close all communication process streams."""
