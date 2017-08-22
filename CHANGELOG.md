@@ -1,3 +1,18 @@
+## Version 0.2.0 (2017/08/22)
+
+### Issues Closed
+
+* [Issue 54](https://github.com/spyder-ide/pywinpty/issues/54) - Release 0.2
+* [Issue 52](https://github.com/spyder-ide/pywinpty/issues/52) - remove  'pypiwin32' from setup requirements
+
+In this release 2 issues were closed.
+
+### Pull Requests Merged
+
+* [PR 53](https://github.com/spyder-ide/pywinpty/pull/53) - PR: Replace pywin32 function calls by Win32 ctypes calls
+
+In this release 1 pull request was closed.
+
 ## Version 0.1.4 (2017/08/08)
 
 ### Issues Closed
