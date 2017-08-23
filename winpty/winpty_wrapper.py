@@ -49,7 +49,7 @@ class PTY(Agent):
         windll.kernel32.GetFileSizeEx(self.conout_pipe, size_p)
         size = size_p[0]
         length = min(size, length)
-        data = ctypes.create_string_buffer(b'\000' * length)
+        data = ctypes.create_string_buffer(length)
         if length > 0:
             windll.kernel32.ReadFile(self.conout_pipe, data, length,
                                      None, None)
@@ -60,7 +60,7 @@ class PTY(Agent):
         data = bytes(data, 'utf-8')
         data_p = ctypes.create_string_buffer(data)
         num_bytes = PLARGE_INTEGER(LARGE_INTEGER(0))
-        bytes_to_write = ctypes.sizeof(data_p)
+        bytes_to_write = len(data)
         err = windll.kernel32.WriteFile(self.conin_pipe, data_p,
                                         bytes_to_write, num_bytes, None)
         return err, num_bytes[0]
@@ -72,7 +72,7 @@ class PTY(Agent):
 
     def isalive(self):
         """Check if current process streams are still open."""
-        alive = True
-        err, _ = self.write('')
-        alive = err == 0
+        err = windll.kernel32.PeekNamedPipe(self.conout_pipe, None, None,
+                                            None, None, None)
+        alive = bool(err)
         return alive
