@@ -1,3 +1,20 @@
+## Version 0.2.1 (2017/08/23)
+
+### Issues Closed
+
+* [Issue 58](https://github.com/spyder-ide/pywinpty/issues/58) - Release v0.2.1
+* [Issue 56](https://github.com/spyder-ide/pywinpty/issues/56) - Each call to isalive function cause to escape unwanted characters on output pipe
+* [Issue 55](https://github.com/spyder-ide/pywinpty/issues/55) - isalive returns True if the underlying winpty process is dead, False otherwise
+
+In this release 3 issues were closed.
+
+### Pull Requests Merged
+
+* [PR 57](https://github.com/spyder-ide/pywinpty/pull/57) - PR: Fix several cytpes migration issues
+
+In this release 1 pull request was closed.
+
+
 ## Version 0.2.0 (2017/08/22)
 
 ### Issues Closed
