@@ -27,12 +27,12 @@ def pty_fixture(cols, rows):
 @flaky(max_runs=4, min_passes=1)
 def test_read():
     pty = pty_fixture(80, 25)
-    line = pty.read()
-    while len(line) < 30:
-        line = pty.read()
-    line = str(line, 'utf-8')
     loc = os.getcwd()
+    line = ''
+    while loc not in line:
+        line += str(pty.read(), 'utf-8')
     assert loc in line
+    pty.close()
     del pty
 
 
@@ -45,10 +45,9 @@ def test_write():
     text = 'Eggs, ham and spam ünicode'
     pty.write(text)
 
-    line = pty.read()
-    while len(line) < 10:
-        line = pty.read()
-    line = str(line, 'utf-8')
+    line = ''
+    while text not in line:
+        line += str(pty.read(), 'utf-8')
 
     assert text in line
 
@@ -59,8 +58,14 @@ def test_write():
 def test_isalive():
     pty = pty_fixture(80, 25)
     pty.write('exit\r\n')
-
+   
+    text = 'exit'
+    line = ''
+    while text not in line:
+        line += str(pty.read(), 'utf-8')
+   
     while pty.isalive():
+        pty.read()
         continue
 
     assert not pty.isalive()
