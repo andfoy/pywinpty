@@ -7,6 +7,7 @@
 import ctypes
 from ctypes import windll
 from winpty.cywinpty import Agent
+from ctypes.wintypes import DWORD, LPVOID, HANDLE, LPDWORD, BOOL, LPCVOID
 
 # yapf: enable
 
@@ -14,9 +15,17 @@ OPEN_EXISTING = 3
 GENERIC_WRITE = 0x40000000
 GENERIC_READ = 0x80000000
 
-DWORD = ctypes.c_ulong
 LARGE_INTEGER = ctypes.c_longlong
 PLARGE_INTEGER = ctypes.POINTER(LARGE_INTEGER)
+LPOVERLAPPED = LPVOID
+
+ReadFile = windll.kernel32.ReadFile
+ReadFile.restype = BOOL
+ReadFile.argtypes = [HANDLE, LPVOID, DWORD, LPDWORD, LPOVERLAPPED]
+
+WriteFile = windll.kernel32.WriteFile
+WriteFile.restype = BOOL
+WriteFile.argtypes = [HANDLE, LPCVOID, DWORD, LPDWORD, LPOVERLAPPED]
 
 
 class PTY(Agent):
@@ -51,8 +60,7 @@ class PTY(Agent):
         length = min(size, length)
         data = ctypes.create_string_buffer(length)
         if length > 0:
-            windll.kernel32.ReadFile(self.conout_pipe, data, length,
-                                     None, None)
+            ReadFile(self.conout_pipe, data, length, None, None)
         return data.value
 
     def write(self, data):
@@ -61,8 +69,8 @@ class PTY(Agent):
         data_p = ctypes.create_string_buffer(data)
         num_bytes = PLARGE_INTEGER(LARGE_INTEGER(0))
         bytes_to_write = len(data)
-        err = windll.kernel32.WriteFile(self.conin_pipe, data_p,
-                                        bytes_to_write, num_bytes, None)
+        err = WriteFile(self.conin_pipe, data_p,
+                        bytes_to_write, num_bytes, None)
         return err, num_bytes[0]
 
     def close(self):
