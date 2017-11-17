@@ -8,6 +8,7 @@ This package provides a Cython wrapper around winpty C++ library.
 # yapf: disable
 
 # Local imports
+from .ptyprocess import PtyProcess
 from .winpty_wrapper import PTY
 
 

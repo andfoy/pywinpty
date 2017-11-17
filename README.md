@@ -52,6 +52,16 @@ pip install -U .
 Pywinpty offers a single python wrapper around winpty library functions. This implies that using a single object (``winpty.PTY``) it is possible to access to all functionallity, as it follows:
 
 ```python
+# High level usage using `spawn`
+from winpty import PtyProcess
+
+proc = PtyProcess.spawn('python')
+proc.write('print("hello, world!")\r\n')
+proc.write('exit()\r\n')
+while proc.isalive():
+	print(proc.readline())
+
+# Low level usage using the raw `PTY` object
 from winpty import PTY
 
 # Start a new winpty-agent process of size (cols, rows)

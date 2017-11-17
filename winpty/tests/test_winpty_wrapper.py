@@ -58,12 +58,12 @@ def test_write():
 def test_isalive():
     pty = pty_fixture(80, 25)
     pty.write('exit\r\n')
-   
+
     text = 'exit'
     line = ''
     while text not in line:
         line += str(pty.read(), 'utf-8')
-   
+
     while pty.isalive():
         pty.read()
         continue
