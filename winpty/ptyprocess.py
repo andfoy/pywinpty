@@ -37,7 +37,7 @@ class PtyProcess(object):
             cmd = shlex.split(cmd, posix=False)
 
         if not isinstance(cmd, (list, tuple)):
-            raise TypeError("Expected a list or tuple for cmd, got %r" % argv)
+            raise TypeError("Expected a list or tuple for cmd, got %r" % cmd)
 
         # Shallow copy of argv so we can modify it
         cmd = cmd[:]

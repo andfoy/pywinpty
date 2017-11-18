@@ -74,7 +74,7 @@ class PTY(Agent):
         num_bytes = PLARGE_INTEGER(LARGE_INTEGER(0))
         bytes_to_write = len(data)
         success = WriteFile(self.conin_pipe, data_p,
-                        bytes_to_write, num_bytes, None)
+                            bytes_to_write, num_bytes, None)
         return success, num_bytes[0]
 
     def close(self):
