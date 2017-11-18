@@ -24,6 +24,7 @@ class PtyProcess(object):
         assert isinstance(proc, PTY)
         self.proc = proc
         self.fd = uuid.uuid4().hex
+        self.pid = uuid.uuid4().hex
         self.decoder = codecs.getincrementaldecoder('utf-8')(errors='strict')
 
     @classmethod
