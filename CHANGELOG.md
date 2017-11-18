@@ -1,3 +1,20 @@
+## Version 0.3 (2017/11/18)
+
+### Issues Closed
+
+* [Issue 63](https://github.com/spyder-ide/pywinpty/issues/63) - Implement a process wrapper
+* [Issue 59](https://github.com/spyder-ide/pywinpty/issues/59) - Access violation writing 0x0000000000000000
+
+In this release 2 issues were closed.
+
+### Pull Requests Merged
+
+* [PR 62](https://github.com/spyder-ide/pywinpty/pull/62) - Implement a PtyProcess class
+* [PR 61](https://github.com/spyder-ide/pywinpty/pull/61) - PR: Define explicit calls to ReadFile and WriteFile
+
+In this release 2 pull requests were closed.
+
+
 ## Version 0.2.1 (2017/08/23)
 
 ### Issues Closed
