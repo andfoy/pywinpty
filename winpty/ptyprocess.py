@@ -7,6 +7,8 @@ import os
 import shlex
 import subprocess
 import time
+import uuid
+
 
 # Local imports
 from .winpty_wrapper import PTY
@@ -19,7 +21,9 @@ class PtyProcess(object):
     """
 
     def __init__(self, proc):
+        assert isinstance(proc, PTY)
         self.proc = proc
+        self.fd = uuid.uuid4().hex
         self.decoder = codecs.getincrementaldecoder('utf-8')(errors='strict')
 
     @classmethod
