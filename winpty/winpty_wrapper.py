@@ -3,11 +3,14 @@
 
 # yapf: disable
 
-# Third party imports
-import ctypes
+# Standard library imports
 from ctypes import windll
-from winpty.cywinpty import Agent
 from ctypes.wintypes import DWORD, LPVOID, HANDLE, LPDWORD, BOOL, LPCVOID
+import ctypes
+
+# Local imports
+from .cywinpty import Agent
+
 
 # yapf: enable
 
@@ -40,16 +43,17 @@ class PTY(Agent):
         """Initialize a new Pseudo Terminal of size ``(cols, rows)``."""
         Agent.__init__(self, cols, rows, True)
         self.conin_pipe = windll.kernel32.CreateFileW(
-            self.conin_pipe_name, GENERIC_WRITE, 0, None,
-            OPEN_EXISTING, 0, None)
+            self.conin_pipe_name, GENERIC_WRITE, 0, None, OPEN_EXISTING, 0,
+            None
+        )
         self.conout_pipe = windll.kernel32.CreateFileW(
-            self.conout_pipe_name, GENERIC_READ, 0, None,
-            OPEN_EXISTING, 0, None
+            self.conout_pipe_name, GENERIC_READ, 0, None, OPEN_EXISTING, 0,
+            None
         )
 
     def read(self, length=1000):
         """
-        Read ``length`` characters from current process output stream.
+        Read ``length`` bytes from current process output stream.
 
         Note: This method is not fully non-blocking, however it
         behaves like one.
@@ -64,14 +68,14 @@ class PTY(Agent):
         return data.value
 
     def write(self, data):
-        """Write data to current process input stream."""
+        """Write string data to current process input stream."""
         data = bytes(data, 'utf-8')
         data_p = ctypes.create_string_buffer(data)
         num_bytes = PLARGE_INTEGER(LARGE_INTEGER(0))
         bytes_to_write = len(data)
-        err = WriteFile(self.conin_pipe, data_p,
+        success = WriteFile(self.conin_pipe, data_p,
                         bytes_to_write, num_bytes, None)
-        return err, num_bytes[0]
+        return success, num_bytes[0]
 
     def close(self):
         """Close all communication process streams."""
@@ -80,7 +84,8 @@ class PTY(Agent):
 
     def isalive(self):
         """Check if current process streams are still open."""
-        err = windll.kernel32.PeekNamedPipe(self.conout_pipe, None, None,
-                                            None, None, None)
+        err = windll.kernel32.PeekNamedPipe(
+            self.conout_pipe, None, None, None, None, None
+        )
         alive = bool(err)
         return alive

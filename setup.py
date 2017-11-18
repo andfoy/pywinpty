@@ -8,7 +8,6 @@ import ast
 import os
 
 # Third party imports
-from Cython.Build import cythonize
 from setuptools import Extension, find_packages, setup
 
 
@@ -39,8 +38,6 @@ try:
 except KeyError:
     library_dirs = []
 
-REQUIREMENTS = ['cython']
-
 
 ext_options = {}
 cythonize_options = {}
@@ -51,6 +48,23 @@ if os.environ.get('CYTHON_COVERAGE'):
         ('CYTHON_TRACE', '1'), ('CYTHON_TRACE_NOGIL', '1')
     ]
 
+try:
+    from Cython.Build import cythonize
+    ext_modules = cythonize([
+        Extension(
+            "winpty.cywinpty",
+            sources=["winpty/cywinpty.pyx"],
+            libraries=["winpty"],
+            include_dirs=include_dirs,
+            library_dirs=library_dirs,
+            **ext_options
+        )],
+        **cythonize_options
+    )
+except ImportError:
+    ext_modules = []
+
+
 setup(
     name='pywinpty',
     version=get_version(),
@@ -60,22 +74,10 @@ setup(
     author='Edgar Andrés Margffoy-Tuay',
     author_email='andfoy@gmail.com',
     description='Python bindings for the winpty library',
-    ext_modules=cythonize(
-        [
-            Extension(
-                "winpty.cywinpty",
-                sources=["winpty/cywinpty.pyx"],
-                libraries=["winpty"],
-                include_dirs=include_dirs,
-                library_dirs=library_dirs,
-                **ext_options
-            )
-        ],
-        **cythonize_options
-    ),
+    ext_modules=ext_modules,
     packages=find_packages(exclude=['contrib', 'docs', 'tests*']),
     include_package_data=True,
-    install_requires=REQUIREMENTS,
+    setup_requires=['Cython'],
     classifiers=[
         'Development Status :: 4 - Beta', 'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
