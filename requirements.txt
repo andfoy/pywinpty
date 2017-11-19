@@ -3,6 +3,7 @@ cython
 python
 setuptools
 winpty
+backports.shutil_which
 
 # Test requirements
 ciocheck

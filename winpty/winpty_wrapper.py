@@ -5,12 +5,15 @@
 
 # Standard library imports
 from ctypes import windll
-from ctypes.wintypes import DWORD, LPVOID, HANDLE, LPDWORD, BOOL, LPCVOID
+from ctypes.wintypes import DWORD, LPVOID, HANDLE, BOOL, LPCVOID
 import ctypes
 
 # Local imports
 from .cywinpty import Agent
 
+import sys
+
+PY2 = sys.version_info[0] == 2
 
 # yapf: enable
 
@@ -21,6 +24,9 @@ GENERIC_READ = 0x80000000
 LARGE_INTEGER = ctypes.c_ulong
 PLARGE_INTEGER = ctypes.POINTER(LARGE_INTEGER)
 LPOVERLAPPED = LPVOID
+
+# LPDWORD is not in ctypes.wintypes on Python 2
+LPDWORD = ctypes.POINTER(DWORD)
 
 ReadFile = windll.kernel32.ReadFile
 ReadFile.restype = BOOL
@@ -69,7 +75,7 @@ class PTY(Agent):
 
     def write(self, data):
         """Write string data to current process input stream."""
-        data = bytes(data, 'utf-8')
+        data = data.encode('utf-8')
         data_p = ctypes.create_string_buffer(data)
         num_bytes = PLARGE_INTEGER(LARGE_INTEGER(0))
         bytes_to_write = len(data)

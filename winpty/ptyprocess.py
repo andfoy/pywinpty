@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 # Standard library imports
-from shutil import which
 import codecs
 import os
 import shlex
@@ -12,8 +11,14 @@ import threading
 import time
 
 
+try:
+    from shutil import which
+except ImportError:
+    from backports.shutil_which import which
+
+
 # Local imports
-from .winpty_wrapper import PTY
+from .winpty_wrapper import PTY, PY2
 
 
 class PtyProcess(object):
@@ -28,6 +33,7 @@ class PtyProcess(object):
         self.pid = pty.pid
         self.closed = False
         self.flag_eof = False
+
         self.decoder = codecs.getincrementaldecoder('utf-8')(errors='strict')
 
         # Used by terminate() to give kernel time to update process status.
@@ -93,6 +99,12 @@ class PtyProcess(object):
         for (key, value) in env.items():
             envStrs.append('%s=%s' % (key, value))
         env = '\0'.join(envStrs) + '\0'
+
+        if PY2:
+            command = _unicode(command)
+            cwd = _unicode(cwd)
+            cmdline = _unicode(cmdline)
+            env = _unicode(env)
 
         if len(argv) == 1:
             proc.spawn(command, cwd=cwd, env=env)
@@ -177,6 +189,7 @@ class PtyProcess(object):
         if not data:
             self.flag_eof = True
             raise EOFError('Pty is closed')
+
         return self.decoder.decode(data, final=False)
 
     def readline(self):
@@ -202,6 +215,9 @@ class PtyProcess(object):
         """
         if not self.isalive():
             raise EOFError('Pty is closed')
+        if PY2:
+            s = _unicode(s)
+
         success, nbytes = self.pty.write(s)
         if not success:
             raise IOError('Write failed')
@@ -349,3 +365,11 @@ def _get_address(default_port=20128):
             sock.close()
             sock = None
     return ("127.0.0.1", default_port)
+
+
+def _unicode(s):
+    """Ensure that a string is Unicode on Python 2.
+    """
+    if isinstance(s, unicode):  # noqa E891
+        return s
+    return s.decode('utf-8')

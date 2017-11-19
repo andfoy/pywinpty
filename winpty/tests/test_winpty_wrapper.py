@@ -8,13 +8,16 @@ import os
 
 # Third party imports
 from flaky import flaky
-from winpty.winpty_wrapper import PTY
+from winpty.winpty_wrapper import PTY, PY2
+from winpty.ptyprocess import which
 import pytest
 
 
 # yapf: enable
 
-CMD = r'C:\windows\system32\cmd.exe'
+CMD = which('cmd')
+if PY2:
+    CMD = unicode(CMD)  # noqa
 
 
 @pytest.fixture(scope='module')
@@ -30,7 +33,7 @@ def test_read():
     loc = os.getcwd()
     line = ''
     while loc not in line:
-        line += str(pty.read(), 'utf-8')
+        line += pty.read().decode('utf-8')
     assert loc in line
     pty.close()
     del pty
@@ -42,12 +45,12 @@ def test_write():
     while len(line) < 10:
         line = pty.read()
 
-    text = 'Eggs, ham and spam ünicode'
+    text = u'Eggs, ham and spam ünicode'
     pty.write(text)
 
-    line = ''
+    line = u''
     while text not in line:
-        line += str(pty.read(), 'utf-8')
+        line += pty.read().decode('utf-8')
 
     assert text in line
 
@@ -57,12 +60,12 @@ def test_write():
 
 def test_isalive():
     pty = pty_fixture(80, 25)
-    pty.write('exit\r\n')
+    pty.write(u'exit\r\n')
 
-    text = 'exit'
-    line = ''
+    text = u'exit'
+    line = u''
     while text not in line:
-        line += str(pty.read(), 'utf-8')
+        line += pty.read().decode('utf-8')
 
     while pty.isalive():
         pty.read()

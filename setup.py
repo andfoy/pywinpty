@@ -78,6 +78,7 @@ setup(
     packages=find_packages(exclude=['contrib', 'docs', 'tests*']),
     include_package_data=True,
     setup_requires=['Cython'],
+    install_requires=['backports.shutil_which;python_version<"3.0"'],
     classifiers=[
         'Development Status :: 4 - Beta', 'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
