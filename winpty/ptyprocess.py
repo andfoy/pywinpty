@@ -27,6 +27,7 @@ class PtyProcess(object):
         self.pty = pty
         self.pid = pty.pid
         self.closed = False
+        self.flag_eof = False
         self.decoder = codecs.getincrementaldecoder('utf-8')(errors='strict')
 
         # Used by terminate() to give kernel time to update process status.
@@ -174,6 +175,7 @@ class PtyProcess(object):
         """
         data = self.fileobj.recv(size)
         if not data:
+            self.flag_eof = True
             raise EOFError('Pty is closed')
         return self.decoder.decode(data, final=False)
 
@@ -189,8 +191,6 @@ class PtyProcess(object):
                 ch = self.read(1)
             except EOFError:
                 return ''.join(buf)
-            if not ch:
-                time.sleep(0.1)
             buf.append(ch)
             if ch == '\n':
                 return ''.join(buf)
@@ -244,6 +244,32 @@ class PtyProcess(object):
         """
         os.kill(self.pid, sig)
 
+    def sendcontrol(self, char):
+        '''Helper method that wraps send() with mnemonic access for sending control
+        character to the child (such as Ctrl-C or Ctrl-D).  For example, to send
+        Ctrl-G (ASCII 7, bell, '\a')::
+            child.sendcontrol('g')
+        See also, sendintr() and sendeof().
+        '''
+        char = char.lower()
+        a = ord(char)
+        if 97 <= a <= 122:
+            a = a - ord('a') + 1
+            byte = bytes([a])
+            return self.pty.write(byte)
+        d = {'@': 0, '`': 0,
+            '[': 27, '{': 27,
+            '\\': 28, '|': 28,
+            ']': 29, '}': 29,
+            '^': 30, '~': 30,
+            '_': 31,
+            '?': 127}
+        if char not in d:
+            return 0, b''
+
+        byte = bytes([d[char]])
+        return self.pty.write(byte)
+
     def sendeof(self):
         """This sends an EOF to the child. This sends a character which causes
         the pending parent output buffer to be sent to the waiting child
@@ -254,7 +280,18 @@ class PtyProcess(object):
         It is the responsibility of the caller to ensure the eof is sent at the
         beginning of a line."""
         # Send control character 4 (Ctrl-D)
-        self.proc.write(b'\x04')
+        self.pty.write(b'\x04')
+
+    def sendintr(self):
+        """This sends a SIGINT to the child. It does not require
+        the SIGINT to be the first character on a line. """
+        # Send control character 3 (Ctrl-C)
+        self.pty.write(b'\x03')
+
+    def eof(self):
+        """This returns True if the EOF exception was ever raised.
+        """
+        return self.flag_eof
 
     def getwinsize(self):
         """Return the window size of the pseudoterminal as a tuple (rows, cols).
