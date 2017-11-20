@@ -22,6 +22,7 @@ class PtyProcess(object):
     def __init__(self, pty):
         assert isinstance(pty, PTY)
         self.pty = pty
+        self.pid = pty.pid
         self.fd = pty.conout_pipe
         self.decoder = codecs.getincrementaldecoder('utf-8')(errors='strict')
 
@@ -168,9 +169,9 @@ class PtyProcess(object):
         return self.pty and self.pty.isalive()
 
     def kill(self, sig=None):
-        """Kill the process.  This is an alias to terminate.
+        """Kill the process with the given signal.
         """
-        self.terminate()
+        os.kill(self.pid, sig)
 
     def getwinsize(self):
         """Return the window size of the pseudoterminal as a tuple (rows, cols).

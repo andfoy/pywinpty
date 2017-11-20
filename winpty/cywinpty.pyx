@@ -17,6 +17,8 @@ cdef extern from "Windows.h":
     ctypedef DWORD *LPDWORD
     ctypedef LPCWSTR LPCTSTR
 
+    DWORD GetProcessId(HANDLE proc)
+
 
 cdef class Agent:
     """
@@ -65,6 +67,7 @@ cdef class Agent:
             raise RuntimeError(msg)
 
         self._agent_process = winpty.winpty_agent_process(self._c_winpty_t)
+        self.pid = GetProcessId(self._agent_process)
         self.conin_pipe_name = winpty.winpty_conin_name(self._c_winpty_t)
         self.conout_pipe_name = winpty.winpty_conout_name(self._c_winpty_t)
 
@@ -75,6 +78,7 @@ cdef class Agent:
     property conout_pipe_name:
         def __get__(self):
             return self.conout_pipe_name
+
 
     def spawn(self, LPCWSTR appname, LPCWSTR cmdline=NULL,
               LPCWSTR cwd=NULL, LPCWSTR env=NULL):
