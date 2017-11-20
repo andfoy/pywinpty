@@ -82,10 +82,9 @@ class PTY(Agent):
         windll.kernel32.CloseHandle(self.conout_pipe)
         windll.kernel32.CloseHandle(self.conin_pipe)
 
-    def isalive(self):
+    def iseof(self):
         """Check if current process streams are still open."""
-        err = windll.kernel32.PeekNamedPipe(
+        succ = windll.kernel32.PeekNamedPipe(
             self.conout_pipe, None, None, None, None, None
         )
-        alive = bool(err)
-        return alive
+        return not bool(succ)

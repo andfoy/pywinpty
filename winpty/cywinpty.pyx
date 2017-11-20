@@ -17,6 +17,14 @@ cdef extern from "Windows.h":
     ctypedef DWORD *LPDWORD
     ctypedef LPCWSTR LPCTSTR
 
+    DEF STILL_ACTIVE = 259
+
+    DWORD GetProcessId(HANDLE proc)
+    bint GetExitCodeProcess(
+      HANDLE  hProcess,
+      LPDWORD lpExitCode
+    )
+
 
 cdef class Agent:
     """
@@ -25,8 +33,12 @@ cdef class Agent:
     """
     cdef winpty.winpty_t* _c_winpty_t
     cdef HANDLE _agent_process
+    cdef HANDLE _process
+    cdef DWORD pid
     cdef LPCWSTR conin_pipe_name
     cdef LPCWSTR conout_pipe_name
+    cdef DWORD exitstatus
+    cdef unsigned char alive
 
     def __init__(self, int cols, int rows, bint override_pipes=True,
                  int mouse_mode=winpty_constants._WINPTY_MOUSE_MODE_NONE,
@@ -67,6 +79,8 @@ cdef class Agent:
         self._agent_process = winpty.winpty_agent_process(self._c_winpty_t)
         self.conin_pipe_name = winpty.winpty_conin_name(self._c_winpty_t)
         self.conout_pipe_name = winpty.winpty_conout_name(self._c_winpty_t)
+        self.alive = 0
+        self.pid = 0
 
     property conin_pipe_name:
         def __get__(self):
@@ -75,6 +89,20 @@ cdef class Agent:
     property conout_pipe_name:
         def __get__(self):
             return self.conout_pipe_name
+
+    property pid:
+        def __get__(self):
+            return self.pid
+
+    property exitstatus:
+        def __get__(self):
+            if self.pid == 0:
+                return None
+            if self.alive == 1:
+                self.isalive()
+            if self.alive == 1:
+                return None
+            return self.exitstatus
 
     def spawn(self, LPCWSTR appname, LPCWSTR cmdline=NULL,
               LPCWSTR cwd=NULL, LPCWSTR env=NULL):
@@ -92,7 +120,7 @@ cdef class Agent:
             raise RuntimeError(msg)
 
         cdef winpty.winpty_error_ptr_t spawn_err
-        cdef bint succ = winpty.winpty_spawn(self._c_winpty_t, spawn_config, NULL,
+        cdef bint succ = winpty.winpty_spawn(self._c_winpty_t, spawn_config, &self._process,
                                              NULL, NULL, &spawn_err)
         winpty.winpty_spawn_config_free(spawn_config)
 
@@ -102,6 +130,9 @@ cdef class Agent:
                 winpty.winpty_error_code(spawn_err))
             winpty.winpty_error_free(spawn_err)
             raise RuntimeError(msg)
+
+        self.pid = GetProcessId(self._process)
+        self.alive = 1
 
         return succ
 
@@ -123,6 +154,23 @@ cdef class Agent:
                 winpty.winpty_error_code(err_pointer))
             winpty.winpty_error_free(err_pointer)
             raise RuntimeError(msg)
+
+    def isalive(self):
+        """This tests if the pty process is running or not.
+        This is non-blocking.
+        """
+        cdef DWORD lpExitCode
+        cdef bint succ = GetExitCodeProcess(self._process, &lpExitCode)
+        if not succ:
+            raise RuntimeError('Could not check status')
+
+        # Check for STILL_ACTIVE flag
+        # https://msdn.microsoft.com/en-us/library/windows/desktop/ms683189(v=vs.85).aspx
+        alive = lpExitCode == STILL_ACTIVE
+        if not alive:
+            self.alive = 0
+            self.exitstatus = lpExitCode
+        return alive
 
     def __dealloc__(self):
         if self._c_winpty_t is not NULL:

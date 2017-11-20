@@ -54,9 +54,11 @@ def test_isalive():
     while text not in data:
         data += pty.read()
 
-    while pty.isalive():
-        pty.read()
-        continue
+    while 1:
+        try:
+            pty.read()
+        except EOFError:
+            break
 
     assert not pty.isalive()
     pty.terminate()
@@ -78,13 +80,32 @@ def test_close():
     pty = pty_fixture()
     pty.close()
     assert not pty.isalive()
-    pty.terminate()
 
 
 def test_flush():
     pty = pty_fixture()
     pty.flush()
     pty.terminate()
+
+
+def test_intr():
+    pty = pty_fixture()
+    pty = pty_fixture(cmd=[sys.executable, 'import time; time.sleep(10)'])
+    pty.sendintr()
+    assert pty.wait() != 0
+
+
+def test_send_control():
+    pty = pty_fixture()
+    pty = pty_fixture(cmd=[sys.executable, 'import time; time.sleep(10)'])
+    pty.sendcontrol('d')
+    assert pty.wait() != 0
+
+
+def test_send_eof():
+    cat = pty_fixture('cat')
+    cat.sendeof()
+    assert cat.wait() == 0
 
 
 def test_isatty():
@@ -95,15 +116,22 @@ def test_isatty():
 
 
 def test_wait():
-    pty = pty_fixture(cmd=[sys.executable, "--version"])
+    pty = pty_fixture(cmd=[sys.executable, '--version'])
     assert pty.wait() == 0
-    pty.kill()
+
+
+def test_exit_status():
+    pty = pty_fixture(cmd=[sys.executable])
+    pty.write('import sys;sys.exit(1)\r\n')
+    pty.wait()
+    assert pty.exitstatus == 1
 
 
 def test_kill():
     pty = pty_fixture()
     pty.kill(signal.SIGTERM)
     assert not pty.isalive()
+    assert pty.exitstatus == signal.SIGTERM
 
 
 def test_getwinsize():
