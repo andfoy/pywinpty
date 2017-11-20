@@ -22,7 +22,7 @@ class PtyProcess(object):
     def __init__(self, pty):
         assert isinstance(pty, PTY)
         self.pty = pty
-        self.fd = id(pty)
+        self.fd = pty.conout_pipe
         self.decoder = codecs.getincrementaldecoder('utf-8')(errors='strict')
 
     @classmethod
