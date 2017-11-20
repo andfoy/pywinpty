@@ -4,6 +4,7 @@ omit =
 	*/tests/*
 	*/external/*
 	*.pxd
+	*__init__*
 
 [report]
 fail_under = 0
