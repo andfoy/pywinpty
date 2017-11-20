@@ -6,7 +6,9 @@ import codecs
 import os
 import shlex
 import signal
+import socket
 import subprocess
+import threading
 import time
 
 
@@ -29,6 +31,21 @@ class PtyProcess(object):
         # Used by terminate() to give kernel time to update process status.
         # Time in seconds.
         self.delayafterterminate = 0.1
+
+        # Set up our file reader sockets.
+        self._server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        address = _get_address()
+        self._server.bind(address)
+        self._server.listen(1)
+
+        # Read from the pty in a thread.
+        self._thread = threading.Thread(target=self._read_in_thread,
+            args=(address,))
+        self._thread.setDaemon(True)
+        self._thread.start()
+
+        self.fileobj, _ = self._server.accept()
+        self.fd = self.fileobj.fileno()
 
     @classmethod
     def spawn(cls, cmd, cwd=None, env=None, dimensions=(24, 80)):
@@ -79,6 +96,7 @@ class PtyProcess(object):
 
         inst = cls(proc)
         inst._winsize = dimensions
+
         return inst
 
     @property
@@ -87,10 +105,18 @@ class PtyProcess(object):
         """
         return self.pty.exitstatus
 
+    def fileno(self):
+        """This returns the file descriptor of the pty for the child.
+        """
+        return self.fd
+
     def close(self):
-        """Close all communication process streams."""
+        """Close all communication process streams.
+        """
         if self.pty:
             self.pty.close()
+            self.fileobj.close()
+            self._server.close()
 
     def __del__(self):
         """This makes sure that no system resources are left open. Python only
@@ -121,17 +147,13 @@ class PtyProcess(object):
 
     def read(self, size=1024):
         """Read and return at most ``size`` characters from the pty.
+
+        Can block if there is nothing to read. Raises :exc:`EOFError` if the
+        terminal was closed.
         """
-        data = self.pty.read(size)
-
-        if not data and not self.isalive():
-            while not self.pty.iseof():
-                time.sleep(0.1)
-                data += self.pty.read(size)
-
-            if not data:
-                raise EOFError('Pty is closed')
-
+        data = self.fileobj.recv(size)
+        if not data:
+            raise EOFError('Pty is closed')
         return self.decoder.decode(data, final=False)
 
     def readline(self):
@@ -211,3 +233,48 @@ class PtyProcess(object):
         """
         self._winsize = (rows, cols)
         self.pty.set_size(cols, rows)
+
+    def _read_in_thread(self, address):
+        """Read data from the pty in a thread.
+        """
+        client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        client.connect(address)
+
+        while 1:
+            data = self.pty.read(4096)
+
+            if not data and not self.isalive():
+                while not data and not self.pty.iseof():
+                    time.sleep(0.1)
+                    data += self.pty.read(4096)
+
+                if not data:
+                    try:
+                        client.send(b'')
+                    except socket.error:
+                        pass
+                    break
+            try:
+                client.send(data)
+            except socket.error:
+                break
+
+        client.close()
+
+
+def _get_address(default_port=20128):
+    """Find and return a non used port"""
+    while True:
+        try:
+            sock = socket.socket(socket.AF_INET,
+                                 socket.SOCK_STREAM,
+                                 socket.IPPROTO_TCP)
+            sock.bind(("127.0.0.1", default_port))
+        except socket.error as _msg:  # analysis:ignore
+            default_port += 1
+        else:
+            break
+        finally:
+            sock.close()
+            sock = None
+    return ("127.0.0.1", default_port)
