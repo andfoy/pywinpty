@@ -102,6 +102,12 @@ def test_send_control():
     assert pty.wait() != 0
 
 
+def test_send_eof():
+    cat = pty_fixture('cat')
+    cat.sendeof()
+    assert cat.wait() == 0
+
+
 def test_isatty():
     pty = pty_fixture()
     assert pty.isatty()
