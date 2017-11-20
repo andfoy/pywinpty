@@ -7,7 +7,6 @@ import os
 import shlex
 import subprocess
 import time
-import uuid
 
 
 # Local imports
@@ -20,11 +19,10 @@ class PtyProcess(object):
     The main constructor is the :meth:`spawn` classmethod.
     """
 
-    def __init__(self, proc):
-        assert isinstance(proc, PTY)
-        self.proc = proc
-        self.fd = uuid.uuid4().hex
-        self.pid = uuid.uuid4().hex
+    def __init__(self, pty):
+        assert isinstance(pty, PTY)
+        self.pty = pty
+        self.fd = id(pty)
         self.decoder = codecs.getincrementaldecoder('utf-8')(errors='strict')
 
     @classmethod
@@ -80,8 +78,23 @@ class PtyProcess(object):
 
     def close(self):
         """Close all communication process streams."""
-        if self.proc:
-            self.proc.close()
+        if self.pty:
+            self.pty.close()
+
+    def __del__(self):
+        """This makes sure that no system resources are left open. Python only
+        garbage collects Python objects. OS file descriptors are not Python
+        objects, so they must be handled explicitly. If the child file
+        descriptor was opened outside of this class (passed to the constructor)
+        then this does not close it.
+        """
+        # It is possible for __del__ methods to execute during the
+        # teardown of the Python VM itself. Thus self.close() may
+        # trigger an exception because os.close may be None.
+        try:
+            self.close()
+        except Exception:
+            pass
 
     def flush(self):
         """This does nothing. It is here to support the interface for a
@@ -94,12 +107,13 @@ class PtyProcess(object):
         return self.isalive()
 
     def read(self, size=1024):
-        """Read and return at most ``size`` bytes from the pty.
+        """Read and return at most ``size`` characters from the pty.
         """
-        if not self.isalive():
+        data = self.pty.read(size)
+
+        if not data and not self.isalive():
             raise EOFError('Pty is closed')
 
-        data = self.proc.read(size)
         return self.decoder.decode(data, final=False)
 
     def readline(self):
@@ -110,9 +124,10 @@ class PtyProcess(object):
         """
         buf = []
         while 1:
-            if not self.isalive():
+            try:
+                ch = self.read(1)
+            except EOFError:
                 return ''.join(buf)
-            ch = self.read(1)
             if not ch:
                 time.sleep(0.1)
             buf.append(ch)
@@ -126,15 +141,15 @@ class PtyProcess(object):
         """
         if not self.isalive():
             raise EOFError('Pty is closed')
-        success, nbytes = self.proc.write(s)
+        success, nbytes = self.pty.write(s)
         if not success:
             raise IOError('Write failed')
         return nbytes
 
     def terminate(self):
         """This forces a child process to terminate."""
-        del self.proc
-        self.proc = None
+        del self.pty
+        self.pty = None
 
     def wait(self):
         """This waits until the child exits. This is a blocking call. This will
@@ -150,7 +165,7 @@ class PtyProcess(object):
         exitstatus or signalstatus of the child. This returns True if the child
         process appears to be running or False if not.
         """
-        return self.proc and self.proc.isalive()
+        return self.pty and self.pty.isalive()
 
     def kill(self, sig=None):
         """Kill the process.  This is an alias to terminate.
@@ -166,4 +181,4 @@ class PtyProcess(object):
         """Set the terminal window size of the child tty.
         """
         self._winsize = (rows, cols)
-        self.proc.set_size(cols, rows)
+        self.pty.set_size(cols, rows)
