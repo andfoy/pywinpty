@@ -18,6 +18,10 @@ cdef extern from "Windows.h":
     ctypedef LPCWSTR LPCTSTR
 
     DWORD GetProcessId(HANDLE proc)
+    bint GetExitCodeProcess(
+      HANDLE  hProcess,
+      LPDWORD lpExitCode
+    )
 
 
 cdef class Agent:
@@ -127,6 +131,11 @@ cdef class Agent:
                 winpty.winpty_error_code(err_pointer))
             winpty.winpty_error_free(err_pointer)
             raise RuntimeError(msg)
+
+    def isalive(self):
+        cdef DWORD lpExitCode
+        cdef bint succ = GetExitCodeProcess(self._agent_process, &lpExitCode)
+        return succ and lpExitCode == 259
 
     def __dealloc__(self):
         if self._c_winpty_t is not NULL:
