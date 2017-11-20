@@ -140,6 +140,8 @@ cdef class Agent:
     def isalive(self):
         cdef DWORD lpExitCode
         cdef bint succ = GetExitCodeProcess(self._agent_process, &lpExitCode)
+        # Check for STILL_ACTIVE flag
+        # https://msdn.microsoft.com/en-us/library/windows/desktop/ms683189(v=vs.85).aspx
         return succ and lpExitCode == 259
 
     def __dealloc__(self):
