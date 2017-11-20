@@ -95,6 +95,13 @@ def test_intr():
     assert pty.wait() != 0
 
 
+def test_send_control():
+    pty = pty_fixture()
+    pty = pty_fixture(cmd=[sys.executable, 'import time; time.sleep(10)'])
+    pty.sendcontrol('d')
+    assert pty.wait() != 0
+
+
 def test_isatty():
     pty = pty_fixture()
     assert pty.isatty()
