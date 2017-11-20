@@ -42,6 +42,7 @@ install:
   - "activate test"
   - CALL "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\vcvarsall.bat" %ARCH%
   - "conda install --file requirements.txt -c conda-forge"
+  - "pip install twine"
   - "%CMD_IN_ENV% python setup.py build_ext -i --compiler=msvc"
 
 # Not a .NET project, we build in the install step instead
@@ -52,3 +53,6 @@ test_script:
   - "conda remove pytest-xdist"
   - "%CMD_IN_ENV% pytest winpty --cov=winpty --cov-report term-missing -v"
   - "%CMD_IN_ENV% coveralls"
+
+on_success:
+  - if "%APPVEYOR_REPO_TAG%"=="true" ( %CMD_IN_ENV% python setup.py bdist_wheel && %CMD_IN_ENV% twine upload dist ) else ( echo "Not deploying because not a tagged commit." )
