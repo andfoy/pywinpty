@@ -31,6 +31,7 @@ cdef class Agent:
     """
     cdef winpty.winpty_t* _c_winpty_t
     cdef HANDLE _agent_process
+    cdef int pid
     cdef LPCWSTR conin_pipe_name
     cdef LPCWSTR conout_pipe_name
 
@@ -82,6 +83,10 @@ cdef class Agent:
     property conout_pipe_name:
         def __get__(self):
             return self.conout_pipe_name
+
+    property pid:
+        def __get__(self):
+            return self.pid
 
 
     def spawn(self, LPCWSTR appname, LPCWSTR cmdline=NULL,
