@@ -88,6 +88,13 @@ def test_flush():
     pty.terminate()
 
 
+def test_intr():
+    pty = pty_fixture()
+    pty = pty_fixture(cmd=[sys.executable, 'import time; time.sleep(10)'])
+    pty.sendintr()
+    assert pty.wait() != 0
+
+
 def test_isatty():
     pty = pty_fixture()
     assert pty.isatty()

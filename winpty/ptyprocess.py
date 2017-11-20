@@ -280,13 +280,13 @@ class PtyProcess(object):
         It is the responsibility of the caller to ensure the eof is sent at the
         beginning of a line."""
         # Send control character 4 (Ctrl-D)
-        self.pty.write(b'\x04')
+        self.pty.write('\x04')
 
     def sendintr(self):
         """This sends a SIGINT to the child. It does not require
         the SIGINT to be the first character on a line. """
         # Send control character 3 (Ctrl-C)
-        self.pty.write(b'\x03')
+        self.pty.write('\x03')
 
     def eof(self):
         """This returns True if the EOF exception was ever raised.
