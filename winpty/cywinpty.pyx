@@ -17,6 +17,8 @@ cdef extern from "Windows.h":
     ctypedef DWORD *LPDWORD
     ctypedef LPCWSTR LPCTSTR
 
+    DEF STILL_ACTIVE = 259
+
     DWORD GetProcessId(HANDLE proc)
     bint GetExitCodeProcess(
       HANDLE  hProcess,
@@ -164,7 +166,7 @@ cdef class Agent:
 
         # Check for STILL_ACTIVE flag
         # https://msdn.microsoft.com/en-us/library/windows/desktop/ms683189(v=vs.85).aspx
-        alive = lpExitCode == 259
+        alive = lpExitCode == STILL_ACTIVE
         if not alive:
             self.alive = 0
             self.exitstatus = lpExitCode
