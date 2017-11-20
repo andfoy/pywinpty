@@ -98,15 +98,22 @@ def test_isatty():
 
 
 def test_wait():
-    pty = pty_fixture(cmd=[sys.executable, "--version"])
+    pty = pty_fixture(cmd=[sys.executable, '--version'])
     assert pty.wait() == 0
-    pty.terminate()
+
+
+def test_exit_status():
+    pty = pty_fixture(cmd=[sys.executable])
+    pty.write('import sys;sys.exit(1)\r\n')
+    pty.wait()
+    assert pty.exitstatus == 1
 
 
 def test_kill():
     pty = pty_fixture()
     pty.kill(signal.SIGTERM)
     assert not pty.isalive()
+    assert pty.exitstatus == signal.SIGTERM
 
 
 def test_getwinsize():

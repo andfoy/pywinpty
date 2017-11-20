@@ -5,6 +5,7 @@ from shutil import which
 import codecs
 import os
 import shlex
+import signal
 import subprocess
 import time
 
@@ -25,6 +26,9 @@ class PtyProcess(object):
         self.pid = pty.pid
         self.fd = pty.conout_pipe
         self.decoder = codecs.getincrementaldecoder('utf-8')(errors='strict')
+        # Used by terminate() to give kernel time to update process status.
+        # Time in seconds.
+        self.delayafterterminate = 0.1
 
     @classmethod
     def spawn(cls, cmd, cwd=None, env=None, dimensions=(24, 80)):
@@ -77,6 +81,12 @@ class PtyProcess(object):
         inst._winsize = dimensions
         return inst
 
+    @property
+    def exitstatus(self):
+        """The exit status of the process.
+        """
+        return self.pty.exitstatus
+
     def close(self):
         """Close all communication process streams."""
         if self.pty:
@@ -93,6 +103,8 @@ class PtyProcess(object):
         # teardown of the Python VM itself. Thus self.close() may
         # trigger an exception because os.close may be None.
         try:
+            del self.pty
+            self.pty = None
             self.close()
         except Exception:
             pass
@@ -113,7 +125,12 @@ class PtyProcess(object):
         data = self.pty.read(size)
 
         if not data and not self.isalive():
-            raise EOFError('Pty is closed')
+            while not self.pty.iseof():
+                time.sleep(0.1)
+                data += self.pty.read(size)
+
+            if not data:
+                raise EOFError('Pty is closed')
 
         return self.decoder.decode(data, final=False)
 
@@ -147,18 +164,29 @@ class PtyProcess(object):
             raise IOError('Write failed')
         return nbytes
 
-    def terminate(self):
+    def terminate(self, force=False):
         """This forces a child process to terminate."""
-        del self.pty
-        self.pty = None
+        if not self.isalive():
+            return True
+        self.kill(signal.SIGINT)
+        time.sleep(self.delayafterterminate)
+        if not self.isalive():
+            return True
+        if force:
+            self.kill(signal.SIGKILL)
+            time.sleep(self.delayafterterminate)
+            if not self.isalive():
+                return True
+            else:
+                return False
 
     def wait(self):
         """This waits until the child exits. This is a blocking call. This will
         not read any data from the child.
         """
         while self.isalive():
-            self.readline()
-        return 0
+            time.sleep(0.1)
+        return self.exitstatus
 
     def isalive(self):
         """This tests if the child process is running or not. This is

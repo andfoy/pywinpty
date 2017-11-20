@@ -81,3 +81,10 @@ class PTY(Agent):
         """Close all communication process streams."""
         windll.kernel32.CloseHandle(self.conout_pipe)
         windll.kernel32.CloseHandle(self.conin_pipe)
+
+    def iseof(self):
+        """Check if current process streams are still open."""
+        succ = windll.kernel32.PeekNamedPipe(
+            self.conout_pipe, None, None, None, None, None
+        )
+        return not bool(succ)
