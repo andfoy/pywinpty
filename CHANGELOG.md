@@ -1,3 +1,22 @@
+## Version 0.4 (2017/11/20)
+
+### Issues Closed
+
+* [Issue 71](https://github.com/spyder-ide/pywinpty/issues/71) - Release 0.4
+* [Issue 68](https://github.com/spyder-ide/pywinpty/issues/68) - Enable automatic wheel distribution using AppVeyor
+
+In this release 2 issues were closed.
+
+### Pull Requests Merged
+
+* [PR 70](https://github.com/spyder-ide/pywinpty/pull/70) - PR: Omit init file from coverage and fix Readme coverage badge
+* [PR 69](https://github.com/spyder-ide/pywinpty/pull/69) - PR: Enable AppVeyor automatic wheel builds
+* [PR 67](https://github.com/spyder-ide/pywinpty/pull/67) - PR: PtyProcess Cleanup
+* [PR 65](https://github.com/spyder-ide/pywinpty/pull/65) - Add a file descriptor
+
+In this release 4 pull requests were closed.
+
+
 ## Version 0.3 (2017/11/18)
 
 ### Issues Closed
