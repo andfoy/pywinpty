@@ -55,9 +55,4 @@ test_script:
   - "%CMD_IN_ENV% coveralls"
 
 on_success:
-  - >
-    if "%APPVEYOR_REPO_TAG%"=="true" (
-        %CMD_IN_ENV% python setup.py bdist_wheel && %CMD_IN_ENV% twine upload dist
-    ) else (
-      echo "Not deploying because not a tagged commit."
-    )
+  - if "%APPVEYOR_REPO_TAG%"=="true" ( %CMD_IN_ENV% python setup.py bdist_wheel && %CMD_IN_ENV% twine upload dist ) else ( echo "Not deploying because not a tagged commit." )
