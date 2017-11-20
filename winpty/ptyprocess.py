@@ -26,11 +26,15 @@ class PtyProcess(object):
         assert isinstance(pty, PTY)
         self.pty = pty
         self.pid = pty.pid
-        self.fd = pty.conout_pipe
+        self.closed = False
         self.decoder = codecs.getincrementaldecoder('utf-8')(errors='strict')
+
         # Used by terminate() to give kernel time to update process status.
         # Time in seconds.
         self.delayafterterminate = 0.1
+        # Used by close() to give kernel time to update process status.
+        # Time in seconds.
+        self.delayafterclose = 0.1
 
         # Set up our file reader sockets.
         self._server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -48,7 +52,7 @@ class PtyProcess(object):
         self.fd = self.fileobj.fileno()
 
     @classmethod
-    def spawn(cls, cmd, cwd=None, env=None, dimensions=(24, 80)):
+    def spawn(cls, argv, cwd=None, env=None, dimensions=(24, 80)):
         """Start the given command in a child process in a pseudo terminal.
 
         This does all the setting up the pty, and returns an instance of
@@ -58,15 +62,15 @@ class PtyProcess(object):
         specified as a tuple (rows, cols), or the default (24, 80) will be
         used.
         """
-        if isinstance(cmd, str):
-            cmd = shlex.split(cmd, posix=False)
+        if isinstance(argv, str):
+            argv = shlex.split(argv, posix=False)
 
-        if not isinstance(cmd, (list, tuple)):
-            raise TypeError("Expected a list or tuple for cmd, got %r" % cmd)
+        if not isinstance(argv, (list, tuple)):
+            raise TypeError("Expected a list or tuple for argv, got %r" % argv)
 
         # Shallow copy of argv so we can modify it
-        cmd = cmd[:]
-        command = cmd[0]
+        argv = argv[:]
+        command = argv[0]
         env = env or os.environ
 
         path = env.get('PATH', os.defpath)
@@ -77,8 +81,8 @@ class PtyProcess(object):
                 'executable: %s.' % command
             )
         command = command_with_path
-        cmd[0] = command
-        cmdline = ' ' + subprocess.list2cmdline(cmd[1:])
+        argv[0] = command
+        cmdline = ' ' + subprocess.list2cmdline(argv[1:])
         cwd = cwd or os.getcwd()
 
         proc = PTY(dimensions[1], dimensions[0])
@@ -89,13 +93,20 @@ class PtyProcess(object):
             envStrs.append('%s=%s' % (key, value))
         env = '\0'.join(envStrs) + '\0'
 
-        if len(cmd) == 1:
+        if len(argv) == 1:
             proc.spawn(command, cwd=cwd, env=env)
         else:
             proc.spawn(command, cwd=cwd, env=env, cmdline=cmdline)
 
         inst = cls(proc)
         inst._winsize = dimensions
+
+        # Set some informational attributes
+        inst.argv = argv
+        if env is not None:
+            inst.env = env
+        if cwd is not None:
+            inst.launch_dir = cwd
 
         return inst
 
@@ -110,13 +121,25 @@ class PtyProcess(object):
         """
         return self.fd
 
-    def close(self):
-        """Close all communication process streams.
-        """
-        if self.pty:
+    def close(self, force=False):
+        """This closes the connection with the child application. Note that
+        calling close() more than once is valid. This emulates standard Python
+        behavior with files. Set force to True if you want to make sure that
+        the child is terminated (SIGKILL is sent if the child ignores
+        SIGINT)."""
+        if not self.closed:
             self.pty.close()
             self.fileobj.close()
             self._server.close()
+            # Give kernel time to update process status.
+            time.sleep(self.delayafterclose)
+            if self.isalive():
+                if not self.terminate(force):
+                    raise PtyProcessError('Could not terminate the child.')
+            self.fd = -1
+            self.closed = True
+            del self.pty
+            self.pty = None
 
     def __del__(self):
         """This makes sure that no system resources are left open. Python only
@@ -129,8 +152,6 @@ class PtyProcess(object):
         # teardown of the Python VM itself. Thus self.close() may
         # trigger an exception because os.close may be None.
         try:
-            del self.pty
-            self.pty = None
             self.close()
         except Exception:
             pass

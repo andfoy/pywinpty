@@ -79,8 +79,6 @@ def test_readline():
 def test_close():
     pty = pty_fixture()
     pty.close()
-    assert pty.isalive()
-    pty.terminate()
     assert not pty.isalive()
 
 
