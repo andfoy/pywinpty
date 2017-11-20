@@ -1,5 +1,5 @@
 
-if ($env:APPVEYOR_REPO_TAG -match "True") {
+if ($env:APPVEYOR_REPO_TAG -match "true") {
     $TWINE_USERNAME = $env:TWINE_USERNAME
     $TWINE_PASSWORD = $env:TWINE_PASSWORD
     $LIB_BIN_PATH = "Library\bin"
