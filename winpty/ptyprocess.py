@@ -135,7 +135,7 @@ class PtyProcess(object):
             time.sleep(self.delayafterclose)
             if self.isalive():
                 if not self.terminate(force):
-                    raise PtyProcessError('Could not terminate the child.')
+                    raise IOError('Could not terminate the child.')
             self.fd = -1
             self.closed = True
             del self.pty
@@ -243,6 +243,18 @@ class PtyProcess(object):
         """Kill the process with the given signal.
         """
         os.kill(self.pid, sig)
+
+    def sendeof(self):
+        """This sends an EOF to the child. This sends a character which causes
+        the pending parent output buffer to be sent to the waiting child
+        program without waiting for end-of-line. If it is the first character
+        of the line, the read() in the user program returns 0, which signifies
+        end-of-file. This means to work as expected a sendeof() has to be
+        called at the beginning of a line. This method does not send a newline.
+        It is the responsibility of the caller to ensure the eof is sent at the
+        beginning of a line."""
+        # Send control character 4 (Ctrl-D)
+        self.proc.write(b'\x04')
 
     def getwinsize(self):
         """Return the window size of the pseudoterminal as a tuple (rows, cols).
