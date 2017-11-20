@@ -54,9 +54,11 @@ def test_isalive():
     while text not in data:
         data += pty.read()
 
-    while pty.isalive():
-        pty.read()
-        continue
+    while 1:
+        try:
+            pty.read()
+        except EOFError:
+            break
 
     assert not pty.isalive()
     pty.terminate()
@@ -77,8 +79,9 @@ def test_readline():
 def test_close():
     pty = pty_fixture()
     pty.close()
-    assert not pty.isalive()
+    assert pty.isalive()
     pty.terminate()
+    assert not pty.isalive()
 
 
 def test_flush():
@@ -97,7 +100,7 @@ def test_isatty():
 def test_wait():
     pty = pty_fixture(cmd=[sys.executable, "--version"])
     assert pty.wait() == 0
-    pty.kill()
+    pty.terminate()
 
 
 def test_kill():
