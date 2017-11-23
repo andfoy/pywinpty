@@ -1,3 +1,20 @@
+## Version 0.4.1 (2017/11/23)
+
+### Issues Closed
+
+* [Issue 73](https://github.com/spyder-ide/pywinpty/issues/73) - Copy winpty binaries on Appveyor upload
+* [Issue 72](https://github.com/spyder-ide/pywinpty/issues/72) - Release 0.4.1
+
+In this release 2 issues were closed.
+
+### Pull Requests Merged
+
+* [PR 74](https://github.com/spyder-ide/pywinpty/pull/74) - Add winpty binaries to Appveyor uploaded wheels
+
+In this release 1 pull request was closed.
+
+
+
 ## Version 0.4 (2017/11/20)
 
 ### Issues Closed
