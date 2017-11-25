@@ -3,6 +3,7 @@
 # Standard library imports
 import codecs
 import os
+import select
 import shlex
 import signal
 import socket
@@ -59,7 +60,8 @@ class PtyProcess(object):
         self.fd = self.fileobj.fileno()
 
     @classmethod
-    def spawn(cls, argv, cwd=None, env=None, dimensions=(24, 80)):
+    def spawn(cls, argv, cwd=None, env=None, dimensions=(24, 80),
+              emit_cursors=True):
         """Start the given command in a child process in a pseudo terminal.
 
         This does all the setting up the pty, and returns an instance of
@@ -92,7 +94,7 @@ class PtyProcess(object):
         cmdline = ' ' + subprocess.list2cmdline(argv[1:])
         cwd = cwd or os.getcwd()
 
-        proc = PTY(dimensions[1], dimensions[0])
+        proc = PTY(dimensions[1], dimensions[0], emit_cursors=emit_cursors)
 
         # Create the environemnt string.
         envStrs = []
@@ -151,8 +153,6 @@ class PtyProcess(object):
                     raise IOError('Could not terminate the child.')
             self.fd = -1
             self.closed = True
-            del self.pty
-            self.pty = None
 
     def __del__(self):
         """This makes sure that no system resources are left open. Python only
@@ -185,7 +185,17 @@ class PtyProcess(object):
         Can block if there is nothing to read. Raises :exc:`EOFError` if the
         terminal was closed.
         """
-        data = self.fileobj.recv(size)
+        if self.flag_eof:
+            raise EOFError('Pty is closed')
+
+        # Allow the read to be interrupted, but with a delay of up to
+        # 1 sec to avoid fast polling here.
+        while 1:
+            r, w, e = select.select([self.fd], [], [self.fd], 1)
+            if self.fd in r or self.fd in e:
+                data = self.fileobj.recv(size)
+                break
+
         if not data:
             self.flag_eof = True
             raise EOFError('Pty is closed')
@@ -198,6 +208,9 @@ class PtyProcess(object):
         Can block if there is nothing to read. Raises :exc:`EOFError` if the
         terminal was closed.
         """
+        if self.flag_eof:
+            raise EOFError('Pty is closed')
+
         buf = []
         while 1:
             try:
@@ -261,9 +274,9 @@ class PtyProcess(object):
         os.kill(self.pid, sig)
 
     def sendcontrol(self, char):
-        '''Helper method that wraps send() with mnemonic access for sending control
-        character to the child (such as Ctrl-C or Ctrl-D).  For example, to send
-        Ctrl-G (ASCII 7, bell, '\a')::
+        '''Helper method that wraps send() with mnemonic access for sending
+        control character to the child (such as Ctrl-C or Ctrl-D).  For
+        example, to send Ctrl-G (ASCII 7, bell, '\a')::
             child.sendcontrol('g')
         See also, sendintr() and sendeof().
         '''
@@ -296,13 +309,13 @@ class PtyProcess(object):
         It is the responsibility of the caller to ensure the eof is sent at the
         beginning of a line."""
         # Send control character 4 (Ctrl-D)
-        self.pty.write('\x04'), '\x04'
+        return self.pty.write('\x04'), '\x04'
 
     def sendintr(self):
         """This sends a SIGINT to the child. It does not require
         the SIGINT to be the first character on a line. """
         # Send control character 3 (Ctrl-C)
-        self.pty.write('\x03'), '\x03'
+        return self.pty.write('\x03'), '\x03'
 
     def eof(self):
         """This returns True if the EOF exception was ever raised.
@@ -341,6 +354,10 @@ def _read_in_thread(address, pty):
                 except socket.error:
                     pass
                 break
+
+        if not data:
+            time.sleep(0.1)
+
         try:
             client.send(data)
         except socket.error:
@@ -367,9 +384,45 @@ def _get_address(default_port=20128):
     return ("127.0.0.1", default_port)
 
 
+
 def _unicode(s):
     """Ensure that a string is Unicode on Python 2.
     """
     if isinstance(s, unicode):  # noqa E891
         return s
     return s.decode('utf-8')
+
+
+class _allow_interrupt(object):
+    """Utility for fixing CTRL-C events on Windows.
+
+    See https://github.com/zeromq/pyzmq/blob/3c41c5dbb8a5b50447fff3f714947636da71c212/zmq/utils/win32.py
+    for details.
+    """
+
+    def __init__(self, action=None):
+        kernel32 = windll.LoadLibrary('kernel32')
+        phandler_routine = WINFUNCTYPE(BOOL, DWORD)
+        self._handler = kernel32.SetConsoleCtrlHandler
+        self._handler.argtypes = (phandler_routine, BOOL)
+        self._handler.restype = BOOL
+
+        @phandler_routine
+        def handle(event):
+            if event == 0:  # CTRL_C_EVENT
+                action()
+            return 0
+        self._handle = handle
+
+    def __enter__(self):
+        """Install the custom CTRL-C handler."""
+        result = self._handler(self._handle, 1)
+        if result == 0:
+            raise WindowsError()
+
+    def __exit__(self, *args):
+        """Remove the custom CTRL-C handler."""
+        result = self._handler(self._handle, 0)
+        if result == 0:
+            raise WindowsError()
+

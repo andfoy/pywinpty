@@ -9,7 +9,7 @@ from ctypes.wintypes import DWORD, LPVOID, HANDLE, BOOL, LPCVOID
 import ctypes
 
 # Local imports
-from .cywinpty import Agent
+from .cywinpty import Agent, WINPTY_FLAG_COLOR_ESCAPES, WINPTY_FLAG_PLAIN_OUTPUT
 
 import sys
 
@@ -45,9 +45,14 @@ class PTY(Agent):
     Inherits all Cython winpty agent functionality and properties.
     """
 
-    def __init__(self, cols, rows):
+    def __init__(self, cols, rows, emit_cursors=True):
         """Initialize a new Pseudo Terminal of size ``(cols, rows)``."""
-        Agent.__init__(self, cols, rows, True)
+        if not emit_cursors:
+            agent_config = WINPTY_FLAG_PLAIN_OUTPUT + WINPTY_FLAG_COLOR_ESCAPES
+        else:
+            agent_config = WINPTY_FLAG_COLOR_ESCAPES
+        Agent.__init__(self, cols, rows, override_pipes=True,
+                       agent_config=agent_config)
         self.conin_pipe = windll.kernel32.CreateFileW(
             self.conin_pipe_name, GENERIC_WRITE, 0, None, OPEN_EXISTING, 0,
             None

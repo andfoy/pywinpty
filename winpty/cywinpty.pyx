@@ -26,6 +26,12 @@ cdef extern from "Windows.h":
     )
 
 
+WINPTY_FLAG_CONERR = winpty_constants._WINPTY_FLAG_CONERR
+WINPTY_FLAG_PLAIN_OUTPUT = winpty_constants._WINPTY_FLAG_PLAIN_OUTPUT
+WINPTY_FLAG_COLOR_ESCAPES = winpty_constants._WINPTY_FLAG_COLOR_ESCAPES
+WINPTY_FLAG_ALLOW_CURPROC_DESKTOP_CREATION = winpty_constants._WINPTY_FLAG_ALLOW_CURPROC_DESKTOP_CREATION
+
+
 cdef class Agent:
     """
     This class wraps a winpty agent and offers communication with

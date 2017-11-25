@@ -18,9 +18,9 @@ import pytest
 
 
 @pytest.fixture(scope='module')
-def pty_fixture(cmd=None, env=None):
+def pty_fixture(cmd=None, **kwargs):
     cmd = cmd or 'cmd'
-    return PtyProcess.spawn(cmd, env=env)
+    return PtyProcess.spawn(cmd, **kwargs)
 
 
 @flaky(max_runs=4, min_passes=1)
@@ -68,11 +68,27 @@ def test_readline():
     env = os.environ.copy()
     env['foo'] = 'bar'
     pty = pty_fixture(env=env)
-    pty.write('echo %foo%\r\n')
+    pty.write('echo %foo%\r\nexit\r\n')
 
     while 'bar' not in pty.readline():
         pass
 
+    while 1:
+        try:
+            pty.readline()
+        except EOFError:
+            break
+
+    assert not pty.isalive()
+
+
+def test_no_emit_cursors():
+    pty = pty_fixture(emit_cursors=False)
+    assert '\x1b[0K' not in pty.readline()
+    pty.terminate()
+
+    pty = pty_fixture()
+    assert '\x1b[0K' in pty.readline()
     pty.terminate()
 
 

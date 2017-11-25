@@ -30,11 +30,11 @@ def get_version(module='winpty'):
 
 
 try:
-    include_dirs = [os.environ['LIBRARY_INC']]
+    include_dirs = os.environ['LIBRARY_INC'].split(os.pathsep)
 except KeyError:
     include_dirs = []
 try:
-    library_dirs = [os.environ['LIBRARY_LIB']]
+    library_dirs = os.environ['LIBRARY_LIB'].split(os.pathsep)
 except KeyError:
     library_dirs = []
 
