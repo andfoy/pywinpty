@@ -1,3 +1,19 @@
+## Version 0.5 (2017/11/27)
+
+### Issues Closed
+
+* [Issue 76](https://github.com/spyder-ide/pywinpty/issues/76) - Release 0.5
+* [Issue 75](https://github.com/spyder-ide/pywinpty/issues/75) - Python 2.7 Support?
+
+In this release 2 issues were closed.
+
+### Pull Requests Merged
+
+* [PR 66](https://github.com/spyder-ide/pywinpty/pull/66) - PR: Add Python 2 support
+
+In this release 1 pull request was closed.
+
+
 ## Version 0.4.1 (2017/11/23)
 
 ### Issues Closed
