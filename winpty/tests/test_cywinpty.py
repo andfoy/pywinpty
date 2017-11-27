@@ -5,12 +5,16 @@
 
 # Third party imports
 from winpty.cywinpty import Agent
+from winpty.winpty_wrapper import PY2
+from winpty.ptyprocess import which
 import pytest
 
 
 # yapf: disable
 
-CMD = r'C:\windows\system32\cmd.exe'
+CMD = which('cmd')
+if PY2:
+    CMD = unicode(CMD)  # noqa
 
 
 @pytest.fixture(scope='module')
@@ -29,7 +33,7 @@ def test_agent_spawn():
 def test_agent_spawn_fail():
     agent = agent_fixture(80, 25)
     try:
-        agent.spawn('cmd.exe')
+        agent.spawn(CMD)
     except RuntimeError:
         pass
 

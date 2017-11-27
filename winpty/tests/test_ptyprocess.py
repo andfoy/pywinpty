@@ -36,7 +36,7 @@ def test_read():
 def test_write():
     pty = pty_fixture()
 
-    text = 'Eggs, ham and spam ünicode'
+    text = u'Eggs, ham and spam ünicode'
     pty.write(text)
 
     data = ''

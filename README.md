@@ -46,16 +46,13 @@ You can install this library by using conda or pip package managers, as it follo
 
 Using conda (Recommended):
 ```bash
-conda install pywinpty -c spyder-ide
+conda install pywinpty -c conda-forge
 ```
 
 Using pip:
 ```bash
 pip install pywinpty
 ```
-
-Due to Visual Studio version incompatibilities, we currently only support Python 3.5 and 3.6
-versions. Both installation packages include the required winpty binaries.
 
 ## Building from sources
 To build from sources you will need to open either a Visual Studio development prompt or execute
@@ -103,13 +100,13 @@ cols, rows = 80, 25
 process = PTY(cols, rows)
 
 # Spawn a new console process, e.g., CMD
-process.spawn(r'C:\windows\system32\cmd.exe')
+process.spawn(ur'C:\windows\system32\cmd.exe')
 
 # Read console output (Unicode)
 process.read()
 
 # Write input to console (Unicode)
-process.write('Text')
+process.write(u'Text')
 
 # Resize console size
 new_cols, new_rows = 90, 30
