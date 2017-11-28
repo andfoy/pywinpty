@@ -391,38 +391,3 @@ def _unicode(s):
     if isinstance(s, unicode):  # noqa E891
         return s
     return s.decode('utf-8')
-
-
-class _allow_interrupt(object):
-    """Utility for fixing CTRL-C events on Windows.
-
-    See https://github.com/zeromq/pyzmq/blob/3c41c5dbb8a5b50447fff3f714947636da71c212/zmq/utils/win32.py
-    for details.
-    """
-
-    def __init__(self, action=None):
-        kernel32 = windll.LoadLibrary('kernel32')
-        phandler_routine = WINFUNCTYPE(BOOL, DWORD)
-        self._handler = kernel32.SetConsoleCtrlHandler
-        self._handler.argtypes = (phandler_routine, BOOL)
-        self._handler.restype = BOOL
-
-        @phandler_routine
-        def handle(event):
-            if event == 0:  # CTRL_C_EVENT
-                action()
-            return 0
-        self._handle = handle
-
-    def __enter__(self):
-        """Install the custom CTRL-C handler."""
-        result = self._handler(self._handle, 1)
-        if result == 0:
-            raise WindowsError()
-
-    def __exit__(self, *args):
-        """Remove the custom CTRL-C handler."""
-        result = self._handler(self._handle, 0)
-        if result == 0:
-            raise WindowsError()
-
