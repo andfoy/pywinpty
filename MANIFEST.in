@@ -1,5 +1,6 @@
 include LICENSE.txt
 global-include *.pyx
 global-include *.pxd
-global-include *.dll
-global-include *.exe
+global-exclude *.exe
+global-exclude *.dll
+global-exclude *.pyd
