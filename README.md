@@ -64,6 +64,7 @@ following environment variables:
 
 ```batch
 set DISTUTILS_USE_SDK=1
+set MSSdk=1
 set LIBRARY_INC=<Path to the folder that contains wintpty headers>
 set LIBRARY_LIB=<Path to the folder that contains wintpty library files>
 ```
