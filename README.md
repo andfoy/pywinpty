@@ -58,7 +58,7 @@ Note: If you install from pip and are using Python 2.7, you will need the
 Visual C++ Redistributable for Visual Studio 2015.
 
 ## Building from sources
-To build from sources you will need to open either a Visual Studio development prompt or execute
+To build from sources you will need to open either a Visual Studio 2015+ development prompt or execute
 the ``vcvarsall.bat`` script from a CMD/Powershell console, then you will need to setup the
 following environment variables:
 
@@ -80,6 +80,9 @@ If everything works correctly, you can install winpty by using ``pip``:
 ```bash
 pip install -U .
 ```
+
+Note that we require Visual Studio 2015+ even when using Python 2.7 because
+`winpty` uses C++11 syntax.
 
 ## Package usage
 Pywinpty offers a single python wrapper around winpty library functions. This implies that using a
