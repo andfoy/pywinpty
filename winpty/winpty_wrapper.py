@@ -43,7 +43,7 @@ WriteFile.argtypes = [HANDLE, LPCVOID, DWORD, LPDWORD, LPOVERLAPPED]
 
 CreateFileW = windll.kernel32.CreateFileW
 CreateFileW.restype = HANDLE
-CreateFileW.argtypes = [LPCWSTR, DWORD, DWORD, LPSECURITY_ATTRIBUTE, DWORD,
+CreateFileW.argtypes = [LPCWSTR, DWORD, DWORD, LPSECURITY_ATTRIBUTES, DWORD,
     DWORD, HANDLE]
 
 
