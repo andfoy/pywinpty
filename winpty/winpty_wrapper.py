@@ -5,7 +5,9 @@
 
 # Standard library imports
 from ctypes import windll
-from ctypes.wintypes import DWORD, LPVOID, HANDLE, BOOL, LPCVOID
+from ctypes.wintypes import (
+    DWORD, LPVOID, HANDLE, BOOL, LPCVOID, LPCTSTR
+)
 import ctypes
 
 # Local imports
@@ -24,6 +26,9 @@ GENERIC_READ = 0x80000000
 LARGE_INTEGER = ctypes.c_ulong
 PLARGE_INTEGER = ctypes.POINTER(LARGE_INTEGER)
 LPOVERLAPPED = LPVOID
+LPSECURITY_ATTRIBUTES = LPVOID
+INVALID_HANDLE_VALUE = -1
+
 
 # LPDWORD is not in ctypes.wintypes on Python 2
 LPDWORD = ctypes.POINTER(DWORD)
@@ -35,6 +40,11 @@ ReadFile.argtypes = [HANDLE, LPVOID, DWORD, LPDWORD, LPOVERLAPPED]
 WriteFile = windll.kernel32.WriteFile
 WriteFile.restype = BOOL
 WriteFile.argtypes = [HANDLE, LPCVOID, DWORD, LPDWORD, LPOVERLAPPED]
+
+CreateFileW = windll.kernel32.CreateFileW
+CreateFileW.restype = HANDLE
+CreateFileW.argtypes = [LPCTSTR, DWORD, DWORD, LPSECURITY_ATTRIBUTE, DWORD,
+    DWORD, HANDLE]
 
 
 class PTY(Agent):
@@ -48,11 +58,11 @@ class PTY(Agent):
     def __init__(self, cols, rows):
         """Initialize a new Pseudo Terminal of size ``(cols, rows)``."""
         Agent.__init__(self, cols, rows, True)
-        self.conin_pipe = windll.kernel32.CreateFileW(
+        self.conin_pipe = CreateFileW(
             self.conin_pipe_name, GENERIC_WRITE, 0, None, OPEN_EXISTING, 0,
             None
         )
-        self.conout_pipe = windll.kernel32.CreateFileW(
+        self.conout_pipe = CreateFileW(
             self.conout_pipe_name, GENERIC_READ, 0, None, OPEN_EXISTING, 0,
             None
         )
@@ -69,6 +79,8 @@ class PTY(Agent):
         size = size_p[0]
         length = min(size, length)
         data = ctypes.create_string_buffer(length)
+        if self.conout_pipe == INVALID_HANDLE_VALUE:
+            raise ValueError('Invalid read pipe')
         if length > 0:
             ReadFile(self.conout_pipe, data, length, None, None)
         return data.value
@@ -79,6 +91,8 @@ class PTY(Agent):
         data_p = ctypes.create_string_buffer(data)
         num_bytes = PLARGE_INTEGER(LARGE_INTEGER(0))
         bytes_to_write = len(data)
+        if self.conin_pipe == INVALID_HANDLE_VALUE:
+            raise ValueError('Invalid write pipe')
         success = WriteFile(self.conin_pipe, data_p,
                             bytes_to_write, num_bytes, None)
         return success, num_bytes[0]
