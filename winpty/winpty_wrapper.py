@@ -6,7 +6,7 @@
 # Standard library imports
 from ctypes import windll
 from ctypes.wintypes import (
-    DWORD, LPVOID, HANDLE, BOOL, LPCVOID, LPCTSTR
+    DWORD, LPVOID, HANDLE, BOOL, LPCVOID, LPCWSTR
 )
 import ctypes
 
@@ -43,7 +43,7 @@ WriteFile.argtypes = [HANDLE, LPCVOID, DWORD, LPDWORD, LPOVERLAPPED]
 
 CreateFileW = windll.kernel32.CreateFileW
 CreateFileW.restype = HANDLE
-CreateFileW.argtypes = [LPCTSTR, DWORD, DWORD, LPSECURITY_ATTRIBUTE, DWORD,
+CreateFileW.argtypes = [LPCWSTR, DWORD, DWORD, LPSECURITY_ATTRIBUTE, DWORD,
     DWORD, HANDLE]
 
 
