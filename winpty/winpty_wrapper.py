@@ -79,11 +79,18 @@ class PTY(Agent):
         windll.kernel32.GetFileSizeEx(self.conout_pipe, size_p)
         size = size_p[0]
         length = min(size, length)
+        print('size', size)
+        print('length', length)
+        print('conout_pipe', self.conout_pipe)
         data = ctypes.create_string_buffer(length)
         if self.conout_pipe == INVALID_HANDLE_VALUE:
             raise ValueError('Invalid read pipe')
         if length > 0:
-            ReadFile(self.conout_pipe, data, length, None, None)
+            try:
+                ReadFile(self.conout_pipe, data, length, None, None)
+            except Exception as e:
+                print(e)
+                ReadFile(self.conout_pipe, data, length, None, None)
         return data.value
 
     def write(self, data):
