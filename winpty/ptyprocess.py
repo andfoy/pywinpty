@@ -46,6 +46,8 @@ class PtyProcess(object):
         # Set up our file reader sockets.
         self._server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         address = _get_address()
+        # Socket from _get_address may still be in wait state.
+        time.sleep(self.delayafterclose * 0.1)
         self._server.bind(address)
         self._server.listen(1)
 
