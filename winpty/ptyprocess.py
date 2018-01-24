@@ -45,8 +45,8 @@ class PtyProcess(object):
 
         # Set up our file reader sockets.
         self._server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        address = _get_address()
-        self._server.bind(address)
+        self._server.bind(("127.0.0.1", 0))
+        address = self._server.getsockname()
         self._server.listen(1)
 
         # Read from the pty in a thread.
@@ -347,24 +347,6 @@ def _read_in_thread(address, pty):
             break
 
     client.close()
-
-
-def _get_address(default_port=20128):
-    """Find and return a non used port"""
-    while True:
-        try:
-            sock = socket.socket(socket.AF_INET,
-                                 socket.SOCK_STREAM,
-                                 socket.IPPROTO_TCP)
-            sock.bind(("127.0.0.1", default_port))
-        except socket.error as _msg:  # analysis:ignore
-            default_port += 1
-        else:
-            break
-        finally:
-            sock.close()
-            sock = None
-    return ("127.0.0.1", default_port)
 
 
 def _unicode(s):
