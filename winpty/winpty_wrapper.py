@@ -11,7 +11,14 @@ import ctypes
 # Local imports
 from .cywinpty import Agent
 
+import os
 import sys
+
+# Refuse to import on Windows 7
+if os.name == 'nt' and sys.getwindowsversion().major == 7:
+    raise OSError('Cannot use winpty on Windows 7, '
+                  'see https://github.com/spyder-ide/pywinpty/issues/59')
+
 
 PY2 = sys.version_info[0] == 2
 
