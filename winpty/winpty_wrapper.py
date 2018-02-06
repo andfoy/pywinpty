@@ -16,6 +16,7 @@ import sys
 
 # Refuse to import on Windows 7
 if os.name == 'nt' and sys.getwindowsversion().major <= 7:
+    print(sys.getwindowsversion())
     raise ImportError('Cannot use winpty on Windows 7, '
                       'see https://github.com/spyder-ide/pywinpty/issues/59')
 
