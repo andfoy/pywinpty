@@ -328,6 +328,7 @@ def _read_in_thread(address, pty):
     client.connect(address)
 
     while 1:
+        time.sleep(0.1)
         data = pty.read(4096)
 
         if not data and not pty.isalive():
