@@ -328,12 +328,11 @@ def _read_in_thread(address, pty):
     client.connect(address)
 
     while 1:
-        data = pty.read(4096)
+        data = pty.read(4096, blocking=True)
 
         if not data and not pty.isalive():
             while not data and not pty.iseof():
-                time.sleep(0.1)
-                data += pty.read(4096)
+                data += pty.read(4096, blocking=True)
 
             if not data:
                 try:
