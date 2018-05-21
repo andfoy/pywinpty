@@ -52,7 +52,7 @@ install:
   - "activate test"
   # - CALL "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\vcvarsall.bat" %ARCH%
   - "conda install --file requirements.txt -c conda-forge"
-  - "if \"%ARCH%\" == \"x86\" (set PATH=%MINGW32_DIR%;%MINGW32_DIR%\\bin;%PATH%) else (set %MINGW64_DIR%;%MINGW64_DIR%\\bin;%PATH%)"
+  - "if %ARCH% == \"x86\" (set PATH=%MINGW32_DIR%;%MINGW32_DIR%\\bin;%PATH%) else (set PATH=%MINGW64_DIR%;%MINGW64_DIR%\\bin;%PATH%)"
   - "pip install twine"
   - "%CMD_IN_ENV% python setup.py build_ext -i"
 
