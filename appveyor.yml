@@ -11,6 +11,8 @@ environment:
     LIBRARY_INC: "C:\\conda\\envs\\test\\Library\\include"
     LIBRARY_LIB: "C:\\conda\\envs\\test\\Library\\lib"
     DISTUTILS_USE_SDK: 1
+    MINGW32_DIR: "C:\\mingw-w64\\i686-6.3.0-posix-dwarf-rt_v5-rev"
+    MINGW64_DIR: "C:\\mingw-w64\\x86_64-7.3.0-posix-seh-rt_v5-rev0"
     # Environment variables used by astropy helpers
     PYTHON: "C:\\conda"
     CMD_IN_ENV: "cmd /E:ON /V:ON /C .\\ci-helpers\\appveyor\\windows_sdk.cmd"
@@ -48,10 +50,11 @@ install:
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
   # Use test conda environment
   - "activate test"
-  - CALL "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\vcvarsall.bat" %ARCH%
+  # - CALL "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\vcvarsall.bat" %ARCH%
   - "conda install --file requirements.txt -c conda-forge"
+  - "if \"%ARCH%\" == \"x86\" (set PATH=%MINGW32_DIR%;%MINGW32_DIR%\\bin;%PATH%) else (set %MINGW64_DIR%;%MINGW64_DIR%\\bin;%PATH%)"
   - "pip install twine"
-  - "%CMD_IN_ENV% python setup.py build_ext -i --compiler=msvc"
+  - "%CMD_IN_ENV% python setup.py build_ext -i"
 
 # Not a .NET project, we build in the install step instead
 build: false
