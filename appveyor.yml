@@ -16,6 +16,7 @@ environment:
     # Environment variables used by astropy helpers
     PYTHON: "C:\\conda"
     CMD_IN_ENV: "cmd /E:ON /V:ON /C .\\ci-helpers\\appveyor\\windows_sdk.cmd"
+    APPVEYOR_RDP_PASSWORD: "dcca4c4863E30d56c2e0dda6327370b3#"
 
   matrix:
     - PYTHON_VERSION: "3.6"
@@ -68,3 +69,6 @@ test_script:
 
 on_success:
   - "%CMD_IN_ENV% powershell appveyor/publish.ps1"
+
+on_finish:
+  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
