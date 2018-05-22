@@ -46,6 +46,7 @@ environment:
 install:
   # Astropy ci-helpers. See https://github.com/astropy/ci-helpers
   - "if \"%ARCH%\" == \"x86\" (set PATH=%MINGW32_DIR%;%MINGW32_DIR%\\bin;\"%PATH%\") else (set PATH=%MINGW64_DIR%;%MINGW64_DIR%\\bin;\"%PATH%\")"
+  - "set PATH=%PATH:\"=%"
   - "git clone git://github.com/astropy/ci-helpers.git"
   - "powershell ci-helpers/appveyor/install-miniconda.ps1"
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
