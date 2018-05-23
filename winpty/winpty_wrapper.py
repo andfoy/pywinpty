@@ -95,3 +95,19 @@ class PTY(Agent):
             self.conout_pipe, None, None, None, None, None
         )
         return not bool(succ)
+
+
+# Make sure the library works at import time
+# p = PTY(80, 25)
+# valid = False
+# p.spawn('C:\\windows\\system32\\cmd.exe')
+# try:
+#     p.read()
+#     valid = True
+# except OSError:
+#     pass
+# p.close()
+# del p
+# if not valid:
+#     raise ImportError('Cannot successfully read from pty, see '
+#                       'https://github.com/spyder-ide/pywinpty/issues/59')
