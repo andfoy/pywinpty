@@ -51,8 +51,13 @@ install:
   # Use test conda environment
   - "activate test"
   # - CALL "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\vcvarsall.bat" %ARCH%
-  - "conda install --file requirements.txt"
+<<<<<<< HEAD
+  - "conda install --file requirements.txt -c conda-forge"
   - "pip install twine codecov"
+=======
+  - "conda install --file requirements.txt"
+  - "pip install twine"
+>>>>>>> upstream/master
   - "%CMD_IN_ENV% python setup.py build_ext -i --compiler=mingw32"
 
 # Not a .NET project, we build in the install step instead
