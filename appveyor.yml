@@ -51,7 +51,7 @@ install:
   # Use test conda environment
   - "activate test"
   # - CALL "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\vcvarsall.bat" %ARCH%
-  - "conda install --file requirements.txt -c conda-forge"
+  - "conda install --file requirements.txt"
   - "pip install twine"
   - "%CMD_IN_ENV% python setup.py build_ext -i --compiler=mingw32"
 
@@ -59,8 +59,8 @@ install:
 build: false
 
 test_script:
-  - "%CMD_IN_ENV% ciocheck winpty --disable-tests"
-  - "conda remove pytest-xdist"
+  #- "%CMD_IN_ENV% ciocheck winpty --disable-tests"
+  #- "conda remove pytest-xdist"
   - "%CMD_IN_ENV% pytest winpty --cov=winpty --cov-report term-missing -v"
   - "%CMD_IN_ENV% coveralls"
 

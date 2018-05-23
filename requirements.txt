@@ -8,6 +8,6 @@ m2w64-toolchain
 libpython
 
 # Test requirements
-ciocheck
 coveralls
 flaky
+pytest-cov
