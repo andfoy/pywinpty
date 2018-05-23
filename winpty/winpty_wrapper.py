@@ -57,7 +57,7 @@ class PTY(Agent):
             None
         )
 
-    def read(self, length=1000):
+    def read(self, length=1000, blocking=False):
         """
         Read ``length`` bytes from current process output stream.
 
@@ -65,9 +65,10 @@ class PTY(Agent):
         behaves like one.
         """
         size_p = PLARGE_INTEGER(LARGE_INTEGER(0))
-        windll.kernel32.GetFileSizeEx(self.conout_pipe, size_p)
-        size = size_p[0]
-        length = min(size, length)
+        if not blocking:
+            windll.kernel32.GetFileSizeEx(self.conout_pipe, size_p)
+            size = size_p[0]
+            length = min(size, length)
         data = ctypes.create_string_buffer(length)
         if length > 0:
             ReadFile(self.conout_pipe, data, length, None, None)
