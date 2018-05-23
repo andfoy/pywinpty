@@ -10,3 +10,4 @@ libpython
 # Test requirements
 coveralls
 flaky
+pytest-cov
