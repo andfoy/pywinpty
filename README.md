@@ -38,8 +38,7 @@ If you want to know more about this, please read this
 
 
 ## Dependencies
-To compile pywinpty sources, you must have [Cython](https://github.com/cython/cython) and Visual
-Studio (2013 or later) installed. You must also have Winpty's C header and library files available
+To compile pywinpty sources, you must have [Cython](https://github.com/cython/cython) and MSYS2/MinGW-w64 installed (Alongside the corresponding Python MSVC Runtime). You must also have Winpty's C header and library files available
 on your include path.
 
 ## Installation
@@ -47,7 +46,7 @@ You can install this library by using conda or pip package managers, as it follo
 
 Using conda (Recommended):
 ```bash
-conda install pywinpty -c conda-forge
+conda install pywinpty
 ```
 
 Using pip:
@@ -55,17 +54,26 @@ Using pip:
 pip install pywinpty
 ```
 
-Note: If you install from pip and are using Python 2.7, you will need the
-Visual C++ Redistributable for Visual Studio 2015.
-
 ## Building from sources
-To build from sources you will need to open either a Visual Studio 2015+ development prompt or execute
-the ``vcvarsall.bat`` script from a CMD/Powershell console, then you will need to setup the
-following environment variables:
+
+To build from sources, we recommend to use conda to install the following packages:
 
 ```batch
-set DISTUTILS_USE_SDK=1
-set MSSdk=1
+conda install --file requirements.txt
+```
+
+Make sure that you are installing packages from the ``default`` channel. If you don't want to use conda, you will need to have the MSYS2/MinGW-w64-flavoured GCC compiler available on your PATH.
+
+You will need to setup the following environment variables:
+
+### Conda compilation:
+```batch
+set LIBRARY_INC=<Path to your anaconda installation>\envs\<environment name>\Library\include
+set LIBRARY_LIB=<Path to your anaconda installation>\envs\<environment name>\Library\lib
+```
+
+### Manual compilation:
+```batch
 set LIBRARY_INC=<Path to the folder that contains wintpty headers>
 set LIBRARY_LIB=<Path to the folder that contains wintpty library files>
 ```
@@ -74,7 +82,7 @@ To test your compilation environment settings, you can build pywinpty Cython sou
 executing:
 
 ```bash
-python setup.py build_ext -i --compiler=msvc
+python setup.py build_ext -i --compiler=mingw32
 ```
 
 If everything works correctly, you can install winpty by using ``pip``:
@@ -83,8 +91,6 @@ If everything works correctly, you can install winpty by using ``pip``:
 pip install -U .
 ```
 
-Note that we require Visual Studio 2015+ even when using Python 2.7 because
-`winpty` uses C++11 syntax.
 
 ## Package usage
 Pywinpty offers a single python wrapper around winpty library functions. This implies that using a
