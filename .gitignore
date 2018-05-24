@@ -22,7 +22,7 @@ sdist/
 var/
 wheels/
 *.egg-info/
-.installed.cfg
+*.installed.cfg
 *.egg
 
 # PyInstaller
@@ -38,9 +38,9 @@ pip-delete-this-directory.txt
 # Unit test / coverage reports
 htmlcov/
 .tox/
-.coverage
+*.coverage
 .coverage.*
-.cache
+*.cache
 nosetests.xml
 coverage.xml
 *.cover
@@ -56,7 +56,7 @@ local_settings.py
 
 # Flask stuff:
 instance/
-.webassets-cache
+*.webassets-cache
 
 # Scrapy stuff:
 .scrapy
@@ -68,10 +68,10 @@ docs/_build/
 target/
 
 # Jupyter Notebook
-.ipynb_checkpoints
+.ipynb_checkpoints/
 
 # pyenv
-.python-version
+*.python-version
 
 # celery beat schedule file
 celerybeat-schedule
@@ -83,13 +83,13 @@ celerybeat-schedule
 .env
 
 # virtualenv
-.venv
+*.venv
 venv/
 ENV/
 
 # Spyder project settings
-.spyderproject
-.spyproject
+*.spyderproject
+.spyproject/
 
 # Rope project settings
 .ropeproject
@@ -104,6 +104,9 @@ ENV/
 cywinpty.c
 
 # Winpty binaries
-.exe
-.dll
-.h
+*.exe
+*.dll
+*.h
+
+# Git giles
+*.orig
