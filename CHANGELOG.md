@@ -1,3 +1,27 @@
+## Version 0.5.2 (2018/05/23)
+
+### Issues Closed
+
+* [Issue 102](https://github.com/spyder-ide/pywinpty/issues/102) - Release v0.5.2
+* [Issue 101](https://github.com/spyder-ide/pywinpty/issues/101) - Update Readme according to latest changes ([PR 104](https://github.com/spyder-ide/pywinpty/pull/104))
+* [Issue 96](https://github.com/spyder-ide/pywinpty/issues/96) - Fix CI Build ([PR 97](https://github.com/spyder-ide/pywinpty/pull/97))
+* [Issue 59](https://github.com/spyder-ide/pywinpty/issues/59) - Access violation writing 0x0000000000000000 on Windows 7 ([PR 99](https://github.com/spyder-ide/pywinpty/pull/99))
+
+In this release 4 issues were closed.
+
+### Pull Requests Merged
+
+* [PR 104](https://github.com/spyder-ide/pywinpty/pull/104) - PR: Update source compilation instructions ([101](https://github.com/spyder-ide/pywinpty/issues/101))
+* [PR 103](https://github.com/spyder-ide/pywinpty/pull/103) - PR: Remove leftover file from merge
+* [PR 100](https://github.com/spyder-ide/pywinpty/pull/100) - PR: Use conda defaults channel for testing
+* [PR 99](https://github.com/spyder-ide/pywinpty/pull/99) - PR: Check that the library works at import time ([59](https://github.com/spyder-ide/pywinpty/issues/59))
+* [PR 98](https://github.com/spyder-ide/pywinpty/pull/98) - Track code coverage using codecov
+* [PR 97](https://github.com/spyder-ide/pywinpty/pull/97) - PR: Compile winpty on Appveyor using MinGW ([96](https://github.com/spyder-ide/pywinpty/issues/96))
+* [PR 95](https://github.com/spyder-ide/pywinpty/pull/95) - PR: Wait (blocking) for data when using PtyProcess
+* [PR 88](https://github.com/spyder-ide/pywinpty/pull/88) - PR: Fix OSError on spawning of PtyProcess ([86](https://github.com/spyder-ide/pywinpty/issues/86))
+
+In this release 8 pull requests were closed.
+
 ## Version 0.5.1 (2017/12/01)
 
 ### Issues Closed
