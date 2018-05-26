@@ -1,3 +1,18 @@
+## Version 0.5.3 (2018/05/25)
+
+### Issues Closed
+
+* [Issue 107](https://github.com/spyder-ide/pywinpty/issues/107) - Release 0.5.3
+* [Issue 105](https://github.com/spyder-ide/pywinpty/issues/105) - 0.5.2 wheels seem to be missing some DLLs ([PR 106](https://github.com/spyder-ide/pywinpty/pull/106))
+
+In this release 2 issues were closed.
+
+### Pull Requests Merged
+
+* [PR 106](https://github.com/spyder-ide/pywinpty/pull/106) - PR: Bundle libgcc and libwinpthread DLL libraries alongside wheels ([105](https://github.com/spyder-ide/pywinpty/issues/105))
+
+In this release 1 pull request was closed.
+
 ## Version 0.5.2 (2018/05/23)
 
 ### Issues Closed
