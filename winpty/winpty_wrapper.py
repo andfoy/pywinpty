@@ -71,7 +71,8 @@ class PTY(Agent):
             length = min(size, length)
         data = ctypes.create_string_buffer(length)
         if length > 0:
-            ReadFile(self.conout_pipe, data, length, None, None)
+            num_bytes = PLARGE_INTEGER(LARGE_INTEGER(0))
+            ReadFile(self.conout_pipe, data, length, num_bytes, None)
         return data.value
 
     def write(self, data):
