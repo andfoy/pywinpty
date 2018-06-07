@@ -31,6 +31,7 @@ class PtyProcess(object):
         assert isinstance(pty, PTY)
         self.pty = pty
         self.pid = pty.pid
+        self.read_blocking = bool(os.environ.get('PYWINPTY_BLOCK', 1))
         self.closed = False
         self.flag_eof = False
 
@@ -328,11 +329,11 @@ def _read_in_thread(address, pty):
     client.connect(address)
 
     while 1:
-        data = pty.read(4096, blocking=True)
+        data = pty.read(4096, blocking=pty.read_blocking)
 
         if not data and not pty.isalive():
             while not data and not pty.iseof():
-                data += pty.read(4096, blocking=True)
+                data += pty.read(4096, blocking=pty.read_blocking)
 
             if not data:
                 try:
