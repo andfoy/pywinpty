@@ -52,7 +52,7 @@ class PtyProcess(object):
 
         # Read from the pty in a thread.
         self._thread = threading.Thread(target=_read_in_thread,
-            args=(address, self.pty, self.blocking_read))
+            args=(address, self.pty, self.read_blocking))
         self._thread.setDaemon(True)
         self._thread.start()
 
