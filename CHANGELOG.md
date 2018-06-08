@@ -1,3 +1,23 @@
+## Version 0.5.4 (2018/06/07)
+
+### Issues Closed
+
+* [Issue 114](https://github.com/spyder-ide/pywinpty/issues/114) - Release v0.5.4
+* [Issue 111](https://github.com/spyder-ide/pywinpty/issues/111) - Remove validation at import introduced in 0.5.2 ([PR 112](https://github.com/spyder-ide/pywinpty/pull/112))
+* [Issue 110](https://github.com/spyder-ide/pywinpty/issues/110) - Disable ptyprocess blocking read by means of a environment variable ([PR 113](https://github.com/spyder-ide/pywinpty/pull/113))
+* [Issue 108](https://github.com/spyder-ide/pywinpty/issues/108) - Access violation once again ([PR 109](https://github.com/spyder-ide/pywinpty/pull/109))
+
+In this release 4 issues were closed.
+
+### Pull Requests Merged
+
+* [PR 113](https://github.com/spyder-ide/pywinpty/pull/113) - PR: Add PYWINPTY_BLOCK envirnoment variable to disable ptyprocess read block ([110](https://github.com/spyder-ide/pywinpty/issues/110))
+* [PR 112](https://github.com/spyder-ide/pywinpty/pull/112) - PR: Remove import-time verification ([111](https://github.com/spyder-ide/pywinpty/issues/111))
+* [PR 109](https://github.com/spyder-ide/pywinpty/pull/109) - PR: Fix for access violation error ([108](https://github.com/spyder-ide/pywinpty/issues/108))
+
+In this release 3 pull requests were closed.
+
+
 ## Version 0.5.3 (2018/05/25)
 
 ### Issues Closed
