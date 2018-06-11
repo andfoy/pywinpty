@@ -1,7 +1,4 @@
-# pywinpty
-Python bindings for the [winpty](https://github.com/rprichard/winpty) pseudo terminal library. It
-allows to create and communicate with Windows processes that print outputs and recieve inputs via
-console input and output pipes.
+# PyWinpty: Python bindings for winpty
 
 [![Project License - MIT](https://img.shields.io/pypi/l/pywinpty.svg)](./LICENSE.txt)
 [![pypi version](https://img.shields.io/pypi/v/pywinpty.svg)](https://pypi.org/project/pywinpty/)
@@ -14,10 +11,19 @@ console input and output pipes.
 [![Coverage Status](https://coveralls.io/repos/github/spyder-ide/pywinpty/badge.svg?branch=master)](https://coveralls.io/github/spyder-ide/pywinpty?branch=master)
 [![codecov](https://codecov.io/gh/spyder-ide/pywinpty/branch/master/graph/badge.svg)](https://codecov.io/gh/spyder-ide/pywinpty)
 
+*Copyright © 2017–2018 Spyder Project Contributors*
+
+
+## Overview
+
+Python bindings for the [winpty](https://github.com/rprichard/winpty) pseudo terminal library.
+PyWinpty allows creating and communicating with Windows processes that receive input and print outputs via console input and output pipes.
+
 
 ## Dependencies
-To compile pywinpty sources, you must have [Cython](https://github.com/cython/cython) and MSYS2/MinGW-w64 installed (Alongside the corresponding Python MSVC Runtime). You must also have Winpty's C header and library files available
-on your include path.
+To compile pywinpty sources, you must have [Cython](https://github.com/cython/cython) and MSYS2/MinGW-w64 installed (alongside the corresponding Python MSVC Runtime).
+You must also have Winpty's C header and library files available on your include path.
+
 
 ## Installation
 You can install this library by using conda or pip package managers, as it follows:
@@ -32,7 +38,8 @@ Using pip:
 pip install pywinpty
 ```
 
-## Building from sources
+
+## Building from source
 
 To build from sources, we recommend to use conda to install the following packages:
 
@@ -40,7 +47,8 @@ To build from sources, we recommend to use conda to install the following packag
 conda install --file requirements.txt
 ```
 
-Make sure that you are installing packages from the ``default`` channel. If you don't want to use conda, you will need to have the MSYS2/MinGW-w64-flavoured GCC compiler available on your PATH.
+Make sure that you are installing packages from the ``default`` channel.
+If you don't want to use conda, you will need to have the MSYS2/MinGW-w64-flavoured GCC compiler available on your PATH.
 
 You will need to setup the following environment variables:
 
@@ -71,8 +79,8 @@ pip install -U .
 
 
 ## Package usage
-Pywinpty offers a single python wrapper around winpty library functions. This implies that using a
-single object (``winpty.PTY``) it is possible to access to all functionallity, as it follows:
+Pywinpty offers a single python wrapper around winpty library functions.
+This implies that using a single object (``winpty.PTY``) it is possible to access to all functionality, as it follows:
 
 ```python
 # High level usage using `spawn`
@@ -114,18 +122,22 @@ process.close()
 del process
 ```
 
+
 ## Changelog
-Visit our [CHANGELOG](CHANGELOG.md) file to know more about our new features and improvements.
+Visit our [CHANGELOG](CHANGELOG.md) file to learn more about our new features and improvements.
+
 
 ## Contribution guidelines
 We follow PEP8 and PEP257 for pure python packages and Cython/VS to compile extensions. Feel free
 to send a PR or create an issue if you have any problem/question.
+
 
 ## Backers
 
 Support us with a monthly donation and help us continue our activities.
 
 [![Backers](https://opencollective.com/spyder/backers.svg)](https://opencollective.com/spyder#support)
+
 
 ## Sponsors
 
