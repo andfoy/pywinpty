@@ -1,3 +1,20 @@
+## Version 0.5.5 (2018/12/09)
+
+### Issues Closed
+
+* [Issue 120](https://github.com/spyder-ide/pywinpty/issues/120) - Release v0.5.5
+* [Issue 118](https://github.com/spyder-ide/pywinpty/issues/118) - pip install fails on 3.7, prevents Jupyter install ([PR 119](https://github.com/spyder-ide/pywinpty/pull/119))
+* [Issue 116](https://github.com/spyder-ide/pywinpty/issues/116) - Python 3.7 wheels? ([PR 119](https://github.com/spyder-ide/pywinpty/pull/119))
+
+In this release 3 issues were closed.
+
+### Pull Requests Merged
+
+* [PR 119](https://github.com/spyder-ide/pywinpty/pull/119) - PR: Add support for Python 3.7 ([118](https://github.com/spyder-ide/pywinpty/issues/118), [116](https://github.com/spyder-ide/pywinpty/issues/116))
+* [PR 115](https://github.com/spyder-ide/pywinpty/pull/115) - PR: Update readme to remove funding appeal, harmonize with other readmes and minor fixes
+
+In this release 2 pull requests were closed.
+
 ## Version 0.5.4 (2018/06/07)
 
 ### Issues Closed
