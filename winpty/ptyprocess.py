@@ -32,6 +32,7 @@ class PtyProcess(object):
         assert isinstance(pty, PTY)
         self.pty = pty
         self.pid = pty.pid
+        self.read_blocking = bool(os.environ.get('PYWINPTY_BLOCK', 1))
         self.closed = False
         self.flag_eof = False
 
@@ -52,7 +53,7 @@ class PtyProcess(object):
 
         # Read from the pty in a thread.
         self._thread = threading.Thread(target=_read_in_thread,
-            args=(address, self.pty))
+            args=(address, self.pty, self.read_blocking))
         self._thread.setDaemon(True)
         self._thread.start()
 
@@ -153,6 +154,8 @@ class PtyProcess(object):
                     raise IOError('Could not terminate the child.')
             self.fd = -1
             self.closed = True
+            del self.pty
+            self.pty = None
 
     def __del__(self):
         """This makes sure that no system resources are left open. Python only
@@ -334,19 +337,19 @@ class PtyProcess(object):
         self.pty.set_size(cols, rows)
 
 
-def _read_in_thread(address, pty):
+def _read_in_thread(address, pty, blocking):
     """Read data from the pty in a thread.
     """
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client.connect(address)
 
     while 1:
-        data = pty.read(4096)
+        data = pty.read(4096, blocking=blocking)
 
         if not data and not pty.isalive():
             while not data and not pty.iseof():
                 time.sleep(0.1)
-                data += pty.read(4096)
+                data += pty.read(4096, blocking=blocking)
 
             if not data:
                 try:

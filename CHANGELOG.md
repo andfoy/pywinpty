@@ -1,3 +1,98 @@
+## Version 0.5.5 (2018/12/09)
+
+### Issues Closed
+
+* [Issue 120](https://github.com/spyder-ide/pywinpty/issues/120) - Release v0.5.5
+* [Issue 118](https://github.com/spyder-ide/pywinpty/issues/118) - pip install fails on 3.7, prevents Jupyter install ([PR 119](https://github.com/spyder-ide/pywinpty/pull/119))
+* [Issue 116](https://github.com/spyder-ide/pywinpty/issues/116) - Python 3.7 wheels? ([PR 119](https://github.com/spyder-ide/pywinpty/pull/119))
+
+In this release 3 issues were closed.
+
+### Pull Requests Merged
+
+* [PR 119](https://github.com/spyder-ide/pywinpty/pull/119) - PR: Add support for Python 3.7 ([118](https://github.com/spyder-ide/pywinpty/issues/118), [116](https://github.com/spyder-ide/pywinpty/issues/116))
+* [PR 115](https://github.com/spyder-ide/pywinpty/pull/115) - PR: Update readme to remove funding appeal, harmonize with other readmes and minor fixes
+
+In this release 2 pull requests were closed.
+
+## Version 0.5.4 (2018/06/07)
+
+### Issues Closed
+
+* [Issue 114](https://github.com/spyder-ide/pywinpty/issues/114) - Release v0.5.4
+* [Issue 111](https://github.com/spyder-ide/pywinpty/issues/111) - Remove validation at import introduced in 0.5.2 ([PR 112](https://github.com/spyder-ide/pywinpty/pull/112))
+* [Issue 110](https://github.com/spyder-ide/pywinpty/issues/110) - Disable ptyprocess blocking read by means of a environment variable ([PR 113](https://github.com/spyder-ide/pywinpty/pull/113))
+* [Issue 108](https://github.com/spyder-ide/pywinpty/issues/108) - Access violation once again ([PR 109](https://github.com/spyder-ide/pywinpty/pull/109))
+
+In this release 4 issues were closed.
+
+### Pull Requests Merged
+
+* [PR 113](https://github.com/spyder-ide/pywinpty/pull/113) - PR: Add PYWINPTY_BLOCK envirnoment variable to disable ptyprocess read block ([110](https://github.com/spyder-ide/pywinpty/issues/110))
+* [PR 112](https://github.com/spyder-ide/pywinpty/pull/112) - PR: Remove import-time verification ([111](https://github.com/spyder-ide/pywinpty/issues/111))
+* [PR 109](https://github.com/spyder-ide/pywinpty/pull/109) - PR: Fix for access violation error ([108](https://github.com/spyder-ide/pywinpty/issues/108))
+
+In this release 3 pull requests were closed.
+
+
+## Version 0.5.3 (2018/05/25)
+
+### Issues Closed
+
+* [Issue 107](https://github.com/spyder-ide/pywinpty/issues/107) - Release 0.5.3
+* [Issue 105](https://github.com/spyder-ide/pywinpty/issues/105) - 0.5.2 wheels seem to be missing some DLLs ([PR 106](https://github.com/spyder-ide/pywinpty/pull/106))
+
+In this release 2 issues were closed.
+
+### Pull Requests Merged
+
+* [PR 106](https://github.com/spyder-ide/pywinpty/pull/106) - PR: Bundle libgcc and libwinpthread DLL libraries alongside wheels ([105](https://github.com/spyder-ide/pywinpty/issues/105))
+
+In this release 1 pull request was closed.
+
+## Version 0.5.2 (2018/05/23)
+
+### Issues Closed
+
+* [Issue 102](https://github.com/spyder-ide/pywinpty/issues/102) - Release v0.5.2
+* [Issue 101](https://github.com/spyder-ide/pywinpty/issues/101) - Update Readme according to latest changes ([PR 104](https://github.com/spyder-ide/pywinpty/pull/104))
+* [Issue 96](https://github.com/spyder-ide/pywinpty/issues/96) - Fix CI Build ([PR 97](https://github.com/spyder-ide/pywinpty/pull/97))
+* [Issue 59](https://github.com/spyder-ide/pywinpty/issues/59) - Access violation writing 0x0000000000000000 on Windows 7 ([PR 99](https://github.com/spyder-ide/pywinpty/pull/99))
+
+In this release 4 issues were closed.
+
+### Pull Requests Merged
+
+* [PR 104](https://github.com/spyder-ide/pywinpty/pull/104) - PR: Update source compilation instructions ([101](https://github.com/spyder-ide/pywinpty/issues/101))
+* [PR 103](https://github.com/spyder-ide/pywinpty/pull/103) - PR: Remove leftover file from merge
+* [PR 100](https://github.com/spyder-ide/pywinpty/pull/100) - PR: Use conda defaults channel for testing
+* [PR 99](https://github.com/spyder-ide/pywinpty/pull/99) - PR: Check that the library works at import time ([59](https://github.com/spyder-ide/pywinpty/issues/59))
+* [PR 98](https://github.com/spyder-ide/pywinpty/pull/98) - Track code coverage using codecov
+* [PR 97](https://github.com/spyder-ide/pywinpty/pull/97) - PR: Compile winpty on Appveyor using MinGW ([96](https://github.com/spyder-ide/pywinpty/issues/96))
+* [PR 95](https://github.com/spyder-ide/pywinpty/pull/95) - PR: Wait (blocking) for data when using PtyProcess
+* [PR 88](https://github.com/spyder-ide/pywinpty/pull/88) - PR: Fix OSError on spawning of PtyProcess ([86](https://github.com/spyder-ide/pywinpty/issues/86))
+
+In this release 8 pull requests were closed.
+
+## Version 0.5.1 (2017/12/01)
+
+### Issues Closed
+
+* [Issue 83](https://github.com/spyder-ide/pywinpty/issues/83) - Release 0.5.1
+* [Issue 81](https://github.com/spyder-ide/pywinpty/issues/81) - Update instructions to build from source for Python 2
+* [Issue 77](https://github.com/spyder-ide/pywinpty/issues/77) - Why is the tarball so huge?
+
+In this release 3 issues were closed.
+
+### Pull Requests Merged
+
+* [PR 82](https://github.com/spyder-ide/pywinpty/pull/82) - PR: Add Python 2.7 build notes
+* [PR 80](https://github.com/spyder-ide/pywinpty/pull/80) - Add trove classifier and note about VS Runtime
+* [PR 78](https://github.com/spyder-ide/pywinpty/pull/78) - PR: Do not include binaries in the tarball
+
+In this release 3 pull requests were closed.
+
+
 ## Version 0.5 (2017/11/27)
 
 ### Issues Closed
