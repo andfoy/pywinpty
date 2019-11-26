@@ -17,6 +17,9 @@ environment:
     APPVEYOR_RDP_PASSWORD: "dcca4c4863E30d56c2e0dda6327370b3#"
 
   matrix:
+    - PYTHON_VERSION: "3.8"
+      PYTHON_ARCH: "32"
+      ARCH: "x86"
     - PYTHON_VERSION: "3.7"
       PYTHON_ARCH: "32"
       ARCH: "x86"
@@ -33,6 +36,10 @@ environment:
       PYTHON_ARCH: "32"
       ARCH: "x86"
       platform: "x86"
+    - PYTHON_VERSION: "3.8"
+      PYTHON_ARCH: "64"
+      ARCH: "amd64"
+      platform: "x64"
     - PYTHON_VERSION: "3.7"
       PYTHON_ARCH: "64"
       ARCH: "amd64"
@@ -55,13 +62,15 @@ install:
   - "set PATH=%PATH:\"=%"
   - "git clone git://github.com/astropy/ci-helpers.git"
   - "powershell ci-helpers/appveyor/install-miniconda.ps1"
-  - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
+  # - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
   # Use test conda environment
-  - "activate test"
+  # - "conda init"
+  # - "conda activate base"
+  - "conda activate test"
   # - CALL "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\vcvarsall.bat" %ARCH%
   - "conda install -q --file requirements.txt"
   - "pip install -q twine codecov"
-  - "%CMD_IN_ENV% python setup.py build_ext -i --compiler=mingw32"
+  - "%CMD_IN_ENV% powershell appveyor/build.ps1"
 
 # Not a .NET project, we build in the install step instead
 build: false

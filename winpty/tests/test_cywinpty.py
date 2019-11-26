@@ -18,19 +18,21 @@ if PY2:
 
 
 @pytest.fixture(scope='module')
-def agent_fixture(cols, rows):
-    agent = Agent(cols, rows)
-    return agent
+def agent_fixture():
+    def _agent_factory(cols, rows):
+        agent = Agent(cols, rows)
+        return agent
+    return _agent_factory
 
 
-def test_agent_spawn():
+def test_agent_spawn(agent_fixture):
     agent = agent_fixture(80, 25)
     succ = agent.spawn(CMD)
     assert succ
     del agent
 
 
-def test_agent_spawn_fail():
+def test_agent_spawn_fail(agent_fixture):
     agent = agent_fixture(80, 25)
     try:
         agent.spawn(CMD)
@@ -38,20 +40,20 @@ def test_agent_spawn_fail():
         pass
 
 
-def test_agent_spawn_size_fail():
+def test_agent_spawn_size_fail(agent_fixture):
     try:
         agent_fixture(80, -25)
     except RuntimeError:
         pass
 
 
-def test_agent_resize():
+def test_agent_resize(agent_fixture):
     agent = agent_fixture(80, 25)
     agent.set_size(80, 70)
     del agent
 
 
-def test_agent_resize_fail():
+def test_agent_resize_fail(agent_fixture):
     agent = agent_fixture(80, 25)
     try:
         agent.set_size(-80, 70)

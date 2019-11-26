@@ -21,15 +21,17 @@ if PY2:
 
 
 @pytest.fixture(scope='module')
-def pty_fixture(cols, rows):
-    pty = PTY(cols, rows)
-    pty.spawn(CMD)
-    return pty
+def pty_fixture():
+    def _pty_factory():
+        pty = PTY(80, 25)
+        pty.spawn(CMD)
+        return pty
+    return _pty_factory
 
 
 @flaky(max_runs=4, min_passes=1)
-def test_read():
-    pty = pty_fixture(80, 25)
+def test_read(pty_fixture):
+    pty = pty_fixture()
     loc = os.getcwd()
     line = ''
     while loc not in line:
@@ -39,8 +41,8 @@ def test_read():
     del pty
 
 
-def test_write():
-    pty = pty_fixture(80, 25)
+def test_write(pty_fixture):
+    pty = pty_fixture()
     line = pty.read()
     while len(line) < 10:
         line = pty.read()
@@ -58,8 +60,8 @@ def test_write():
     del pty
 
 
-def test_isalive():
-    pty = pty_fixture(80, 25)
+def test_isalive(pty_fixture):
+    pty = pty_fixture()
     pty.write(u'exit\r\n')
 
     text = u'exit'
