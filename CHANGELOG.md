@@ -1,3 +1,19 @@
+## Version 0.5.6 (2019/11/26)
+
+### Issues Closed
+
+* [Issue 126](https://github.com/spyder-ide/pywinpty/issues/126) - Release v0.5.6
+* [Issue 123](https://github.com/spyder-ide/pywinpty/issues/123) - pip install fails on Python 3.8/Windoes ([PR 125](https://github.com/spyder-ide/pywinpty/pull/125))
+
+In this release 2 issues were closed.
+
+### Pull Requests Merged
+
+* [PR 125](https://github.com/spyder-ide/pywinpty/pull/125) - PR: Add support for Python 3.8 ([123](https://github.com/spyder-ide/pywinpty/issues/123))
+
+In this release 1 pull request was closed.
+
+
 ## Version 0.5.5 (2018/12/09)
 
 ### Issues Closed
