@@ -21,7 +21,7 @@ if PY2:
 
 
 @pytest.fixture(scope='module')
-def pty_fixture(cols, rows):
+def pty_fixture():
     pty = PTY(80, 25)
     pty.spawn(CMD)
     return pty
