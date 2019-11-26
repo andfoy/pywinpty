@@ -25,7 +25,7 @@ if ($env:APPVEYOR_REPO_TAG -match "true") {
 
     if ($env:ARCH -match "amd64") {
         copy-item $LIB_GCC_64 $FOLDER
-        if($env:PYTHON_VERSION -match "3.6") {
+        if($env:PYTHON_VERSION -match "3.7") {
             python setup.py sdist
         }
     }

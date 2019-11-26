@@ -70,7 +70,7 @@ install:
   # - CALL "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\vcvarsall.bat" %ARCH%
   - "conda install -q --file requirements.txt"
   - "pip install -q twine codecov"
-  - "%CMD_IN_ENV% python setup.py build_ext -i --compiler=mingw32"
+  - "%CMD_IN_ENV% powershell appveyor/build.ps1"
 
 # Not a .NET project, we build in the install step instead
 build: false
