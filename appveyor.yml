@@ -62,10 +62,10 @@ install:
   - "set PATH=%PATH:\"=%"
   - "git clone git://github.com/astropy/ci-helpers.git"
   - "powershell ci-helpers/appveyor/install-miniconda.ps1"
-  - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
+  # - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
   # Use test conda environment
-  - "conda init"
-  - "conda activate base"
+  # - "conda init"
+  # - "conda activate base"
   - "conda activate test"
   # - CALL "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\vcvarsall.bat" %ARCH%
   - "conda install -q --file requirements.txt"
