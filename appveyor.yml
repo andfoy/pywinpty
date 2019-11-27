@@ -18,9 +18,9 @@ environment:
 
   matrix:
     - PYTHON_VERSION: "3.8"
-      PYTHON_ARCH: "64"
-      ARCH: "amd64"
-      platform: "x64"
+      PYTHON_ARCH: "32"
+      ARCH: "x86"
+      platform: "x86"
     - PYTHON_VERSION: "3.7"
       PYTHON_ARCH: "32"
       ARCH: "x86"
@@ -37,6 +37,10 @@ environment:
       PYTHON_ARCH: "32"
       ARCH: "x86"
       platform: "x86"
+    - PYTHON_VERSION: "3.8"
+      PYTHON_ARCH: "64"
+      ARCH: "amd64"
+      platform: "x64"
     - PYTHON_VERSION: "3.7"
       PYTHON_ARCH: "64"
       ARCH: "amd64"
