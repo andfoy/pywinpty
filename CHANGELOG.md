@@ -1,3 +1,18 @@
+## Version 0.5.7 (2019/11/26)
+
+### Issues Closed
+
+* [Issue 128](https://github.com/spyder-ide/pywinpty/issues/128) - Release v0.5.7
+
+In this release 1 issue was closed.
+
+### Pull Requests Merged
+
+* [PR 127](https://github.com/spyder-ide/pywinpty/pull/127) - PR: Debug Python 3.8 wheel building
+
+In this release 1 pull request was closed.
+
+
 ## Version 0.5.6 (2019/11/26)
 
 ### Issues Closed
