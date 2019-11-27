@@ -7,7 +7,7 @@ m2w64-toolchain
 libpython
 
 # Test requirements
-pytest<5
+pytest
 coveralls
 flaky
 pytest-cov
