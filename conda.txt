@@ -8,6 +8,4 @@ libpython
 
 # Test requirements
 pytest
-coveralls
 flaky
-pytest-cov
