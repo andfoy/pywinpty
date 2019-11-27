@@ -1,14 +1,10 @@
 # Build requirements
 cython
-python
 setuptools
 winpty
-backports.shutil_which
 m2w64-toolchain
 libpython
 
 # Test requirements
-pytest<5
-coveralls
+pytest
 flaky
-pytest-cov
