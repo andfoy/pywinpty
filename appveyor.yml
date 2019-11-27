@@ -17,10 +17,6 @@ environment:
     APPVEYOR_RDP_PASSWORD: "dcca4c4863E30d56c2e0dda6327370b3#"
 
   matrix:
-    - PYTHON_VERSION: "3.8"
-      PYTHON_ARCH: "32"
-      ARCH: "x86"
-      platform: "x86"
     - PYTHON_VERSION: "3.7"
       PYTHON_ARCH: "32"
       ARCH: "x86"
@@ -69,8 +65,8 @@ install:
   # - "conda activate base"
   - "conda activate test"
   # - CALL "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\vcvarsall.bat" %ARCH%
-  - "conda install -q --file requirements.txt"
-  - "pip install -q twine codecov"
+  # - "conda install -q --file conda.txt"
+  - "%CMD_IN_ENV% powershell appveyor/install.ps1"
   - "%CMD_IN_ENV% powershell appveyor/build.ps1"
 
 # Not a .NET project, we build in the install step instead
