@@ -1,6 +1,5 @@
 # Build requirements
 cython
-python
 setuptools
 winpty
 m2w64-toolchain
