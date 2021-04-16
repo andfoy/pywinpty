@@ -8,6 +8,7 @@ license = "MIT"
 keywords = ["pty", "pseudo-terminal", "conpty", "windows", "winpty"]
 readme = "README.md"
 edition = "2018"
+links = "winpty"
 
 [lib]
 name = "winpty"

@@ -8,10 +8,11 @@ pub mod winpty {
     extern "Rust" {}
 
     unsafe extern "C++" {
-        include!("include/wrapper.h");
+        include!("wrapper.h");
 
         /// Reference to a torch tensor in memory
         // type CrossTensor;
+        type WinptyPTY;
 
     }
 }

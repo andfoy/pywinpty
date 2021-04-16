@@ -1,1 +1,1 @@
-#include "Windows.h"
+#include "winpty_common.h"

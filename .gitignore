@@ -114,3 +114,7 @@ cywinpty.c
 
 /target
 Cargo.lock
+
+# Visual Studio files
+.vs/
+CppProperties.json

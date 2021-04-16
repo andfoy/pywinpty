@@ -20,20 +20,27 @@ fn command_output(cmd: &mut Command) -> String {
 fn main() {
     println!("cargo:rerun-if-changed=src/lib.rs");
     println!("cargo:rerun-if-changed=src/native.rs");
+    println!("cargo:rerun-if-changed=src/csrc");
 
-    let cmd = Command::new("winpty-agent").arg("--version");
-    let mut winpty_enabled = false;
-    if command_ok(cmd) {
+    let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
+    let include_path = Path::new(&manifest_dir)
+        .join("include");
+    CFG.exported_header_dirs.push(&include_path);
+
+    let mut cmd = Command::new("winpty-agent");
+    let mut winpty_enabled = "0";
+    if command_ok(cmd.arg("--version")) {
         // let winpty_path = cm
-        winpty_enabled = true;
-        let winpty_version = command_output(cmd);
+        winpty_enabled = "1";
+        let winpty_version = command_output(cmd.arg("--version"));
         println!("Using Winpty version: {}", &winpty_version);
 
         let winpty_location = which("winpty-agent").unwrap();
         let winpty_path = winpty_location.parent().unwrap();
-        let winpty_include = winpty_path.join("include")
+        let winpty_root = winpty_path.parent().unwrap();
+        let winpty_include = winpty_root.join("include");
 
-        let winpty_lib = winpty_path.join("lib");
+        let winpty_lib = winpty_root.join("lib");
 
         println!(
             "cargo:rustc-link-search=native={}",
@@ -48,16 +55,14 @@ fn main() {
     }
 
     cxx_build::bridge("src/native.rs")
-        .file("src/csrc/wrapper.cc")
-        .file("src/csrc/utils.cc")
-        .file("src/csrc/creation.cc")
-        .file("src/csrc/info.cc")
+        .file("src/csrc/winpty_common.cpp")
         // .flag_if_supported("-std=c++17")
         .flag_if_supported("-std=gnu++14")
         .define("_GLIBCXX_USE_CXX11_ABI", "0")
+        .define("ENABLE_WINPTY", winpty_enabled)
         .warnings(false)
         .extra_warnings(false)
-        .compile("winpty");
+        .compile("winptywrapper");
 
     println!("cargo:rustc-link-lib=dylib=winpty");
 }
