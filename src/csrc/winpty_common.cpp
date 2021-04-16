@@ -1,19 +1,14 @@
 #include "winpty_common.h"
-#include <stdexcept>
-#include <algorithm>
 
-
+#ifdef ENABLE_WINPTY
 void compose_error_message(winpty_error_ptr_t err, char* tmp) {
 	std::wstring err_msg = winpty_error_msg(err);
 	std::wstring err_code = std::to_wstring(winpty_error_code(err));
-	// convertLPWToString(&err_msg, winpty_error_msg(err));
-	// std::wstringstream mBufferStream;
+
 	std::wstring prefix = L"An error has occurred: ";
 	std::wstring error = prefix + err_msg + L" - Code: " + err_code;
 
-	//char tmp[256];
 	sprintf(tmp, "%ls", error.c_str());
-	//return tmp;
 }
 
 WinptyPTY::WinptyPTY(int cols, int rows, bool override_pipes, int mouse_mode,
@@ -186,3 +181,42 @@ int64_t WinptyPTY::get_exitstatus() {
 	}
 	return exitstatus;
 }
+#else
+WinptyPTY::WinptyPTY(int cols, int rows, bool override_pipes, int mouse_mode,
+	int timeout, int agent_config) {
+	throw std::runtime_error("pywinpty was compiled without winpty support");
+}
+
+WinptyPTY::~WinptyPTY() {
+	throw std::runtime_error("pywinpty was compiled without winpty support");
+}
+
+bool WinptyPTY::spawn(std::wstring appname, std::wstring cmdline,
+	std::wstring cwd, std::wstring env) {
+	throw std::runtime_error("pywinpty was compiled without winpty support");
+}
+
+void WinptyPTY::set_size(int cols, int rows) {
+	throw std::runtime_error("pywinpty was compiled without winpty support");
+}
+
+bool WinptyPTY::is_alive() { 
+	throw std::runtime_error("pywinpty was compiled without winpty support");
+}
+
+std::wstring WinptyPTY::read(uint64_t length, bool blocking) {
+	throw std::runtime_error("pywinpty was compiled without winpty support");
+}
+
+std::pair<bool, DWORD> WinptyPTY::write(std::wstring str) {
+	throw std::runtime_error("pywinpty was compiled without winpty support");
+}
+
+bool WinptyPTY::is_eof() {
+	throw std::runtime_error("pywinpty was compiled without winpty support");
+}
+
+int64_t WinptyPTY::get_exitstatus() {
+	throw std::runtime_error("pywinpty was compiled without winpty support");
+}
+#endif
