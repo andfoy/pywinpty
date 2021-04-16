@@ -106,11 +106,9 @@ cywinpty.c
 # Winpty binaries
 *.exe
 *.dll
-*.h
 
 # Git giles
 *.orig
-
 
 # Added by cargo
 
