@@ -5,6 +5,8 @@ use std::process::Command;
 use std::str;
 use std::i64;
 use which::which;
+use pywinpty_findlib::win_calls::Windows::Win32::SystemServices::{GetProcAddress, GetModuleHandleW};
+
 
 fn command_ok(cmd: &mut Command) -> bool {
     cmd.status().ok().map_or(false, |s| s.success())
@@ -21,14 +23,15 @@ fn main() {
     println!("cargo:rerun-if-changed=src/lib.rs");
     println!("cargo:rerun-if-changed=src/native.rs");
     println!("cargo:rerun-if-changed=src/csrc");
+    println!("cargo:rerun-if-changed=include/");
 
     let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
     let include_path = Path::new(&manifest_dir)
         .join("include");
     CFG.exported_header_dirs.push(&include_path);
+    CFG.exported_header_dirs.push(&Path::new(&manifest_dir));
     
     // Check if ConPTY is enabled
-    let mut conpty_enabled = "0";
     let reg_entry = "HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion";
        
     let major_version = command_output(Command::new("Reg").arg("Query").arg(&reg_entry).arg("/v").arg("CurrentMajorVersionNumber"));
@@ -42,9 +45,20 @@ fn main() {
     println!("Windows major version: {:?}", major_version);
     println!("Windows build number: {:?}", build_version);
 
-    if major_version >= 10 && build_version >= 17692 {
-        conpty_enabled = "1";
+    let conpty_enabled;
+    let kernel32 = unsafe { GetModuleHandleW("kernel32.dll") };
+    let conpty = unsafe { GetProcAddress(kernel32, "CreatePseudoConsole") };
+    match conpty {
+        Some(_) => {
+            conpty_enabled = "1";     
+		},
+            
+        None => {
+            conpty_enabled = "0";     
+		} 
 	}
+
+    println!("ConPTY enabled: {}", conpty_enabled);
 
     // Check if winpty is installed
     let mut cmd = Command::new("winpty-agent");
@@ -74,8 +88,12 @@ fn main() {
         CFG.exported_header_dirs.push(&winpty_include);
     }
 
-    cxx_build::bridge("src/native.rs")
+    cxx_build::bridge("src/lib.rs")
+        .file("src/csrc/base.cpp")
+        .file("src/csrc/pty.cpp")
+        .file("src/csrc/wrapper.cpp")
         .file("src/csrc/winpty_common.cpp")
+        .file("src/csrc/conpty_common.cpp")
         // .flag_if_supported("-std=c++17")
         .flag_if_supported("-std=gnu++14")
         .define("_GLIBCXX_USE_CXX11_ABI", "0")

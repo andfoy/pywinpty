@@ -121,66 +121,6 @@ void WinptyPTY::set_size(int cols, int rows) {
 		throw std::runtime_error(tmp);
 	}
 }
-
-bool WinptyPTY::is_alive() {
-	DWORD lpExitCode;
-	bool succ = GetExitCodeProcess(process, &lpExitCode);
-	if (!succ) {
-		throw std::runtime_error("Could not check status");
-	}
-
-	// Check for STILL_ACTIVE flag
-	// https://msdn.microsoft.com/en-us/library/windows/desktop/ms683189(v=vs.85).aspx
-	alive = lpExitCode == STILL_ACTIVE;
-	if (!alive) {
-		alive = 0;
-		exitstatus = lpExitCode;
-	}
-	return alive;
-}
-
-std::wstring WinptyPTY::read(uint64_t length, bool blocking) {
-	PLARGE_INTEGER size_p;
-	if (!blocking) {
-		GetFileSizeEx(conout, size_p);
-		LONGLONG expected_length = (*size_p).QuadPart;
-		length = std::min(static_cast<uint64_t>(expected_length), length);
-	}
-
-	std::wstring data;
-	data.reserve(length);
-	if (length > 0) {
-		LPDWORD num_bytes;
-		ReadFile(conout, (void*)data.data(), length, num_bytes, NULL);
-	}
-	return data;
-}
-
-std::pair<bool, DWORD> WinptyPTY::write(std::wstring str) {
-	LPDWORD num_bytes;
-	bool success = WriteFile(conin, (void*)str.data(), str.size(), num_bytes, NULL);
-	return std::make_pair(success, *num_bytes);
-}
-
-
-bool WinptyPTY::is_eof() {
-	bool succ = PeekNamedPipe(conout, NULL, false, NULL, NULL, NULL);
-	return !succ;
-}
-
-
-int64_t WinptyPTY::get_exitstatus() {
-	if (pid == 0) {
-		return -1;
-	}
-	if (alive == 1) {
-		is_alive();
-	}
-	if (alive == 1) {
-		return -1;
-	}
-	return exitstatus;
-}
 #else
 WinptyPTY::WinptyPTY(int cols, int rows, bool override_pipes, int mouse_mode,
 	int timeout, int agent_config) {
@@ -197,26 +137,6 @@ bool WinptyPTY::spawn(std::wstring appname, std::wstring cmdline,
 }
 
 void WinptyPTY::set_size(int cols, int rows) {
-	throw std::runtime_error("pywinpty was compiled without winpty support");
-}
-
-bool WinptyPTY::is_alive() { 
-	throw std::runtime_error("pywinpty was compiled without winpty support");
-}
-
-std::wstring WinptyPTY::read(uint64_t length, bool blocking) {
-	throw std::runtime_error("pywinpty was compiled without winpty support");
-}
-
-std::pair<bool, DWORD> WinptyPTY::write(std::wstring str) {
-	throw std::runtime_error("pywinpty was compiled without winpty support");
-}
-
-bool WinptyPTY::is_eof() {
-	throw std::runtime_error("pywinpty was compiled without winpty support");
-}
-
-int64_t WinptyPTY::get_exitstatus() {
 	throw std::runtime_error("pywinpty was compiled without winpty support");
 }
 #endif

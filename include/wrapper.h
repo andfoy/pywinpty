@@ -1,1 +1,41 @@
-#include "winpty_common.h"
+#pragma once
+#include "pty.h"
+#include "pywinpty/src/lib.rs.h"
+#include "rust/cxx.h"
+
+struct PTYRef;
+struct PTYConfig;
+
+// Create an automatic-backend PTY with a given number of columns and rows
+PTYRef create_pty(int cols, int rows);
+
+// Create a PTY with a given number of columns, rows and backend
+PTYRef create_pty(int cols, int rows, int backend);
+
+// Create an automatic-backend PTY with a given number of columns, rows and configuration
+PTYRef create_pty(int cols, int rows, PTYConfig config);
+
+// Create a PTY with a given number of columns, rows, configuration and backend
+PTYRef create_pty(int cols, int rows, int backend, PTYConfig config);
+
+// Spawn a process on a given PTY
+bool spawn(PTYRef pty_ref, rust::Vec<uint16_t> appname, rust::Vec<uint16_t> cmdline,
+	rust::Vec<uint16_t> cwd, rust::Vec<uint16_t> env);
+
+// Set the size of a given PTY
+void set_size(PTYRef pty_ref, int cols, int rows);
+
+// Read n UTF-16 characters from the stdout stream of the PTY process
+rust::Vec<uint16_t> read(PTYRef pty_ref, uint64_t length, bool blocking);
+
+// Read n UTF-16 characters from the stderr stream of the PTY process
+rust::Vec<uint16_t> read_stderr(PTYRef pty_ref, uint64_t length, bool blocking);
+
+// Write a stream of UTF-16 characters into the stdin stream of the PTY process
+uint32_t write(PTYRef pty_ref, rust::Vec<uint16_t> in_str);
+
+// Determine if the process spawned by the PTY is alive
+bool is_alive(PTYRef pty_ref);
+
+// Retrieve the exit status code of the process spawned by the PTY
+int64_t get_exitstatus(PTYRef pty_ref);
