@@ -88,12 +88,13 @@ fn main() {
         CFG.exported_header_dirs.push(&winpty_include);
     }
 
-    cxx_build::bridge("src/lib.rs")
+    cxx_build::bridge("src/native.rs")
         .file("src/csrc/base.cpp")
         .file("src/csrc/pty.cpp")
         .file("src/csrc/wrapper.cpp")
         .file("src/csrc/winpty_common.cpp")
         .file("src/csrc/conpty_common.cpp")
+        .file("src/csrc/StackWalker.cpp")
         // .flag_if_supported("-std=c++17")
         .flag_if_supported("-std=gnu++14")
         .define("_GLIBCXX_USE_CXX11_ABI", "0")

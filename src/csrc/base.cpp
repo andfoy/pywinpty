@@ -1,19 +1,54 @@
 #include "base.h"
 
 std::wstring base_read(uint64_t length, bool blocking, HANDLE stream) {
-	PLARGE_INTEGER size_p;
+	LARGE_INTEGER size_p;
 	if (!blocking) {
-		GetFileSizeEx(stream, size_p);
-		LONGLONG expected_length = (*size_p).QuadPart;
+		HRESULT hr = GetFileSizeEx(stream, &size_p) ? S_OK : GetLastError();
+		//std::cout << "result: " << result << std::endl;
+
+		if (S_OK != hr) {
+			char* err;
+			if (!FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
+				NULL, hr,
+				MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // default language
+				(LPTSTR)&err, 0, NULL)) {
+				throw std::runtime_error("An unexpected error has occurred");
+			}
+
+			std::cout << "Exception here!" << std::endl;
+			throw std::runtime_error(err);
+			LocalFree(err);
+		}
+
+		LONGLONG expected_length = size_p.QuadPart;
 		length = std::min(static_cast<uint64_t>(expected_length), length);
 	}
 
 	std::wstring data;
-	data.reserve(length);
+	//data.reserve(length);
+	wchar_t out_data[1024];
 	if (length > 0) {
-		LPDWORD num_bytes;
-		ReadFile(stream, (void*)data.data(), length, num_bytes, NULL);
+		DWORD num_bytes{};
+		HRESULT hr = ReadFile(stream, (void*)out_data, length, &num_bytes, NULL) ? S_OK : GetLastError();
+		
+		if (S_OK != hr) {
+			char* err;
+			if (!FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
+				NULL, hr,
+				MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // default language
+				(LPTSTR)&err, 0, NULL)) {
+				throw std::runtime_error("An unexpected error has occurred");
+			}
+
+			std::cout << "Exception here!" << std::endl;
+			throw std::runtime_error(err);
+			LocalFree(err);
+		}
+		//std::cout << "Read result: " << read_result << std::endl;
+		std::cout << "Num bytes: " << num_bytes << std::endl;
+		data = std::wstring(out_data);
 	}
+	//std::wcout << L"" << out_data << std::endl;
 	return data;
 }
 

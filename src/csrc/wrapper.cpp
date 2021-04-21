@@ -3,8 +3,7 @@
 #include <locale>
 
 PTYRef create_pty(int cols, int rows) {
-	PTY pty(cols, rows);
-	std::shared_ptr<PTY> shared_ptr = std::make_shared<PTY>(std::move(pty));
+	std::shared_ptr<PTY> shared_ptr(new PTY(cols, rows));
 	return PTYRef{
 		shared_ptr
 	};
@@ -12,8 +11,7 @@ PTYRef create_pty(int cols, int rows) {
 
 
 PTYRef create_pty(int cols, int rows, int backend) {
-	PTY pty(cols, rows, static_cast<Backend>(backend));
-	std::shared_ptr<PTY> shared_ptr = std::make_shared<PTY>(std::move(pty));
+	std::shared_ptr<PTY> shared_ptr(new PTY(cols, rows, static_cast<Backend>(backend)));
 	return PTYRef{
 		shared_ptr
 	};
@@ -21,9 +19,10 @@ PTYRef create_pty(int cols, int rows, int backend) {
 
 
 PTYRef create_pty(int cols, int rows, PTYConfig config) {
-	PTY pty(cols, rows, config.input_mode, config.output_mode,
-		config.override_pipes, config.mouse_mode, config.timeout, config.agent_config);
-	std::shared_ptr<PTY> shared_ptr = std::make_shared<PTY>(std::move(pty));
+	//PTY* pty = ;
+	std::shared_ptr<PTY> shared_ptr(new PTY(cols, rows, config.input_mode, config.output_mode,
+		config.override_pipes, config.mouse_mode, config.timeout, config.agent_config));
+	std::cout << "Reference created?" << std::endl;
 	return PTYRef{
 		shared_ptr
 	};
@@ -31,9 +30,8 @@ PTYRef create_pty(int cols, int rows, PTYConfig config) {
 
 
 PTYRef create_pty(int cols, int rows, int backend, PTYConfig config) {
-	PTY pty(cols, rows, static_cast<Backend>(backend), config.input_mode, config.output_mode,
-		config.override_pipes, config.mouse_mode, config.timeout, config.agent_config);
-	std::shared_ptr<PTY> shared_ptr = std::make_shared<PTY>(std::move(pty));
+	std::shared_ptr<PTY> shared_ptr(new PTY(cols, rows, static_cast<Backend>(backend), config.input_mode, config.output_mode,
+		config.override_pipes, config.mouse_mode, config.timeout, config.agent_config));
 	return PTYRef{
 		shared_ptr
 	};
@@ -56,7 +54,7 @@ std::wstring vec_to_wstr(rust::Vec<uint16_t> vec_in) {
 	return ws;
 }
 
-bool spawn(PTYRef pty_ref, rust::Vec<uint16_t> appname, rust::Vec<uint16_t> cmdline,
+bool spawn(const PTYRef& pty_ref, rust::Vec<uint16_t> appname, rust::Vec<uint16_t> cmdline,
 	rust::Vec<uint16_t> cwd, rust::Vec<uint16_t> env) {
 
 	std::wstring app_wstr = vec_to_wstr(appname);
@@ -65,22 +63,24 @@ bool spawn(PTYRef pty_ref, rust::Vec<uint16_t> appname, rust::Vec<uint16_t> cmdl
 	std::wstring env_wstr = vec_to_wstr(env);
 	
 	auto pty_ptr = pty_ref.pty;
-	PTY pty = *pty_ptr.get();
+	PTY* pty = pty_ptr.get();
 
+	bool value = pty->spawn(app_wstr, cmdline_wstr, cwd_wstr, env_wstr);
 	//return false;
-	return pty.spawn(app_wstr, cmdline_wstr, cwd_wstr, env_wstr);
+	std::cout << "Call: " << value << std::endl;
+	return value;
 }
 
-void set_size(PTYRef pty_ref, int cols, int rows) {
+void set_size(const PTYRef& pty_ref, int cols, int rows) {
 	auto pty_ptr = pty_ref.pty;
 	PTY pty = *pty_ptr.get();
 	pty.set_size(cols, rows);
 }
 
-rust::Vec<uint16_t> read(PTYRef pty_ref, uint64_t length, bool blocking) {
+rust::Vec<uint16_t> read(const PTYRef& pty_ref, uint64_t length, bool blocking) {
 	auto pty_ptr = pty_ref.pty;
-	PTY pty = *pty_ptr.get();
-	std::wstring wstr = pty.read(length, blocking);
+	PTY* pty = pty_ptr.get();
+	std::wstring wstr = pty->read(length, blocking);
 	std::u16string u16str(wstr.begin(), wstr.end());
 	
 	rust::Vec<uint16_t> out_buf;
@@ -91,10 +91,10 @@ rust::Vec<uint16_t> read(PTYRef pty_ref, uint64_t length, bool blocking) {
 	return out_buf;
 }
 
-rust::Vec<uint16_t> read_stderr(PTYRef pty_ref, uint64_t length, bool blocking) {
+rust::Vec<uint16_t> read_stderr(const PTYRef& pty_ref, uint64_t length, bool blocking) {
 	auto pty_ptr = pty_ref.pty;
-	PTY pty = *pty_ptr.get();
-	std::wstring wstr = pty.read_stderr(length, blocking);
+	PTY* pty = pty_ptr.get();
+	std::wstring wstr = pty->read_stderr(length, blocking);
 	std::u16string u16str(wstr.begin(), wstr.end());
 
 	rust::Vec<uint16_t> out_buf;
@@ -106,28 +106,28 @@ rust::Vec<uint16_t> read_stderr(PTYRef pty_ref, uint64_t length, bool blocking) 
 }
 
 
-uint32_t write(PTYRef pty_ref, rust::Vec<uint16_t> in_str) {
+uint32_t write(const PTYRef& pty_ref, rust::Vec<uint16_t> in_str) {
 	std::wstring wstr = vec_to_wstr(in_str);
 
 	auto pty_ptr = pty_ref.pty;
-	PTY pty = *pty_ptr.get();
+	PTY* pty = pty_ptr.get();
 
 	bool ret;
 	DWORD num_bytes;
-	std::tie(ret, num_bytes) = pty.write(wstr);
+	std::tie(ret, num_bytes) = pty->write(wstr);
 	return num_bytes;
 }
 
 
 bool is_alive(PTYRef pty_ref) {
 	auto pty_ptr = pty_ref.pty;
-	PTY pty = *pty_ptr.get();
-	return pty.is_alive();
+	PTY* pty = pty_ptr.get();
+	return pty->is_alive();
 }
 
 
 int64_t get_exitstatus(PTYRef pty_ref) {
 	auto pty_ptr = pty_ref.pty;
-	PTY pty = *pty_ptr.get();
-	return pty.get_exitstatus();
+	PTY* pty = pty_ptr.get();
+	return pty->get_exitstatus();
 }

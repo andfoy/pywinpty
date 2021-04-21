@@ -26,5 +26,11 @@ struct ConPTY: BaseProcess {
 	bool pty_started;
 	HPCON pty_handle;
 	PROCESS_INFORMATION process_info;
-	STARTUPINFOEXW startup_info;
+	STARTUPINFOEX startup_info;
+
+	HANDLE inputReadSide;
+	HANDLE outputWriteSide;
+
+	HANDLE outputReadSide;
+	HANDLE inputWriteSide;
 };

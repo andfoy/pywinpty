@@ -1,5 +1,6 @@
 #pragma once
 #define NOMINMAX
+#define UNICODE
 
 #include <Windows.h>
 #undef min

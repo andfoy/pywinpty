@@ -8,11 +8,11 @@ This package provides a Cython wrapper around winpty C++ library.
 # yapf: disable
 
 # Local imports
-from .ptyprocess import PtyProcess
-from .winpty_wrapper import PTY
+# from .ptyprocess import PtyProcess
+from .winpty import PTY
 
 
 PTY
-PtyProcess
+# PtyProcess
 VERSION_INFO = (0, 6, 0, 'dev0')
 __version__ = '.'.join(map(str, VERSION_INFO))

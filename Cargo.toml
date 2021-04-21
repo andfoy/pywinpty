@@ -11,7 +11,7 @@ edition = "2018"
 links = "winpty"
 
 [lib]
-name = "pywinpty_rs"
+name = "winpty"
 crate-type = ["cdylib"]
 
 [dependencies]

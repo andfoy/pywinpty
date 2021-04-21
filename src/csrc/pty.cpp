@@ -1,4 +1,17 @@
 #include "pty.h"
+#include "StackWalker.h"
+
+
+class MyStackWalker : public StackWalker
+{
+public:
+	MyStackWalker() : StackWalker() {}
+protected:
+	virtual void OnOutput(LPCSTR szText) {
+		printf(szText); StackWalker::OnOutput(szText);
+	}
+};
+
 
 PTY::PTY(int cols, int rows) {
 	winpty = NULL;
@@ -11,8 +24,8 @@ PTY::PTY(int cols, int rows) {
 		auto kernel32 = GetModuleHandleW(L"kernel32.dll");
 		auto conpty_addr = GetProcAddress(kernel32, "CreatePseudoConsole");
 		if (conpty_addr != NULL) {
-			auto conpty_ref = ConPTY(cols, rows);
-			conpty = &conpty_ref;
+			conpty = new ConPTY(cols, rows);
+			//conpty = &conpty_ref;
 			initialized = true;
 			used_backend = Backend::CONPTY;
 		}
@@ -41,8 +54,8 @@ PTY::PTY(int cols, int rows, Backend backend) {
 		auto kernel32 = GetModuleHandleW(L"kernel32.dll");
 		auto conpty_addr = GetProcAddress(kernel32, "CreatePseudoConsole");
 		if (conpty_addr != NULL) {
-			auto conpty_ref = ConPTY(cols, rows);
-			conpty = &conpty_ref;
+			conpty = new ConPTY(cols, rows);
+			// conpty = &conpty_ref;
 			used_backend = Backend::CONPTY;
 		}
 		else {
@@ -77,8 +90,8 @@ PTY::PTY(int cols, int rows, int input_mode, int output_mode, bool override_pipe
 		auto kernel32 = GetModuleHandleW(L"kernel32.dll");
 		auto conpty_addr = GetProcAddress(kernel32, "CreatePseudoConsole");
 		if (conpty_addr != NULL) {
-			auto conpty_ref = ConPTY(cols, rows, input_mode, output_mode);
-			conpty = &conpty_ref;
+			conpty = new ConPTY(cols, rows, input_mode, output_mode);
+			//conpty = &conpty_ref;
 			initialized = true;
 			used_backend = Backend::CONPTY;
 		}
@@ -108,8 +121,7 @@ PTY::PTY(int cols, int rows, Backend backend, int input_mode, int output_mode, b
 		auto kernel32 = GetModuleHandleW(L"kernel32.dll");
 		auto conpty_addr = GetProcAddress(kernel32, "CreatePseudoConsole");
 		if (conpty_addr != NULL) {
-			auto conpty_ref = ConPTY(cols, rows, input_mode, output_mode);
-			conpty = &conpty_ref;
+			conpty = new ConPTY(cols, rows, input_mode, output_mode);
 			used_backend = Backend::CONPTY;
 		}
 		else {
@@ -134,6 +146,9 @@ PTY::PTY(int cols, int rows, Backend backend, int input_mode, int output_mode, b
 
 
 PTY::~PTY() {
+	std::cout << "Destructor called?" << std::endl;
+	//MyStackWalker sw; sw.ShowCallstack();
+
 	if (used_backend == Backend::CONPTY) {
 		delete conpty;
 	}
@@ -145,7 +160,9 @@ PTY::~PTY() {
 bool PTY::spawn(std::wstring appname, std::wstring cmdline,
 	       std::wstring cwd, std::wstring env) {
 	if (used_backend == Backend::CONPTY) {
-		return conpty->spawn(appname, cmdline, cwd, env);
+		bool value = conpty->spawn(appname, cmdline, cwd, env);
+		std::cout << "pty.cpp Value: " << value << std::endl;
+		return value;
 	}
 	else if (used_backend == Backend::WINPTY) {
 		return winpty->spawn(appname, cmdline, cwd, env);
