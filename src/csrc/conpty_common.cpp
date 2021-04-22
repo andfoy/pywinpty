@@ -212,7 +212,7 @@ bool ConPTY::spawn(std::wstring appname, std::wstring cmdline, std::wstring cwd,
 		NULL,
 		FALSE,
 		EXTENDED_STARTUPINFO_PRESENT | CREATE_UNICODE_ENVIRONMENT,
-		(void*) env_test,
+		NULL, //(void*)env_test,
 		NULL,
 		&siEx.StartupInfo,
 		&pi))
