@@ -1,6 +1,6 @@
 #include "base.h"
 
-std::wstring base_read(uint64_t length, bool blocking, HANDLE stream) {
+uint32_t base_read(char* szBuffer, uint64_t length, bool blocking, HANDLE stream) {
 	LARGE_INTEGER size_p;
 	if (!blocking) {
 		HRESULT hr = GetFileSizeEx(stream, &size_p) ? S_OK : GetLastError();
@@ -24,15 +24,21 @@ std::wstring base_read(uint64_t length, bool blocking, HANDLE stream) {
 		length = std::min(static_cast<uint64_t>(expected_length), length);
 	}
 
-	std::wstring data;
+	// std::wstring data;
 	//data.reserve(length);
-	wchar_t out_data[1024];
+	//wchar_t out_data[1024];
+	//const DWORD BUFF_SIZE{ 512 };
+	//char szBuffer[BUFF_SIZE]{};
+
+	DWORD dwBytesRead{};
+
 	if (length > 0) {
-		DWORD num_bytes{};
-		HRESULT hr = ReadFile(stream, (void*)out_data, length, &num_bytes, NULL) ? S_OK : GetLastError();
+		HRESULT hr = ReadFile(stream, szBuffer, length, &dwBytesRead, NULL) ? S_OK : GetLastError();
+		//DWORD num_bytes{};
+		//HRESULT hr = ReadFile(stream, (void*)out_data, length, &num_bytes, NULL) ? S_OK : GetLastError();
 		
 		if (S_OK != hr) {
-			char* err;
+			char* err = new char[512];
 			if (!FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
 				NULL, hr,
 				MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // default language
@@ -45,25 +51,25 @@ std::wstring base_read(uint64_t length, bool blocking, HANDLE stream) {
 			LocalFree(err);
 		}
 		//std::cout << "Read result: " << read_result << std::endl;
-		std::cout << "Num bytes: " << num_bytes << std::endl;
-		data = std::wstring(out_data);
+		std::cout << "Num bytes: " << dwBytesRead << std::endl;
+		//data = std::wstring(out_data);
 	}
 	//std::wcout << L"" << out_data << std::endl;
-	return data;
+	return dwBytesRead;
 }
 
-std::wstring BaseProcess::read(uint64_t length, bool blocking) {
-	return base_read(length, blocking, conout);
+uint32_t BaseProcess::read(char* buf, uint64_t length, bool blocking) {
+	return base_read(buf, length, blocking, conout);
 }
 
-std::wstring BaseProcess::read_stderr(uint64_t length, bool blocking) {
-	return base_read(length, blocking, conerr);
+uint32_t BaseProcess::read_stderr(char* buf, uint64_t length, bool blocking) {
+	return base_read(buf, length, blocking, conerr);
 }
 
 std::pair<bool, DWORD> BaseProcess::write(std::wstring str) {
-	LPDWORD num_bytes;
-	bool success = WriteFile(conin, (void*)str.data(), str.size(), num_bytes, NULL);
-	return std::make_pair(success, *num_bytes);
+	DWORD num_bytes;
+	bool success = WriteFile(conin, (void*)str.data(), str.size(), &num_bytes, NULL);
+	return std::make_pair(success, num_bytes);
 }
 
 bool BaseProcess::is_eof() {

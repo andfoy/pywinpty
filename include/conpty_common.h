@@ -20,7 +20,7 @@ struct ConPTY: BaseProcess {
 
 	void set_size(int cols, int rows);
 
-	std::wstring read_stderr(uint64_t length, bool blocking);
+	uint32_t read_stderr(char* buf, uint64_t length, bool blocking);
 
 	bool pty_created;
 	bool pty_started;

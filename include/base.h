@@ -5,10 +5,10 @@
 // Base struct that contains methods to read/write to the standard streams of a process.
 struct BaseProcess {
 	// Read n bytes from the stdout stream.
-	std::wstring read(uint64_t length = 1000, bool blocking = false);
+	uint32_t read(char* buf, uint64_t length = 1000, bool blocking = false);
 
 	// Read n bytes from the stderr stream.
-	std::wstring read_stderr(uint64_t length = 1000, bool blocking = false);
+	uint32_t read_stderr(char* buf, uint64_t length = 1000, bool blocking = false);
 
 	// Write bytes to the stdin stream.
 	std::pair<bool, DWORD> write(std::wstring str);

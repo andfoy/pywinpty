@@ -105,7 +105,7 @@ ConPTY::ConPTY(int cols, int rows, int input_mode, int output_mode) {
 		&outputReadSide, &inputWriteSide);
 	
 	if (hr != S_OK) {
-        char* err;
+        char* err = new char[250];
         if (!FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
             NULL, hr,
             MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // default language
@@ -127,7 +127,7 @@ ConPTY::ConPTY(int cols, int rows, int input_mode, int output_mode) {
 
 ConPTY::~ConPTY() {
 	std::cout << "Calling ConPTY destructor" << std::endl;
-    if (pty_started) {
+    /**if (pty_started) {
         // Close process
         CloseHandle(process_info.hThread);
         CloseHandle(process_info.hProcess);
@@ -135,15 +135,15 @@ ConPTY::~ConPTY() {
         // Cleanup attribute list
         DeleteProcThreadAttributeList(startup_info.lpAttributeList);
         free(startup_info.lpAttributeList);
-    }
+    }**/
 
     if (pty_created) {
         // Close ConPTY - this will terminate client process if running
         ClosePseudoConsole(pty_handle);
 
         // Clean-up the pipes
-        if (INVALID_HANDLE_VALUE != conout) CloseHandle(conout);
-        if (INVALID_HANDLE_VALUE != conin) CloseHandle(conin);
+        if (INVALID_HANDLE_VALUE != outputReadSide) CloseHandle(outputReadSide);
+        if (INVALID_HANDLE_VALUE != inputWriteSide) CloseHandle(inputWriteSide);
     }
 }
  
@@ -166,7 +166,7 @@ bool ConPTY::spawn(std::wstring appname, std::wstring cmdline, std::wstring cwd,
 		return false;
 	}
 
-	PCWSTR childApplication = L"C:\\windows\\system32\\cmd.exe";
+	PCWSTR childApplication = appname.c_str(); // L"C:\\windows\\system32\\cmd.exe";
 
 	// Create mutable text string for CreateProcessW command line string.
 	const size_t charsRequired = wcslen(childApplication) + 1; // +1 null terminator
@@ -203,7 +203,7 @@ bool ConPTY::spawn(std::wstring appname, std::wstring cmdline, std::wstring cwd,
 	siEx.StartupInfo.dwFlags |= STARTF_USESTDHANDLES;**/
 
 	wchar_t szCommand[]{ L"c:\\windows\\system32\\cmd.exe" };
-	wchar_t* env_test = L"\0PATH=C:\\Users\\andfoy-windows\\AppData\\Local\\Continuum\\miniconda3\\envs\\pywinpty;C:\\Users\\andfoy-windows\\AppData\\Local\\Continuum\\miniconda3\\envs\\pywinpty\\Library\\mingw-w64\\bin;C:\\Users\\andfoy-windows\\AppData\\Local\\Continuum\\miniconda3\\envs\\pywinpty\\Library\\usr\\bin;C:\\Users\\andfoy-windows\\AppData\\Local\\Continuum\\miniconda3\\envs\\pywinpty\\Library\\bin;C:\\Users\\andfoy-windows\\AppData\\Local\\Continuum\\miniconda3\\envs\\pywinpty\\Scripts;C:\\Users\\andfoy-windows\\AppData\\Local\\Continuum\\miniconda3\\envs\\pywinpty\\bin;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.25.28610\\bin\\HostX64\\x64;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\Common7\\IDE\\VC\\VCPackages;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TeamFoundation\\Team Explorer;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\MSBuild\\Current\\bin\\Roslyn;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\Team Tools\\Performance Tools\\x64;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\Team Tools\\Performance Tools;C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\Common\\VSPerfCollectionTools\\vs2019\\x64;C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\Common\\VSPerfCollectionTools\\vs2019;C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.18362.0\\x64;C:\\Program Files (x86)\\Windows Kits\\10\\bin\\x64;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\MSBuild\\Current\\Bin;C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\Common7\\IDE;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\Common7\\Tools;C:\\Users\\andfoy-windows\\AppData\\Local\\Continuum\\miniconda3\\condabin;C:\\Windows\\system32;C:\\Windows;C:\\Windows\\System32\\Wbem;C:\\Windows\\System32\\WindowsPowerShell\\v1.0;C:\\Windows\\System32\\OpenSSH;C:\\Program Files\\Git\\cmd;C:\\ProgramData\\chocolatey\\bin;C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit;C:\\Users\\andfoy-windows\\.cargo\\bin;C:\\Users\\andfoy-windows\\AppData\\Local\\Continuum\\miniconda3;C:\\Users\\andfoy-windows\\AppData\\Local\\Continuum\\miniconda3\\Library\\mingw-w64\\bin;C:\\Users\\andfoy-windows\\AppData\\Local\\Continuum\\miniconda3\\Library\\usr\\bin;C:\\Users\\andfoy-windows\\AppData\\Local\\Continuum\\miniconda3\\Library\\bin;C:\\Users\\andfoy-windows\\AppData\\Local\\Continuum\\miniconda3\\Scripts;C:\\Users\\andfoy-windows\\AppData\\Local\\Microsoft\\WindowsApps;C:\\tools\\msys64\0";
+	wchar_t* env_test = L"\0PATH=C:\\Users\\andfoy-windows\\AppData\\Local\\Continuum\\miniconda3\\envs\\pywinpty;C:\\Users\\andfoy-windows\\AppData\\Local\\Continuum\\miniconda3\\envs\\pywinpty\\Library\\mingw-w64\\bin;C:\\Users\\andfoy-windows\\AppData\\Local\\Continuum\\miniconda3\\envs\\pywinpty\\Library\\usr\\bin;C:\\Users\\andfoy-windows\\AppData\\Local\\Continuum\\miniconda3\\envs\\pywinpty\\Library\\bin;C:\\Users\\andfoy-windows\\AppData\\Local\\Continuum\\miniconda3\\envs\\pywinpty\\Scripts;C:\\Users\\andfoy-windows\\AppData\\Local\\Continuum\\miniconda3\\envs\\pywinpty\\bin;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.25.28610\\bin\\HostX64\\x64;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\Common7\\IDE\\VC\\VCPackages;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TeamFoundation\\Team Explorer;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\MSBuild\\Current\\bin\\Roslyn;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\Team Tools\\Performance Tools\\x64;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\Team Tools\\Performance Tools;C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\Common\\VSPerfCollectionTools\\vs2019\\x64;C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\Common\\VSPerfCollectionTools\\vs2019;C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.18362.0\\x64;C:\\Program Files (x86)\\Windows Kits\\10\\bin\\x64;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\MSBuild\\Current\\Bin;C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\Common7\\IDE;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\Common7\\Tools;C:\\Users\\andfoy-windows\\AppData\\Local\\Continuum\\miniconda3\\condabin;C:\\Windows\\system32;C:\\Windows;C:\\Windows\\System32\\Wbem;C:\\Windows\\System32\\WindowsPowerShell\\v1.0;C:\\Windows\\System32\\OpenSSH;C:\\Program Files\\Git\\cmd;C:\\ProgramData\\chocolatey\\bin;C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit;C:\\Users\\andfoy-windows\\.cargo\\bin;C:\\Users\\andfoy-windows\\AppData\\Local\\Continuum\\miniconda3;C:\\Users\\andfoy-windows\\AppData\\Local\\Continuum\\miniconda3\\Library\\mingw-w64\\bin;C:\\Users\\andfoy-windows\\AppData\\Local\\Continuum\\miniconda3\\Library\\usr\\bin;C:\\Users\\andfoy-windows\\AppData\\Local\\Continuum\\miniconda3\\Library\\bin;C:\\Users\\andfoy-windows\\AppData\\Local\\Continuum\\miniconda3\\Scripts;C:\\Users\\andfoy-windows\\AppData\\Local\\Microsoft\\WindowsApps\0";
 
 	// Call CreateProcess
 	if (!CreateProcessW(NULL,
@@ -219,15 +219,23 @@ bool ConPTY::spawn(std::wstring appname, std::wstring cmdline, std::wstring cwd,
 	{
 		HeapFree(GetProcessHeap(), 0, cmdLineMutable);
 		hr = GetLastError();
+		
 		char* err;
-		if (!FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
-			NULL, hr,
-			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // default language
-			(LPTSTR)&err, 0, NULL)) {
+		LPVOID lpMsgBuf;
+		if (!FormatMessage(
+			FORMAT_MESSAGE_ALLOCATE_BUFFER |
+			FORMAT_MESSAGE_FROM_SYSTEM |
+			FORMAT_MESSAGE_IGNORE_INSERTS,
+			NULL,
+			hr,
+			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+			(LPTSTR)&lpMsgBuf,
+			0, NULL)) {
 			throw std::runtime_error("An unexpected error has occurred");
 		}
 
-		std::cerr << err << std::endl;
+		std::cerr << (LPTSTR) lpMsgBuf << std::endl;
+		//throw std::runtime_error(err);
 		LocalFree(err);
 		return false;
 	}
@@ -240,13 +248,14 @@ bool ConPTY::spawn(std::wstring appname, std::wstring cmdline, std::wstring cwd,
 	pid = pi.dwProcessId;
 	process = pi.hProcess;
 	pty_started = true;
-
+	//startup_info = siEx;
+	process_info = pi;
 	//std::cout << "Process is alive: " << is_alive() << std::endl;
 	/**const DWORD BUFF_SIZE{ 512 };
 	char szBuffer[BUFF_SIZE]{};
 
 	DWORD dwBytesRead{};
-	bool result = ReadFile(conout, szBuffer, BUFF_SIZE, &dwBytesRead, NULL);**/
+	bool result = read(szBuffer, BUFF_SIZE, true); // ReadFile(conout, szBuffer, BUFF_SIZE, &dwBytesRead, NULL);**/
 
     return true;
 }
@@ -258,7 +267,7 @@ void ConPTY::set_size(int cols, int rows) {
     HRESULT hr = ResizePseudoConsole(pty_handle, consoleSize);
 
     if (hr != S_OK) {
-        char* err;
+        char* err = new char[250];
         if (!FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
             NULL, hr,
             MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // default language
@@ -288,6 +297,6 @@ void ConPTY::set_size(int cols, int rows) {
 }
 #endif  // ENABLE_CONPTY
 
-std::wstring ConPTY::read_stderr(uint64_t length, bool blocking) {
+uint32_t ConPTY::read_stderr(char* buf, uint64_t length, bool blocking) {
     throw std::runtime_error("ConPTY stderr reading is disabled");
 }

@@ -13,71 +13,6 @@ protected:
 };
 
 
-PTY::PTY(int cols, int rows) {
-	winpty = NULL;
-	conpty = NULL;
-	used_backend = Backend::NONE;
-	bool initialized = false;
-
-	if (CONPTY_ENABLED) {
-		// Check if the host has access to ConPTY API
-		auto kernel32 = GetModuleHandleW(L"kernel32.dll");
-		auto conpty_addr = GetProcAddress(kernel32, "CreatePseudoConsole");
-		if (conpty_addr != NULL) {
-			conpty = new ConPTY(cols, rows);
-			//conpty = &conpty_ref;
-			initialized = true;
-			used_backend = Backend::CONPTY;
-		}
-	}
-
-	if (!initialized && WINPTY_ENABLED) {
-		// Fallback to winpty API
-		auto winpty_ref = WinptyPTY(cols, rows);
-		winpty = &winpty_ref;
-		used_backend = Backend::WINPTY;
-	}
-	else if (!initialized && !WINPTY_ENABLED && CONPTY_ENABLED) {
-		throw std::runtime_error("pywinpty was compiled without WinPTY support and host does not support ConPTY");
-	}
-	else if (!initialized && !WINPTY_ENABLED) {
-		throw std::runtime_error("pywinpty was compiled without ConPTY/WinPTY support");
-	}
-}
-
-PTY::PTY(int cols, int rows, Backend backend) {
-	winpty = NULL;
-	conpty = NULL;
-	used_backend = Backend::NONE;
-	if (backend == Backend::CONPTY && CONPTY_ENABLED) {
-		// Check if the host has access to ConPTY API
-		auto kernel32 = GetModuleHandleW(L"kernel32.dll");
-		auto conpty_addr = GetProcAddress(kernel32, "CreatePseudoConsole");
-		if (conpty_addr != NULL) {
-			conpty = new ConPTY(cols, rows);
-			// conpty = &conpty_ref;
-			used_backend = Backend::CONPTY;
-		}
-		else {
-			throw std::runtime_error("Host does not support ConPTY");
-		}
-	}
-	else if (backend == Backend::CONPTY && !CONPTY_ENABLED) {
-		throw std::runtime_error("pywinpty was compiled without ConPTY support");
-	}
-	else if (backend == Backend::WINPTY && WINPTY_ENABLED) {
-		auto winpty_ref = WinptyPTY(cols, rows);
-		winpty = &winpty_ref;
-		used_backend = Backend::WINPTY;
-	}
-	else if (backend == Backend::WINPTY && !WINPTY_ENABLED) {
-		throw std::runtime_error("pywinpty was compiled without WinPTY support");
-	}
-	else if (backend == Backend::NONE) {
-		throw std::runtime_error("None is not a valid backend");
-	}
-}
-
 PTY::PTY(int cols, int rows, int input_mode, int output_mode, bool override_pipes, int mouse_mode,
 	     int timeout, int agent_config) {
 	winpty = NULL;
@@ -184,24 +119,24 @@ void PTY::set_size(int cols, int rows) {
 	}
 }
 
-std::wstring PTY::read(uint64_t length, bool blocking) {
+uint32_t PTY::read(char* buf, uint64_t length, bool blocking) {
 	if (used_backend == Backend::CONPTY) {
-		return conpty->read(length, blocking);
+		return conpty->read(buf, length, blocking);
 	}
 	else if (used_backend == Backend::WINPTY) {
-		return winpty->read(length, blocking);
+		return winpty->read(buf, length, blocking);
 	}
 	else {
 		throw std::runtime_error("PTY was not initialized");
 	}
 }
 
-std::wstring PTY::read_stderr(uint64_t length, bool blocking) {
+uint32_t PTY::read_stderr(char* buf, uint64_t length, bool blocking) {
 	if (used_backend == Backend::CONPTY) {
-		return conpty->read_stderr(length, blocking);
+		return conpty->read_stderr(buf, length, blocking);
 	}
 	else if (used_backend == Backend::WINPTY) {
-		return winpty->read_stderr(length, blocking);
+		return winpty->read_stderr(buf, length, blocking);
 	}
 	else {
 		throw std::runtime_error("PTY was not initialized");

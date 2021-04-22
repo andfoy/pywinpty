@@ -6,21 +6,13 @@ use pyo3::prelude::*;
 use cxx::Exception;
 use pyo3::create_exception;
 use pyo3::exceptions::PyException;
-use std::char::{decode_utf16, REPLACEMENT_CHARACTER};
+use pyo3::types::PyBytes;
+//use std::char::{decode_utf16, REPLACEMENT_CHARACTER};
 
 
-fn unwrap_option_utf16(value: Option<&str>) -> Vec<u16> {
-    let str_value;
-    match value {
-        Some(str_val) => {
-            str_value = str_val;  
-		},
-        None => {
-            str_value = "";  
-		}
-	}
-
-    str_value.encode_utf16().collect()
+fn unwrap_bytes(value: Option<Vec<u8>>) -> Vec<u8> {
+    let vec: Vec<u8> = Vec::new();
+    value.unwrap_or(vec)
 }
 
 
@@ -39,11 +31,12 @@ struct PTY {
 #[pymethods]
 impl PTY {
     #[new]
-    #[args(backend = "None", input_mode = "512", output_mode = "4",
+    #[args(encoding="\"utf-8\".to_owned()", backend = "None", input_mode = "512", output_mode = "4",
            override_pipes = "true", mouse_mode = "0", timeout = "1000", agent_config = "4")]
     fn new(
         cols: i32,
         rows: i32,
+        encoding: String,
         backend: Option<i32>,
         input_mode: i32,
         output_mode: i32,
@@ -58,7 +51,8 @@ impl PTY {
             override_pipes,
             mouse_mode,
 	    	timeout,
-            agent_config  
+            agent_config,
+            encoding
 		};
 
         let pty: Result<pywinptyrs::PTYRef, Exception>;
@@ -84,15 +78,10 @@ impl PTY {
 	}
 
     #[args(cmdline = "None", cwd = "None", env = "None")]
-    fn spawn(&self, appname: &str, cmdline: Option<&str>, cwd: Option<&str>, env: Option<&str>) -> PyResult<bool> {
-        let utf16_appname: Vec<u16> = appname.encode_utf16().collect();
-        
-        let utf16_cmdline: Vec<u16> = unwrap_option_utf16(cmdline);
-        let utf16_cwd: Vec<u16> = unwrap_option_utf16(cwd);
-        let utf16_env: Vec<u16> = unwrap_option_utf16(env);
-
+    fn spawn(&self, appname: Vec<u8>, cmdline: Option<Vec<u8>>, cwd: Option<Vec<u8>>, env: Option<Vec<u8>>) -> PyResult<bool> {
+        println!("{:?}", appname);
         let result: Result<bool, Exception> = pywinptyrs::spawn(
-            &self.pty, utf16_appname, utf16_cmdline, utf16_cwd, utf16_env);
+            &self.pty, appname, unwrap_bytes(cmdline), unwrap_bytes(cwd), unwrap_bytes(env));
         
         match result {
             Ok(bool_result) => Ok(bool_result),
@@ -115,15 +104,11 @@ impl PTY {
 	}
 
     #[args(length = "1000", blocking = "false")]
-    fn read(&self, length: u64, blocking: bool) -> PyResult<String> {
-        let result: Result<Vec<u16>, Exception> = pywinptyrs::read(&self.pty, length, blocking);
+    fn read<'p>(&self, length: u64, blocking: bool, py: Python<'p>) -> PyResult<&'p PyBytes> {
+        let result: Result<Vec<u8>, Exception> = pywinptyrs::read(&self.pty, length, blocking);
         match result {
-            Ok(utf16_vec) => {
-                let encoded_string =
-                    decode_utf16(utf16_vec.iter().cloned())
-                    .map(|r| r.unwrap_or(REPLACEMENT_CHARACTER))
-                    .collect::<String>();
-                Ok(encoded_string)
+            Ok(bytes) => {
+                Ok(PyBytes::new(py, &bytes[..]))
             },
             Err(error) => {
                 let error_str: String = error.what().to_owned();
@@ -133,15 +118,11 @@ impl PTY {
 	}
 
     #[args(length = "1000", blocking = "false")]
-    fn read_stderr(&self, length: u64, blocking: bool) -> PyResult<String> {
-        let result: Result<Vec<u16>, Exception> = pywinptyrs::read_stderr(&self.pty, length, blocking);
+    fn read_stderr<'p>(&self, length: u64, blocking: bool, py: Python<'p>) -> PyResult<&'p PyBytes> {
+        let result: Result<Vec<u8>, Exception> = pywinptyrs::read_stderr(&self.pty, length, blocking);
         match result {
-            Ok(utf16_vec) => {
-                let encoded_string =
-                    decode_utf16(utf16_vec.iter().cloned())
-                    .map(|r| r.unwrap_or(REPLACEMENT_CHARACTER))
-                    .collect::<String>();
-                Ok(encoded_string)
+             Ok(bytes) => {
+                Ok(PyBytes::new(py, &bytes[..]))
             },
             Err(error) => {
                 let error_str: String = error.what().to_owned();
@@ -150,9 +131,9 @@ impl PTY {
 		}
 	}
 
-    fn write(&self, to_write: &str) -> PyResult<u32> {
-        let utf16_str: Vec<u16> = to_write.encode_utf16().collect();
-        let result: Result<u32, Exception> = pywinptyrs::write(&self.pty, utf16_str);
+    fn write(&self, to_write: Vec<u8>) -> PyResult<u32> {
+        //let utf16_str: Vec<u16> = to_write.encode_utf16().collect();
+        let result: Result<u32, Exception> = pywinptyrs::write(&self.pty, to_write);
         match result {
             Ok(bytes) => Ok(bytes),
             Err(error) => {

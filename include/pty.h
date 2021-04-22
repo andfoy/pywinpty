@@ -10,14 +10,14 @@ enum Backend {
 	NONE
 };
 
+// Available encodings
+enum Encoding {
+	UTF8,
+	UTF16
+};
+
 // Wrapper struct around ConPTY and WinPTY
 struct PTY {
-	// Partial constructor with columns and rows with default parameters and automatic backend selection.
-	PTY(int cols, int rows);
-
-	// Partial constructor with columns and rows with the default parameters of the specified backend.
-	PTY(int cols, int rows, Backend backend);
-
 	// Partial constructor with automatic backend selection and extended parameters.
 	PTY(int cols, int rows, int input_mode, int output_mode, bool override_pipes, int mouse_mode,
 		int timeout, int agent_config);
@@ -37,10 +37,10 @@ struct PTY {
 	void set_size(int cols, int rows);
 
 	// Read n bytes from the stdout stream.
-	std::wstring read(uint64_t length = 1000, bool blocking = false);
+	uint32_t read(char* buf, uint64_t length = 1000, bool blocking = false);
 
 	// Read n bytes from the stderr stream.
-	std::wstring read_stderr(uint64_t length = 1000, bool blocking = false);
+	uint32_t read_stderr(char* buf, uint64_t length = 1000, bool blocking = false);
 
 	// Write bytes to the stdin stream.
 	std::pair<bool, DWORD> write(std::wstring str);
