@@ -67,7 +67,6 @@ impl PTY {
 
         match pty {
             Ok(pty) => {
-                println!("PTY created");
                 Ok(PTY { pty })
 			}  
             Err(error) => {
@@ -79,7 +78,6 @@ impl PTY {
 
     #[args(cmdline = "None", cwd = "None", env = "None")]
     fn spawn(&self, appname: Vec<u8>, cmdline: Option<Vec<u8>>, cwd: Option<Vec<u8>>, env: Option<Vec<u8>>) -> PyResult<bool> {
-        println!("{:?}", appname);
         let result: Result<bool, Exception> = pywinptyrs::spawn(
             &self.pty, appname, unwrap_bytes(cmdline), unwrap_bytes(cwd), unwrap_bytes(env));
         

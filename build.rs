@@ -88,6 +88,24 @@ fn main() {
         CFG.exported_header_dirs.push(&winpty_include);
     }
 
+    // Check if building under debug mode
+    let debug;
+    match env::var("PROFILE") {
+        Ok(profile) => {
+            match profile.as_str() {
+                "debug" => {
+                    debug = "1";        
+				}
+                _ => {
+                    debug = "0";    
+				}
+            }
+	    },
+        Err(_) => {
+            debug = "0";
+	    }
+	}
+
     cxx_build::bridge("src/native.rs")
         .file("src/csrc/base.cpp")
         .file("src/csrc/pty.cpp")
@@ -97,9 +115,11 @@ fn main() {
         .file("src/csrc/StackWalker.cpp")
         // .flag_if_supported("-std=c++17")
         .flag_if_supported("-std=gnu++14")
+        .flag_if_supported("/EHsc")
         .define("_GLIBCXX_USE_CXX11_ABI", "0")
         .define("ENABLE_WINPTY", winpty_enabled)
         .define("ENABLE_CONPTY", conpty_enabled)
+        .define("DEBUG", debug)
         .warnings(false)
         .extra_warnings(false)
         .compile("winptywrapper");

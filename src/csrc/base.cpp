@@ -1,74 +1,49 @@
 #include "base.h"
 
-uint32_t base_read(char* szBuffer, uint64_t length, bool blocking, HANDLE stream) {
+uint32_t base_read(char* szBuffer, uint64_t length, bool blocking, HANDLE stream, bool using_pipes) {
 	LARGE_INTEGER size_p;
 	if (!blocking) {
-		HRESULT hr = GetFileSizeEx(stream, &size_p) ? S_OK : GetLastError();
-		//std::cout << "result: " << result << std::endl;
-
-		if (S_OK != hr) {
-			char* err;
-			if (!FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
-				NULL, hr,
-				MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // default language
-				(LPTSTR)&err, 0, NULL)) {
-				throw std::runtime_error("An unexpected error has occurred");
+		if (!using_pipes) {
+			HRESULT hr = GetFileSizeEx(stream, &size_p) ? S_OK : GetLastError();
+			if (S_OK != hr) {
+				throw_runtime_error(hr);
 			}
-
-			std::cout << "Exception here!" << std::endl;
-			throw std::runtime_error(err);
-			LocalFree(err);
+			LONGLONG expected_length = size_p.QuadPart;
+			length = std::min(static_cast<uint64_t>(expected_length), length);
 		}
+		else {
+			DWORD available_bytes;
+			HRESULT hr = PeekNamedPipe(stream, NULL, 0, NULL, &available_bytes, NULL) ? S_OK : GetLastError();
+			if (S_OK != hr) {
+				throw_runtime_error(hr);
+			}
+			length = std::min(static_cast<uint64_t>(available_bytes), length);
 
-		LONGLONG expected_length = size_p.QuadPart;
-		length = std::min(static_cast<uint64_t>(expected_length), length);
+		}
 	}
-
-	// std::wstring data;
-	//data.reserve(length);
-	//wchar_t out_data[1024];
-	//const DWORD BUFF_SIZE{ 512 };
-	//char szBuffer[BUFF_SIZE]{};
 
 	DWORD dwBytesRead{};
 
 	if (length > 0) {
 		HRESULT hr = ReadFile(stream, szBuffer, length, &dwBytesRead, NULL) ? S_OK : GetLastError();
-		//DWORD num_bytes{};
-		//HRESULT hr = ReadFile(stream, (void*)out_data, length, &num_bytes, NULL) ? S_OK : GetLastError();
-		
 		if (S_OK != hr) {
-			char* err = new char[512];
-			if (!FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
-				NULL, hr,
-				MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // default language
-				(LPTSTR)&err, 0, NULL)) {
-				throw std::runtime_error("An unexpected error has occurred");
-			}
-
-			std::cout << "Exception here!" << std::endl;
-			throw std::runtime_error(err);
-			LocalFree(err);
+			throw_runtime_error(hr);
 		}
-		//std::cout << "Read result: " << read_result << std::endl;
-		std::cout << "Num bytes: " << dwBytesRead << std::endl;
-		//data = std::wstring(out_data);
 	}
-	//std::wcout << L"" << out_data << std::endl;
 	return dwBytesRead;
 }
 
 uint32_t BaseProcess::read(char* buf, uint64_t length, bool blocking) {
-	return base_read(buf, length, blocking, conout);
+	return base_read(buf, length, blocking, conout, using_pipes);
 }
 
 uint32_t BaseProcess::read_stderr(char* buf, uint64_t length, bool blocking) {
-	return base_read(buf, length, blocking, conerr);
+	return base_read(buf, length, blocking, conerr, using_pipes);
 }
 
-std::pair<bool, DWORD> BaseProcess::write(std::wstring str) {
+std::pair<bool, DWORD> BaseProcess::write(const char* str, size_t length) {
 	DWORD num_bytes;
-	bool success = WriteFile(conin, (void*)str.data(), str.size(), &num_bytes, NULL);
+	bool success = WriteFile(conin, str, length, &num_bytes, NULL);
 	return std::make_pair(success, num_bytes);
 }
 

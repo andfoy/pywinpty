@@ -82,6 +82,7 @@
  *
  **********************************************************************/
 
+#ifdef DEBUG
 #include "StackWalker.h"
 
 #include <stdio.h>
@@ -1538,3 +1539,4 @@ void StackWalker::OnOutput(LPCSTR buffer)
 {
     OutputDebugStringA(buffer);
 }
+#endif // DEBUG

@@ -43,7 +43,7 @@ struct PTY {
 	uint32_t read_stderr(char* buf, uint64_t length = 1000, bool blocking = false);
 
 	// Write bytes to the stdin stream.
-	std::pair<bool, DWORD> write(std::wstring str);
+	std::pair<bool, DWORD> write(const char* str, size_t length);
 
 	// Determine if the process is alive.
 	bool is_alive();

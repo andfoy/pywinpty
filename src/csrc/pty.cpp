@@ -1,16 +1,11 @@
 #include "pty.h"
+
+#ifdef DEBUG
+// Debug utilities used to print a stack trace 
+// In order to use it:
+// MyStackWalker sw; sw.ShowCallstack();
 #include "StackWalker.h"
-
-
-class MyStackWalker : public StackWalker
-{
-public:
-	MyStackWalker() : StackWalker() {}
-protected:
-	virtual void OnOutput(LPCSTR szText) {
-		printf(szText); StackWalker::OnOutput(szText);
-	}
-};
+#endif
 
 
 PTY::PTY(int cols, int rows, int input_mode, int output_mode, bool override_pipes, int mouse_mode,
@@ -82,7 +77,6 @@ PTY::PTY(int cols, int rows, Backend backend, int input_mode, int output_mode, b
 
 PTY::~PTY() {
 	std::cout << "Destructor called?" << std::endl;
-	//MyStackWalker sw; sw.ShowCallstack();
 
 	if (used_backend == Backend::CONPTY) {
 		delete conpty;
@@ -96,7 +90,6 @@ bool PTY::spawn(std::wstring appname, std::wstring cmdline,
 	       std::wstring cwd, std::wstring env) {
 	if (used_backend == Backend::CONPTY) {
 		bool value = conpty->spawn(appname, cmdline, cwd, env);
-		std::cout << "pty.cpp Value: " << value << std::endl;
 		return value;
 	}
 	else if (used_backend == Backend::WINPTY) {
@@ -143,12 +136,12 @@ uint32_t PTY::read_stderr(char* buf, uint64_t length, bool blocking) {
 	}
 }
 
-std::pair<bool, DWORD> PTY::write(std::wstring str) {
+std::pair<bool, DWORD> PTY::write(const char* str, size_t length) {
 	if (used_backend == Backend::CONPTY) {
-		return conpty->write(str);
+		return conpty->write(str, length);
 	}
 	else if (used_backend == Backend::WINPTY) {
-		return winpty->write(str);
+		return winpty->write(str, length);
 	}
 	else {
 		throw std::runtime_error("PTY was not initialized");

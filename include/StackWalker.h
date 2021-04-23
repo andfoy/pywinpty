@@ -1,3 +1,5 @@
+
+#ifdef DEBUG
 #ifndef __STACKWALKER_H__
 #define __STACKWALKER_H__
 
@@ -42,6 +44,7 @@
 #pragma once
 
 #include <windows.h>
+#include <cstdio>
 
 // special defines for VC5/6 (if no actual PSDK is installed):
 #if _MSC_VER < 1300
@@ -268,6 +271,18 @@ protected:
   } while (0);
 #endif
 
+
+class MyStackWalker : public StackWalker
+{
+public:
+    MyStackWalker() : StackWalker() {}
+protected:
+    virtual void OnOutput(LPCSTR szText) {
+        printf(szText); StackWalker::OnOutput(szText);
+    }
+};
+
 #endif //defined(_MSC_VER)
 
 #endif // __STACKWALKER_H__
+#endif // DEBUG
