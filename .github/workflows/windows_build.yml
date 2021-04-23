@@ -50,6 +50,17 @@ jobs:
             - name: Run tests
               shell: bash -l {0}
               run: pytest -x -v -s winpty/tests
-            - name: Setup tmate session
+            - name: Download
               if: ${{ failure() }}
-              uses: mxschmitt/action-tmate@v3
+              run: Invoke-WebRequest https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
+            - name: Extract
+              run: Expand-Archive ngrok.zip
+            - name: Auth
+              run: .\ngrok\ngrok.exe authtoken $Env:1raaG4z7gsaCRlLw8cRkUWW6ItF_2LWTUFxXwd6UeeJNAAAci
+            - name: Enable TS
+              run: Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server'-name "fDenyTSConnections" -Value 0
+            - run: Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+            - run: Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -name "UserAuthentication" -Value 1
+            - run: Set-LocalUser -Name "runneradmin" -Password (ConvertTo-SecureString -AsPlainText "P@ssw0rd!" -Force)
+            - name: Create Tunnel
+              run: .\ngrok\ngrok.exe tcp 3389
