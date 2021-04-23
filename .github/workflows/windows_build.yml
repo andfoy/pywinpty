@@ -48,5 +48,8 @@ jobs:
               shell: bash -l {0}
               run: maturin develop
             - name: Run tests
-              shell: cmd
+              shell: bash -l {0}
               run: pytest -x -v -s winpty/tests
+            - name: Setup tmate session
+              if: ${{ failure() }}
+              uses: mxschmitt/action-tmate@v3
