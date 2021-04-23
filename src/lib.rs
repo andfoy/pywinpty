@@ -319,7 +319,7 @@ impl PTY {
     /// WinptyError
     ///     If there was an error whilist trying to determine the status of the process.
     ///
-    fn is_alive(&self) -> PyResult<bool> {
+    fn isalive(&self) -> PyResult<bool> {
         let result: Result<bool, Exception> = pywinptyrs::is_alive(&self.pty);
         match result {
             Ok(alive) => Ok(alive),
@@ -371,7 +371,7 @@ impl PTY {
     /// WinptyError
     ///     If there was an error whilist trying to determine the EOF status of the process.
     ///
-    fn is_eof(&self) -> PyResult<bool> {
+    fn iseof(&self) -> PyResult<bool> {
         let result: Result<bool, Exception> = pywinptyrs::is_eof(&self.pty);
         match result {
             Ok(eof) => Ok(eof),

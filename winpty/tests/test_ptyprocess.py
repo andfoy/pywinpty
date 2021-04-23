@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """winpty wrapper tests."""
 
-# yapf: disable
-
 # Standard library imports
 import os
 import signal
@@ -13,8 +11,6 @@ from flaky import flaky
 from winpty.ptyprocess import PtyProcess
 import pytest
 
-
-# yapf: enable
 
 @pytest.fixture(scope='module')
 def pty_fixture():
@@ -148,3 +144,4 @@ def test_setwinsize(pty_fixture):
     pty = PtyProcess.spawn('cmd', dimensions=(60, 120))
     assert pty.getwinsize() == (60, 120)
     pty.terminate()
+
