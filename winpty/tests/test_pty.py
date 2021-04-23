@@ -43,7 +43,6 @@ def pty_fixture(request):
 def test_read(pty_fixture):
     pty = pty_fixture
     loc = os.getcwd()
-    line = ''
     readline = ''
 
     while loc not in readline:
@@ -91,7 +90,9 @@ def test_agent_spawn_fail(pty_fixture):
         pass
 """
 
-@pytest.mark.parametrize('backend_name,backend', [("ConPTY", Backend.ConPTY), ('WinPTY', Backend.WinPTY)])
+@pytest.mark.parametrize(
+    'backend_name,backend',
+    [("ConPTY", Backend.ConPTY), ('WinPTY', Backend.WinPTY)])
 def test_pty_create_size_fail(backend_name, backend):
     try:
         PTY(80, -25, backend=backend)

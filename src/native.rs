@@ -7,15 +7,15 @@ pub mod pywinptyrs {
     struct PTYRef {
         pty: SharedPtr<PTY>,
         encoding: i32,
-	}
+    }
 
     // Shared struct that contains the configuration values for the pseudo terminal
     struct PTYConfig {
         mouse_mode: i32,
-		timeout: i32,
+        timeout: i32,
         agent_config: i32,
-        encoding: String
-	}
+        encoding: String,
+    }
 
     extern "Rust" {}
 
@@ -38,8 +38,8 @@ pub mod pywinptyrs {
             pty: &PTYRef,
             appname: Vec<u8>,
             cmdline: Vec<u8>,
-	        cwd: Vec<u8>,
-            env: Vec<u8>
+            cwd: Vec<u8>,
+            env: Vec<u8>,
         ) -> Result<bool>;
 
         /// Resize a given pseudo terminal

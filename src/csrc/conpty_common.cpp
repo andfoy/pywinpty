@@ -10,19 +10,19 @@ See: https://docs.microsoft.com/en-us/windows/console/creating-a-pseudoconsole-s
 #ifdef ENABLE_CONPTY
 
 HRESULT SetUpPseudoConsole(HPCON* hPC, COORD size, HANDLE* inputReadSide, HANDLE* outputWriteSide,
-	                       HANDLE* outputReadSide, HANDLE* inputWriteSide) {
-	HRESULT hr = S_OK;
+                           HANDLE* outputReadSide, HANDLE* inputWriteSide) {
+    HRESULT hr = S_OK;
 
-	if (!CreatePipe(inputReadSide, inputWriteSide, NULL, 0)) {
-		return HRESULT_FROM_WIN32(GetLastError());
-	}
+    if (!CreatePipe(inputReadSide, inputWriteSide, NULL, 0)) {
+        return HRESULT_FROM_WIN32(GetLastError());
+    }
 
-	if (!CreatePipe(outputReadSide, outputWriteSide, NULL, 0)) {
-		return HRESULT_FROM_WIN32(GetLastError());
-	}
+    if (!CreatePipe(outputReadSide, outputWriteSide, NULL, 0)) {
+        return HRESULT_FROM_WIN32(GetLastError());
+    }
 
-	hr = CreatePseudoConsole(size, *inputReadSide, *outputWriteSide, 0, hPC);
-	return hr;
+    hr = CreatePseudoConsole(size, *inputReadSide, *outputWriteSide, 0, hPC);
+    return hr;
 }
 
 
@@ -30,88 +30,88 @@ HRESULT SetUpPseudoConsole(HPCON* hPC, COORD size, HANDLE* inputReadSide, HANDLE
 // updates its thread attribute list with the specified ConPTY handle
 HRESULT PrepareStartupInformation(HPCON hpc, STARTUPINFOEX* psi)
 {
-	// Prepare Startup Information structure
-	STARTUPINFOEX si;
-	ZeroMemory(&si, sizeof(si));
-	si.StartupInfo.cb = sizeof(STARTUPINFOEX);
+    // Prepare Startup Information structure
+    STARTUPINFOEX si;
+    ZeroMemory(&si, sizeof(si));
+    si.StartupInfo.cb = sizeof(STARTUPINFOEX);
 
-	// Discover the size required for the list
-	size_t bytesRequired;
-	InitializeProcThreadAttributeList(NULL, 1, 0, &bytesRequired);
+    // Discover the size required for the list
+    size_t bytesRequired;
+    InitializeProcThreadAttributeList(NULL, 1, 0, &bytesRequired);
 
-	// Allocate memory to represent the list
-	si.lpAttributeList = (PPROC_THREAD_ATTRIBUTE_LIST)HeapAlloc(GetProcessHeap(), 0, bytesRequired);
-	if (!si.lpAttributeList)
-	{
-		return E_OUTOFMEMORY;
-	}
+    // Allocate memory to represent the list
+    si.lpAttributeList = (PPROC_THREAD_ATTRIBUTE_LIST)HeapAlloc(GetProcessHeap(), 0, bytesRequired);
+    if (!si.lpAttributeList)
+    {
+        return E_OUTOFMEMORY;
+    }
 
-	// Initialize the list memory location
-	if (!InitializeProcThreadAttributeList(si.lpAttributeList, 1, 0, &bytesRequired))
-	{
-		HeapFree(GetProcessHeap(), 0, si.lpAttributeList);
-		return HRESULT_FROM_WIN32(GetLastError());
-	}
+    // Initialize the list memory location
+    if (!InitializeProcThreadAttributeList(si.lpAttributeList, 1, 0, &bytesRequired))
+    {
+        HeapFree(GetProcessHeap(), 0, si.lpAttributeList);
+        return HRESULT_FROM_WIN32(GetLastError());
+    }
 
-	// Set the pseudoconsole information into the list
-	if (!UpdateProcThreadAttribute(si.lpAttributeList,
-		0,
-		PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE,
-		hpc,
-		sizeof(hpc),
-		NULL,
-		NULL))
-	{
-		HeapFree(GetProcessHeap(), 0, si.lpAttributeList);
-		return HRESULT_FROM_WIN32(GetLastError());
-	}
+    // Set the pseudoconsole information into the list
+    if (!UpdateProcThreadAttribute(si.lpAttributeList,
+        0,
+        PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE,
+        hpc,
+        sizeof(hpc),
+        NULL,
+        NULL))
+    {
+        HeapFree(GetProcessHeap(), 0, si.lpAttributeList);
+        return HRESULT_FROM_WIN32(GetLastError());
+    }
 
-	*psi = si;
+    *psi = si;
 
-	return S_OK;
+    return S_OK;
 }
 
 
 ConPTY::ConPTY(int cols, int rows) {
     pty_started = false;
-	pty_created = false;
-	using_pipes = true;
-	pid = 0;
+    pty_created = false;
+    using_pipes = true;
+    pid = 0;
 
-	if (cols <= 0 || rows <= 0) {
-		std::string prefix = "PTY cols and rows must be positive and non-zero. Got: ";
-		std::string size = "(" + std::to_string(cols) + "," + std::to_string(rows) + ")";
-		std::string error = prefix + size;
-		throw std::runtime_error(error.c_str());
-	}
+    if (cols <= 0 || rows <= 0) {
+        std::string prefix = "PTY cols and rows must be positive and non-zero. Got: ";
+        std::string size = "(" + std::to_string(cols) + "," + std::to_string(rows) + ")";
+        std::string error = prefix + size;
+        throw std::runtime_error(error.c_str());
+    }
 
     HRESULT hr{ E_UNEXPECTED };
-    
-	// Create communication channels
-	// - Close these after CreateProcess of child application with pseudoconsole object.
-	HANDLE inputReadSide{ INVALID_HANDLE_VALUE };
-	HANDLE outputWriteSide{ INVALID_HANDLE_VALUE };
-	// - Hold onto these and use them for communication with the child through the pseudoconsole.
-	HANDLE outputReadSide{ INVALID_HANDLE_VALUE };
-	HANDLE inputWriteSide{ INVALID_HANDLE_VALUE };
 
-	// Setup PTY size
-	COORD size = {};
-	size.X = cols;
-	size.Y = rows;
+    // Create communication channels
+    // - Close these after CreateProcess of child application with pseudoconsole object.
+    HANDLE inputReadSide{ INVALID_HANDLE_VALUE };
+    HANDLE outputWriteSide{ INVALID_HANDLE_VALUE };
+    // - Hold onto these and use them for communication with the child through the pseudoconsole.
+    HANDLE outputReadSide{ INVALID_HANDLE_VALUE };
+    HANDLE inputWriteSide{ INVALID_HANDLE_VALUE };
 
-	hr = SetUpPseudoConsole(&pty_handle, size, &inputReadSide, &outputWriteSide,
-		&outputReadSide, &inputWriteSide);
-	
-	if (hr != S_OK) {
-		throw_runtime_error(hr);
-	}
+    // Setup PTY size
+    COORD size = {};
+    size.X = cols;
+    size.Y = rows;
 
-	this->inputReadSide = inputReadSide;
-	this->outputWriteSide = outputWriteSide;
-	this->outputReadSide = outputReadSide;
-	this->inputWriteSide = inputWriteSide;
-	pty_created = true;
+    hr = SetUpPseudoConsole(&pty_handle, size, &inputReadSide, &outputWriteSide,
+        &outputReadSide, &inputWriteSide);
+
+    if (hr != S_OK) {
+        throw_runtime_error(hr);
+    }
+
+    this->inputReadSide = inputReadSide;
+    this->outputWriteSide = outputWriteSide;
+    this->outputReadSide = outputReadSide;
+    this->inputWriteSide = inputWriteSide;
+    pty_created = true;
 
 }
 
@@ -134,91 +134,91 @@ ConPTY::~ConPTY() {
         if (INVALID_HANDLE_VALUE != inputWriteSide) CloseHandle(inputWriteSide);
     }
 }
- 
+
 bool ConPTY::spawn(std::wstring appname, std::wstring cmdline, std::wstring cwd, std::wstring env) {
-	if (pty_started && is_alive()) {
-		throw std::runtime_error("A process was already spawned and is running currently");
-	}
+    if (pty_started && is_alive()) {
+        throw std::runtime_error("A process was already spawned and is running currently");
+    }
 
-	HRESULT hr{ E_UNEXPECTED };
-	STARTUPINFOEX siEx;
-	hr = PrepareStartupInformation(pty_handle, &siEx);
+    HRESULT hr{ E_UNEXPECTED };
+    STARTUPINFOEX siEx;
+    hr = PrepareStartupInformation(pty_handle, &siEx);
 
-	if (hr != S_OK) {
-		throw_runtime_error(hr);
-	}
+    if (hr != S_OK) {
+        throw_runtime_error(hr);
+    }
 
-	PCWSTR childApplication = L"";
-	if(cmdline.length() > 0) {
-		childApplication = cmdline.c_str();
-	}
+    PCWSTR childApplication = L"";
+    if(cmdline.length() > 0) {
+        childApplication = cmdline.c_str();
+    }
 
-	LPVOID environment = NULL;
-	if (env.length() > 0) {
-		environment = (void*)env.c_str();
-	}
-	
-	LPCWSTR working_dir = NULL;
-	if (cwd.length() > 0) {
-		working_dir = cwd.c_str();
-	}
+    LPVOID environment = NULL;
+    if (env.length() > 0) {
+        environment = (void*)env.c_str();
+    }
 
-	// Create mutable text string for CreateProcessW command line string.
-	const size_t charsRequired = wcslen(childApplication) + 1; // +1 null terminator
-	PWSTR cmdLineMutable = (PWSTR)HeapAlloc(GetProcessHeap(), 0, sizeof(wchar_t) * charsRequired);
+    LPCWSTR working_dir = NULL;
+    if (cwd.length() > 0) {
+        working_dir = cwd.c_str();
+    }
 
-	if (!cmdLineMutable) {
-		hr = E_OUTOFMEMORY;
-	}
+    // Create mutable text string for CreateProcessW command line string.
+    const size_t charsRequired = wcslen(childApplication) + 1; // +1 null terminator
+    PWSTR cmdLineMutable = (PWSTR)HeapAlloc(GetProcessHeap(), 0, sizeof(wchar_t) * charsRequired);
 
-	if (hr != S_OK) {
-		throw_runtime_error(hr);
-	}
+    if (!cmdLineMutable) {
+        hr = E_OUTOFMEMORY;
+    }
 
-	wcscpy_s(cmdLineMutable, charsRequired, childApplication);
+    if (hr != S_OK) {
+        throw_runtime_error(hr);
+    }
 
-	PROCESS_INFORMATION pi;
-	ZeroMemory(&pi, sizeof(pi));
+    wcscpy_s(cmdLineMutable, charsRequired, childApplication);
 
-	// Call CreateProcess
-	hr = CreateProcessW(
-		appname.c_str(),    // Application name
-		cmdLineMutable,     // Command line arguments
-		NULL,               // Process attributes (unused)
-		NULL,               // Thread attributes (unused)
-		FALSE,              // Inherit pipes (false)
-		EXTENDED_STARTUPINFO_PRESENT | CREATE_UNICODE_ENVIRONMENT,  // Process creation flags 
-		environment,              // Environment variables
-		working_dir,              // Current working directory
-		&siEx.StartupInfo,        // Startup info
-		&pi                       // Process information
-	) ? S_OK : GetLastError();
+    PROCESS_INFORMATION pi;
+    ZeroMemory(&pi, sizeof(pi));
 
-	if (hr != S_OK) {
-		HeapFree(GetProcessHeap(), 0, cmdLineMutable);
-		throw_runtime_error(hr);
-	}
+    // Call CreateProcess
+    hr = CreateProcessW(
+        appname.c_str(),    // Application name
+        cmdLineMutable,     // Command line arguments
+        NULL,               // Process attributes (unused)
+        NULL,               // Thread attributes (unused)
+        FALSE,              // Inherit pipes (false)
+        EXTENDED_STARTUPINFO_PRESENT | CREATE_UNICODE_ENVIRONMENT,  // Process creation flags
+        environment,              // Environment variables
+        working_dir,              // Current working directory
+        &siEx.StartupInfo,        // Startup info
+        &pi                       // Process information
+    ) ? S_OK : GetLastError();
 
-	CloseHandle(inputReadSide);
-	CloseHandle(outputWriteSide);
+    if (hr != S_OK) {
+        HeapFree(GetProcessHeap(), 0, cmdLineMutable);
+        throw_runtime_error(hr);
+    }
 
-	conout = outputReadSide;
-	conin = inputWriteSide;
-	pid = pi.dwProcessId;
-	process = pi.hProcess;
-	pty_started = true;
-	process_info = pi;
-	
+    CloseHandle(inputReadSide);
+    CloseHandle(outputWriteSide);
+
+    conout = outputReadSide;
+    conin = inputWriteSide;
+    pid = pi.dwProcessId;
+    process = pi.hProcess;
+    pty_started = true;
+    process_info = pi;
+
     return true;
 }
 
 void ConPTY::set_size(int cols, int rows) {
-	if (cols <= 0 || rows <= 0) {
-		std::string prefix = "PTY cols and rows must be positive and non-zero. Got: ";
-		std::string size = "(" + std::to_string(cols) + "," + std::to_string(rows) + ")";
-		std::string error = prefix + size;
-		throw std::runtime_error(error.c_str());
-	}
+    if (cols <= 0 || rows <= 0) {
+        std::string prefix = "PTY cols and rows must be positive and non-zero. Got: ";
+        std::string size = "(" + std::to_string(cols) + "," + std::to_string(rows) + ")";
+        std::string error = prefix + size;
+        throw std::runtime_error(error.c_str());
+    }
 
     COORD consoleSize{};
     consoleSize.X = cols;
@@ -226,7 +226,7 @@ void ConPTY::set_size(int cols, int rows) {
     HRESULT hr = ResizePseudoConsole(pty_handle, consoleSize);
 
     if (hr != S_OK) {
-		throw_runtime_error(hr);
+        throw_runtime_error(hr);
     }
 }
 #else

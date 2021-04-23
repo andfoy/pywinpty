@@ -1,12 +1,13 @@
 use cxx_build::CFG;
+use pywinpty_findlib::win_calls::Windows::Win32::SystemServices::{
+    GetModuleHandleW, GetProcAddress,
+};
 use std::env;
+use std::i64;
 use std::path::Path;
 use std::process::Command;
 use std::str;
-use std::i64;
 use which::which;
-use pywinpty_findlib::win_calls::Windows::Win32::SystemServices::{GetProcAddress, GetModuleHandleW};
-
 
 fn command_ok(cmd: &mut Command) -> bool {
     cmd.status().ok().map_or(false, |s| s.success())
@@ -26,19 +27,30 @@ fn main() {
     println!("cargo:rerun-if-changed=include/");
 
     let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
-    let include_path = Path::new(&manifest_dir)
-        .join("include");
+    let include_path = Path::new(&manifest_dir).join("include");
     CFG.exported_header_dirs.push(&include_path);
     CFG.exported_header_dirs.push(&Path::new(&manifest_dir));
-    
     // Check if ConPTY is enabled
     let reg_entry = "HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion";
-       
-    let major_version = command_output(Command::new("Reg").arg("Query").arg(&reg_entry).arg("/v").arg("CurrentMajorVersionNumber"));
-    let version_parts: Vec<&str> = major_version.split("REG_DWORD").collect();
-    let major_version = i64::from_str_radix(version_parts[1].trim().trim_start_matches("0x"), 16).unwrap();
 
-    let build_version = command_output(Command::new("Reg").arg("Query").arg(&reg_entry).arg("/v").arg("CurrentBuildNumber"));
+    let major_version = command_output(
+        Command::new("Reg")
+            .arg("Query")
+            .arg(&reg_entry)
+            .arg("/v")
+            .arg("CurrentMajorVersionNumber"),
+    );
+    let version_parts: Vec<&str> = major_version.split("REG_DWORD").collect();
+    let major_version =
+        i64::from_str_radix(version_parts[1].trim().trim_start_matches("0x"), 16).unwrap();
+
+    let build_version = command_output(
+        Command::new("Reg")
+            .arg("Query")
+            .arg(&reg_entry)
+            .arg("/v")
+            .arg("CurrentBuildNumber"),
+    );
     let build_parts: Vec<&str> = build_version.split("REG_SZ").collect();
     let build_version = i64::from_str_radix(build_parts[1].trim(), 10).unwrap();
 
@@ -50,13 +62,12 @@ fn main() {
     let conpty = unsafe { GetProcAddress(kernel32, "CreatePseudoConsole") };
     match conpty {
         Some(_) => {
-            conpty_enabled = "1";     
-		},
-            
+            conpty_enabled = "1";
+        }
         None => {
-            conpty_enabled = "0";     
-		} 
-	}
+            conpty_enabled = "0";
+        }
+    }
 
     println!("ConPTY enabled: {}", conpty_enabled);
 
@@ -91,20 +102,18 @@ fn main() {
     // Check if building under debug mode
     let debug;
     match env::var("PROFILE") {
-        Ok(profile) => {
-            match profile.as_str() {
-                "debug" => {
-                    debug = "1";        
-				}
-                _ => {
-                    debug = "0";    
-				}
+        Ok(profile) => match profile.as_str() {
+            "debug" => {
+                debug = "1";
             }
-	    },
+            _ => {
+                debug = "0";
+            }
+        },
         Err(_) => {
             debug = "0";
-	    }
-	}
+        }
+    }
 
     cxx_build::bridge("src/native.rs")
         .file("src/csrc/base.cpp")

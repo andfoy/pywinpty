@@ -1,13 +1,14 @@
-
 mod native;
 
 pub use crate::native::pywinptyrs;
-use pyo3::prelude::*;
 use cxx::Exception;
 use pyo3::create_exception;
 use pyo3::exceptions::PyException;
+use pyo3::prelude::*;
 use pyo3::types::PyBytes;
-//use std::char::{decode_utf16, REPLACEMENT_CHARACTER};
+
+// Package version
+const VERSION: &'static str = env!("CARGO_PKG_VERSION");
 
 
 fn unwrap_bytes(value: Option<Vec<u8>>) -> Vec<u8> {
@@ -15,11 +16,9 @@ fn unwrap_bytes(value: Option<Vec<u8>>) -> Vec<u8> {
     value.unwrap_or(vec)
 }
 
-
 fn string_to_static_str(s: String) -> &'static str {
     Box::leak(s.into_boxed_str())
 }
-
 
 create_exception!(pywinpty, WinptyError, PyException);
 
@@ -68,51 +67,58 @@ create_exception!(pywinpty, WinptyError, PyException);
 ///
 #[pyclass]
 struct PTY {
-    pty: pywinptyrs::PTYRef
+    pty: pywinptyrs::PTYRef,
 }
 
 #[pymethods]
 impl PTY {
     #[new]
-    #[args(encoding="\"utf-8\".to_owned()", backend = "None",
-           mouse_mode = "0", timeout = "30000", agent_config = "4")]
+    #[args(
+        encoding = "\"utf-8\".to_owned()",
+        backend = "None",
+        mouse_mode = "0",
+        timeout = "30000",
+        agent_config = "4"
+    )]
     fn new(
         cols: i32,
         rows: i32,
         encoding: String,
         backend: Option<i32>,
         mouse_mode: i32,
-		timeout: i32,
-        agent_config: i32) -> PyResult<Self> {
-        
+        timeout: i32,
+        agent_config: i32,
+    ) -> PyResult<Self> {
         let config = pywinptyrs::PTYConfig {
             mouse_mode,
-	    	timeout,
+            timeout,
             agent_config,
-            encoding
-		};
+            encoding,
+        };
 
         let pty: Result<pywinptyrs::PTYRef, Exception>;
         match backend {
             Some(backend_value) => {
-                pty = pywinptyrs::create_pty_with_backend_and_config(cols, rows, backend_value, config);
-            },
+                pty = pywinptyrs::create_pty_with_backend_and_config(
+                    cols,
+                    rows,
+                    backend_value,
+                    config,
+                );
+            }
             None => {
                 pty = pywinptyrs::create_pty_with_config(cols, rows, config);
-			}
-		}
+            }
+        }
 
         match pty {
-            Ok(pty) => {
-                Ok(PTY { pty })
-			}  
+            Ok(pty) => Ok(PTY { pty }),
             Err(error) => {
                 let error_str: String = error.what().to_owned();
                 Err(WinptyError::new_err(string_to_static_str(error_str)))
-			}
-		}
-	}
-
+            }
+        }
+    }
 
     /// Start an application that will communicate through the pseudo-terminal.
     ///
@@ -151,17 +157,28 @@ impl PTY {
     /// https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-createprocessw
     ///
     #[args(cmdline = "None", cwd = "None", env = "None")]
-    fn spawn(&self, appname: Vec<u8>, cmdline: Option<Vec<u8>>, cwd: Option<Vec<u8>>, env: Option<Vec<u8>>) -> PyResult<bool> {
+    fn spawn(
+        &self,
+        appname: Vec<u8>,
+        cmdline: Option<Vec<u8>>,
+        cwd: Option<Vec<u8>>,
+        env: Option<Vec<u8>>,
+    ) -> PyResult<bool> {
         let result: Result<bool, Exception> = pywinptyrs::spawn(
-            &self.pty, appname, unwrap_bytes(cmdline), unwrap_bytes(cwd), unwrap_bytes(env));
-        
+            &self.pty,
+            appname,
+            unwrap_bytes(cmdline),
+            unwrap_bytes(cwd),
+            unwrap_bytes(env),
+        );
+
         match result {
             Ok(bool_result) => Ok(bool_result),
             Err(error) => {
                 let error_str: String = error.what().to_owned();
                 Err(WinptyError::new_err(string_to_static_str(error_str)))
-			}
-		}
+            }
+        }
     }
 
     /// Modify the size of the pseudo terminal.
@@ -181,15 +198,16 @@ impl PTY {
     ///     If an error occurred whilist resizing the pseudo terminal.
     ///
     fn set_size(&self, cols: i32, rows: i32, py: Python) -> PyResult<()> {
-       let result: Result<(), Exception> = py.allow_threads(|| pywinptyrs::set_size(&self.pty, cols, rows));
-       match result {
+        let result: Result<(), Exception> =
+            py.allow_threads(|| pywinptyrs::set_size(&self.pty, cols, rows));
+        match result {
             Ok(()) => Ok(()),
             Err(error) => {
                 let error_str: String = error.what().to_owned();
                 Err(WinptyError::new_err(string_to_static_str(error_str)))
-			}
-		}
-	}
+            }
+        }
+    }
 
     /// Read a number of bytes from the pseudoterminal output stream.
     ///
@@ -221,20 +239,17 @@ impl PTY {
     ///
     #[args(length = "1000", blocking = "false")]
     fn read<'p>(&self, length: u64, blocking: bool, py: Python<'p>) -> PyResult<&'p PyBytes> {
-        let result: Result<Vec<u8>, Exception> = py.allow_threads(|| {
-            pywinptyrs::read(&self.pty, length, blocking)
-        });
+        let result: Result<Vec<u8>, Exception> =
+            py.allow_threads(|| pywinptyrs::read(&self.pty, length, blocking));
 
         match result {
-            Ok(bytes) => {
-                Ok(PyBytes::new(py, &bytes[..]))
-            },
+            Ok(bytes) => Ok(PyBytes::new(py, &bytes[..])),
             Err(error) => {
                 let error_str: String = error.what().to_owned();
                 Err(WinptyError::new_err(string_to_static_str(error_str)))
-		    }
-	    }
-	}
+            }
+        }
+    }
 
     /// Read a number of bytes from the pseudoterminal error stream.
     ///
@@ -267,18 +282,22 @@ impl PTY {
     /// 2. This call is only available when using the WinPTY backend.
     ///
     #[args(length = "1000", blocking = "false")]
-    fn read_stderr<'p>(&self, length: u64, blocking: bool, py: Python<'p>) -> PyResult<&'p PyBytes> {
-        let result: Result<Vec<u8>, Exception> = py.allow_threads(|| pywinptyrs::read_stderr(&self.pty, length, blocking));
+    fn read_stderr<'p>(
+        &self,
+        length: u64,
+        blocking: bool,
+        py: Python<'p>,
+    ) -> PyResult<&'p PyBytes> {
+        let result: Result<Vec<u8>, Exception> =
+            py.allow_threads(|| pywinptyrs::read_stderr(&self.pty, length, blocking));
         match result {
-             Ok(bytes) => {
-                Ok(PyBytes::new(py, &bytes[..]))
-            },
+            Ok(bytes) => Ok(PyBytes::new(py, &bytes[..])),
             Err(error) => {
                 let error_str: String = error.what().to_owned();
                 Err(WinptyError::new_err(string_to_static_str(error_str)))
-			}
-		}
-	}
+            }
+        }
+    }
 
     /// Write a byte string into the pseudoterminal input stream.
     ///
@@ -300,15 +319,16 @@ impl PTY {
     ///
     fn write(&self, to_write: Vec<u8>, py: Python) -> PyResult<u32> {
         //let utf16_str: Vec<u16> = to_write.encode_utf16().collect();
-        let result: Result<u32, Exception> = py.allow_threads(|| pywinptyrs::write(&self.pty, to_write));
+        let result: Result<u32, Exception> =
+            py.allow_threads(|| pywinptyrs::write(&self.pty, to_write));
         match result {
             Ok(bytes) => Ok(bytes),
             Err(error) => {
                 let error_str: String = error.what().to_owned();
                 Err(WinptyError::new_err(string_to_static_str(error_str)))
-			}
-		}
-	}
+            }
+        }
+    }
 
     /// Determine if the application process that is running behind the pseudoterminal is alive.
     ///
@@ -329,9 +349,9 @@ impl PTY {
             Err(error) => {
                 let error_str: String = error.what().to_owned();
                 Err(WinptyError::new_err(string_to_static_str(error_str)))
-			}
-		}
-	}
+            }
+        }
+    }
 
     /// Determine the exit status code of the process that is running behind the pseudoterminal.
     ///
@@ -347,20 +367,19 @@ impl PTY {
     ///     If there was an error whilist trying to determine the exit status of the process.
     ///
     fn get_exitstatus(&self, py: Python) -> PyResult<Option<i64>> {
-        let result: Result<i64, Exception> = py.allow_threads(|| pywinptyrs::get_exitstatus(&self.pty));
+        let result: Result<i64, Exception> =
+            py.allow_threads(|| pywinptyrs::get_exitstatus(&self.pty));
         match result {
-            Ok(status) => {
-                match status {
-                    -1 => Ok(None),
-                    _ => Ok(Some(status))
-				}
+            Ok(status) => match status {
+                -1 => Ok(None),
+                _ => Ok(Some(status)),
             },
             Err(error) => {
                 let error_str: String = error.what().to_owned();
                 Err(WinptyError::new_err(string_to_static_str(error_str)))
-			}
-		}
-	}
+            }
+        }
+    }
 
     /// Determine if the application process that is running behind the pseudoterminal reached EOF.
     ///
@@ -381,9 +400,9 @@ impl PTY {
             Err(error) => {
                 let error_str: String = error.what().to_owned();
                 Err(WinptyError::new_err(string_to_static_str(error_str)))
-			}
-		}
-	}
+            }
+        }
+    }
 
     /// Retrieve the process identifier (PID) of the running process.
     #[getter]
@@ -391,14 +410,14 @@ impl PTY {
         let result = pywinptyrs::pid(&self.pty);
         match result {
             0 => Ok(None),
-            _ => Ok(Some(result))
-		}
-	}
+            _ => Ok(Some(result)),
+        }
+    }
 }
-
 
 #[pymodule]
 fn winpty(py: Python, m: &PyModule) -> PyResult<()> {
+    m.add("__version__", VERSION)?;
     m.add("WinptyError", py.get_type::<WinptyError>())?;
     m.add_class::<PTY>()?;
     Ok(())

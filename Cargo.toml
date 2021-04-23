@@ -1,6 +1,6 @@
 [package]
 name = "pywinpty"
-version = "0.1.0"
+version = "0.7.0-dev0"
 authors = ["Edgar Andrés Margffoy Tuay <andfoy@gmail.com>"]
 description = "Pseudo terminal support for Windows from Python."
 repository = "https://github.com/spyder-ide/pywinpty"
@@ -26,3 +26,7 @@ features = ["extension-module"]
 cxx-build = {version = "1.0.45", features = ["parallel"]}
 pywinpty_findlib = { version = "=0.1.0", path = "findlib" }
 which = "4.1.0"
+
+[package.metadata.docs.rs]
+default-target = "x86_64-pc-windows-msvc"
+targets = ["x86_64-pc-windows-msvc"]
