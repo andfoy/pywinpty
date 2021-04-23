@@ -40,16 +40,17 @@ def pty_fixture(request):
 
 
 #@flaky(max_runs=4, min_passes=1)
-def test_read(pty_fixture):
+def test_read(pty_fixture, capsys):
     pty = pty_fixture
     loc = os.getcwd()
     readline = ''
 
-    start_time = time.time()
-    while loc not in readline:
-        if time.time() - start_time > 5:
-            break
-        readline += pty.read().decode('utf-8')
+    with capsys.disabled():
+        start_time = time.time()
+        while loc not in readline:
+            if time.time() - start_time > 5:
+                break
+            readline += pty.read().decode('utf-8')
     assert loc in readline
 
 
