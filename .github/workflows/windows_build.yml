@@ -49,7 +49,7 @@ jobs:
               run: maturin develop
             - name: Run tests
               shell: pwsh
-              run: pytest -x -v -s winpty/tests
+              run: pytest -x -v --capture=sys winpty/tests
             - name: Download
               if: ${{ failure() }}
               run: Invoke-WebRequest https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
