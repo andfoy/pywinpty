@@ -142,7 +142,8 @@ class PtyProcess(object):
         the child is terminated (SIGKILL is sent if the child ignores
         SIGINT)."""
         if not self.closed:
-            self.pty.close()
+            del self.pty
+            self.pty = None
             self.fileobj.close()
             self._server.close()
             # Give kernel time to update process status.
@@ -152,8 +153,6 @@ class PtyProcess(object):
                     raise IOError('Could not terminate the child.')
             self.fd = -1
             self.closed = True
-            del self.pty
-            self.pty = None
 
     def __del__(self):
         """This makes sure that no system resources are left open. Python only
@@ -217,9 +216,7 @@ class PtyProcess(object):
         if not self.isalive():
             raise EOFError('Pty is closed')
 
-        success, nbytes = self.pty.write(bytes(s, self.encoding))
-        if not success:
-            raise IOError('Write failed')
+        nbytes = self.pty.write(bytes(s, self.encoding))
         return nbytes
 
     def terminate(self, force=False):
@@ -270,7 +267,7 @@ class PtyProcess(object):
         a = ord(char)
         if 97 <= a <= 122:
             a = a - ord('a') + 1
-            byte = bytes([a], self.encoding)
+            byte = bytes([a])
             return self.pty.write(byte), byte
         d = {'@': 0, '`': 0,
             '[': 27, '{': 27,
@@ -282,7 +279,7 @@ class PtyProcess(object):
         if char not in d:
             return 0, b''
 
-        byte = bytes([d[char]], self.encoding)
+        byte = bytes([d[char]])
         return self.pty.write(byte), byte
 
     def sendeof(self):

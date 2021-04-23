@@ -71,8 +71,6 @@ PTY::PTY(int cols, int rows, Backend backend, int mouse_mode, int timeout, int a
 
 
 PTY::~PTY() {
-	std::cout << "Destructor called?" << std::endl;
-
 	if (used_backend == Backend::CONPTY) {
 		delete conpty;
 	}
@@ -173,6 +171,18 @@ int64_t PTY::get_exitstatus() {
 	}
 	else if (used_backend == Backend::WINPTY) {
 		return winpty->get_exitstatus();
+	}
+	else {
+		throw std::runtime_error("PTY was not initialized");
+	}
+}
+
+uint32_t PTY::pid() {
+	if (used_backend == Backend::CONPTY) {
+		return conpty->pid;
+	}
+	else if (used_backend == Backend::WINPTY) {
+		return winpty->pid;
 	}
 	else {
 		throw std::runtime_error("PTY was not initialized");

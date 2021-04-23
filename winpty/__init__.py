@@ -7,7 +7,7 @@ pseudo terminals in Windows.
 """
 
 # Local imports
-from .winpty import PTY
+from .winpty import PTY, WinptyError
 from .ptyprocess import PtyProcess
 from .enums import Backend, Encoding, MouseMode, AgentConfig
 
@@ -18,6 +18,7 @@ Backend
 Encoding
 MouseMode
 AgentConfig
+WinptyError
 
 VERSION_INFO = (0, 6, 0, 'dev0')
 __version__ = '.'.join(map(str, VERSION_INFO))

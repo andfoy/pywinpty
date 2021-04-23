@@ -52,6 +52,9 @@ struct PTY {
 	// Get the exit status code of the process.
 	int64_t get_exitstatus();
 
+	// Get the PID of the process.
+	uint32_t pid();
+
 	ConPTY* conpty;
 	WinptyPTY* winpty;
 	Backend used_backend;

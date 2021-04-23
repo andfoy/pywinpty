@@ -36,3 +36,6 @@ int64_t get_exitstatus(const PTYRef& pty_ref);
 
 // Determine if the process ended
 bool is_eof(const PTYRef& pty_ref);
+
+// Retrieve the PID of the process spawned by the PTY
+uint32_t pid(const PTYRef& pty_ref);

@@ -48,12 +48,15 @@ PTYRef create_pty(int cols, int rows, int backend, PTYConfig config) {
 std::wstring vec_to_wstr(rust::Vec<uint8_t> vec_in, Encoding enc) {
 	std::wstring wstr;
 	if (vec_in.size() > 0) {
-		vec_in.push_back(0);
-		const char* ccp = reinterpret_cast<const char*>(vec_in.data());
+		if (vec_in.back() != 0) {
+			vec_in.push_back(0);
+		}
+		uint8_t* up = vec_in.data();
+		const char* ccp = reinterpret_cast<const char*>(up);
 
 		if (enc == Encoding::UTF8) {
 			std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-			wstr = converter.from_bytes(ccp);
+			wstr = converter.from_bytes(ccp, ccp + vec_in.size());
 		}
 		else if (enc == Encoding::UTF16) {
 			size_t len = mbstowcs(nullptr, &ccp[0], 0);
@@ -75,7 +78,7 @@ bool spawn(const PTYRef& pty_ref, rust::Vec<uint8_t> appname, rust::Vec<uint8_t>
 	std::wstring cmdline_wstr = vec_to_wstr(cmdline, enc);
 	std::wstring cwd_wstr = vec_to_wstr(cwd, enc);
 	std::wstring env_wstr = vec_to_wstr(env, enc);
-	
+
 	auto pty_ptr = pty_ref.pty;
 	PTY* pty = pty_ptr.get();
 
@@ -152,4 +155,11 @@ bool is_eof(const PTYRef& pty_ref) {
 	auto pty_ptr = pty_ref.pty;
 	PTY* pty = pty_ptr.get();
 	return pty->is_eof();
+}
+
+
+uint32_t pid(const PTYRef& pty_ref) {
+	auto pty_ptr = pty_ref.pty;
+	PTY* pty = pty_ptr.get();
+	return pty->pid();
 }

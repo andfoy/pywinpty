@@ -8,19 +8,22 @@ import sys
 
 # Third party imports
 from flaky import flaky
-from winpty.ptyprocess import PtyProcess
+from winpty.enums import Backend
+from winpty.ptyprocess import PtyProcess, which
 import pytest
 
 
-@pytest.fixture(scope='module')
-def pty_fixture():
+@pytest.fixture(scope='module', params=['ConPTY', 'WinPTY'])
+def pty_fixture(request):
+    backend = request.param
+    backend = getattr(Backend, backend)
     def _pty_factory(cmd=None, env=None):
         cmd = cmd or 'cmd'
-        return PtyProcess.spawn(cmd, env=env)
+        return PtyProcess.spawn(cmd, env=env, backend=backend)
     return _pty_factory
 
 
-@flaky(max_runs=4, min_passes=1)
+# @flaky(max_runs=4, min_passes=1)
 def test_read(pty_fixture):
     pty = pty_fixture()
     loc = os.getcwd()
@@ -33,7 +36,7 @@ def test_read(pty_fixture):
 def test_write(pty_fixture):
     pty = pty_fixture()
 
-    text = u'Eggs, ham and spam ünicode'
+    text = 'Eggs, ham and spam ünicode'
     pty.write(text)
 
     data = ''
@@ -50,12 +53,6 @@ def test_isalive(pty_fixture):
     data = ''
     while text not in data:
         data += pty.read()
-
-    while 1:
-        try:
-            pty.read()
-        except EOFError:
-            break
 
     assert not pty.isalive()
     pty.terminate()
@@ -96,7 +93,7 @@ def test_send_control(pty_fixture):
     pty.sendcontrol('d')
     assert pty.wait() != 0
 
-
+@pytest.mark.skipif(which('cat') is None, reason="Requires cat on the PATH")
 def test_send_eof(pty_fixture):
     cat = pty_fixture('cat')
     cat.sendeof()

@@ -62,6 +62,9 @@ pub mod pywinptyrs {
 
         /// Determine if the process spawned by the PTY reached the end of file
         fn is_eof(pty: &PTYRef) -> Result<bool>;
+
+        /// Retrieve the PID of the PTY process
+        fn pid(pty: &PTYRef) -> u32;
     }
 }
 

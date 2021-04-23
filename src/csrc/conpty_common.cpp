@@ -78,6 +78,13 @@ ConPTY::ConPTY(int cols, int rows) {
 	using_pipes = true;
 	pid = 0;
 
+	if (cols <= 0 || rows <= 0) {
+		std::string prefix = "PTY cols and rows must be positive and non-zero. Got: ";
+		std::string size = "(" + std::to_string(cols) + "," + std::to_string(rows) + ")";
+		std::string error = prefix + size;
+		throw std::runtime_error(error.c_str());
+	}
+
     HRESULT hr{ E_UNEXPECTED };
     
 	// Create communication channels
@@ -129,6 +136,10 @@ ConPTY::~ConPTY() {
 }
  
 bool ConPTY::spawn(std::wstring appname, std::wstring cmdline, std::wstring cwd, std::wstring env) {
+	if (pty_started && is_alive()) {
+		throw std::runtime_error("A process was already spawned and is running currently");
+	}
+
 	HRESULT hr{ E_UNEXPECTED };
 	STARTUPINFOEX siEx;
 	hr = PrepareStartupInformation(pty_handle, &siEx);
@@ -202,6 +213,13 @@ bool ConPTY::spawn(std::wstring appname, std::wstring cmdline, std::wstring cwd,
 }
 
 void ConPTY::set_size(int cols, int rows) {
+	if (cols <= 0 || rows <= 0) {
+		std::string prefix = "PTY cols and rows must be positive and non-zero. Got: ";
+		std::string size = "(" + std::to_string(cols) + "," + std::to_string(rows) + ")";
+		std::string error = prefix + size;
+		throw std::runtime_error(error.c_str());
+	}
+
     COORD consoleSize{};
     consoleSize.X = cols;
     consoleSize.Y = rows;

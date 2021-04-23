@@ -7,7 +7,7 @@ import time
 
 # Third party imports
 from flaky import flaky
-from winpty import PTY
+from winpty import PTY, WinptyError
 from winpty.enums import Backend
 from winpty.ptyprocess import which
 import pytest
@@ -21,7 +21,7 @@ def pty_factory(backend):
     def pty_fixture():
         pty = PTY(80, 20, backend=backend)
         loc = bytes(os.getcwd(), 'utf8')
-        pty.spawn(CMD)
+        assert pty.spawn(CMD)
         time.sleep(0.3)
         return pty
     return pty_fixture
@@ -80,3 +80,36 @@ def test_isalive(pty_fixture):
         continue
 
     assert not pty.isalive()
+
+"""
+def test_agent_spawn_fail(pty_fixture):
+    pty = pty_fixture
+    try:
+        pty.spawn(CMD)
+        assert False
+    except WinptyError:
+        pass
+"""
+
+@pytest.mark.parametrize('backend_name,backend', [("ConPTY", Backend.ConPTY), ('WinPTY', Backend.WinPTY)])
+def test_pty_create_size_fail(backend_name, backend):
+    try:
+        PTY(80, -25, backend=backend)
+        assert False
+    except WinptyError:
+        pass
+
+
+def test_agent_resize_fail(pty_fixture):
+    pty = pty_fixture
+    try:
+        pty.set_size(-80, 70)
+        assert False
+    except WinptyError:
+        pass
+
+
+def test_agent_resize(pty_fixture):
+    pty = pty_fixture
+    pty.set_size(80, 70)
+

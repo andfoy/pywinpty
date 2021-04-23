@@ -180,8 +180,8 @@ impl PTY {
     /// WinptyError
     ///     If an error occurred whilist resizing the pseudo terminal.
     ///
-    fn set_size(&self, cols: i32, rows: i32) -> PyResult<()> {
-       let result: Result<(), Exception> = pywinptyrs::set_size(&self.pty, cols, rows);
+    fn set_size(&self, cols: i32, rows: i32, py: Python) -> PyResult<()> {
+       let result: Result<(), Exception> = py.allow_threads(|| pywinptyrs::set_size(&self.pty, cols, rows));
        match result {
             Ok(()) => Ok(()),
             Err(error) => {
@@ -221,7 +221,10 @@ impl PTY {
     ///
     #[args(length = "1000", blocking = "false")]
     fn read<'p>(&self, length: u64, blocking: bool, py: Python<'p>) -> PyResult<&'p PyBytes> {
-        let result: Result<Vec<u8>, Exception> = pywinptyrs::read(&self.pty, length, blocking);
+        let result: Result<Vec<u8>, Exception> = py.allow_threads(|| {
+            pywinptyrs::read(&self.pty, length, blocking)
+        });
+
         match result {
             Ok(bytes) => {
                 Ok(PyBytes::new(py, &bytes[..]))
@@ -229,8 +232,8 @@ impl PTY {
             Err(error) => {
                 let error_str: String = error.what().to_owned();
                 Err(WinptyError::new_err(string_to_static_str(error_str)))
-			}
-		}
+		    }
+	    }
 	}
 
     /// Read a number of bytes from the pseudoterminal error stream.
@@ -265,7 +268,7 @@ impl PTY {
     ///
     #[args(length = "1000", blocking = "false")]
     fn read_stderr<'p>(&self, length: u64, blocking: bool, py: Python<'p>) -> PyResult<&'p PyBytes> {
-        let result: Result<Vec<u8>, Exception> = pywinptyrs::read_stderr(&self.pty, length, blocking);
+        let result: Result<Vec<u8>, Exception> = py.allow_threads(|| pywinptyrs::read_stderr(&self.pty, length, blocking));
         match result {
              Ok(bytes) => {
                 Ok(PyBytes::new(py, &bytes[..]))
@@ -295,9 +298,9 @@ impl PTY {
     ///     If there was an error whilist trying to write the requested number of bytes
     ///     into the pseudoterminal.
     ///
-    fn write(&self, to_write: Vec<u8>) -> PyResult<u32> {
+    fn write(&self, to_write: Vec<u8>, py: Python) -> PyResult<u32> {
         //let utf16_str: Vec<u16> = to_write.encode_utf16().collect();
-        let result: Result<u32, Exception> = pywinptyrs::write(&self.pty, to_write);
+        let result: Result<u32, Exception> = py.allow_threads(|| pywinptyrs::write(&self.pty, to_write));
         match result {
             Ok(bytes) => Ok(bytes),
             Err(error) => {
@@ -319,8 +322,8 @@ impl PTY {
     /// WinptyError
     ///     If there was an error whilist trying to determine the status of the process.
     ///
-    fn isalive(&self) -> PyResult<bool> {
-        let result: Result<bool, Exception> = pywinptyrs::is_alive(&self.pty);
+    fn isalive(&self, py: Python) -> PyResult<bool> {
+        let result: Result<bool, Exception> = py.allow_threads(|| pywinptyrs::is_alive(&self.pty));
         match result {
             Ok(alive) => Ok(alive),
             Err(error) => {
@@ -343,8 +346,8 @@ impl PTY {
     /// WinptyError
     ///     If there was an error whilist trying to determine the exit status of the process.
     ///
-    fn get_exitstatus(&self) -> PyResult<Option<i64>> {
-        let result: Result<i64, Exception> = pywinptyrs::get_exitstatus(&self.pty);
+    fn get_exitstatus(&self, py: Python) -> PyResult<Option<i64>> {
+        let result: Result<i64, Exception> = py.allow_threads(|| pywinptyrs::get_exitstatus(&self.pty));
         match result {
             Ok(status) => {
                 match status {
@@ -371,8 +374,8 @@ impl PTY {
     /// WinptyError
     ///     If there was an error whilist trying to determine the EOF status of the process.
     ///
-    fn iseof(&self) -> PyResult<bool> {
-        let result: Result<bool, Exception> = pywinptyrs::is_eof(&self.pty);
+    fn iseof(&self, py: Python) -> PyResult<bool> {
+        let result: Result<bool, Exception> = py.allow_threads(|| pywinptyrs::is_eof(&self.pty));
         match result {
             Ok(eof) => Ok(eof),
             Err(error) => {
@@ -382,6 +385,15 @@ impl PTY {
 		}
 	}
 
+    /// Retrieve the process identifier (PID) of the running process.
+    #[getter]
+    fn pid(&self) -> PyResult<Option<u32>> {
+        let result = pywinptyrs::pid(&self.pty);
+        match result {
+            0 => Ok(None),
+            _ => Ok(Some(result))
+		}
+	}
 }
 
 

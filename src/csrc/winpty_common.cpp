@@ -13,6 +13,9 @@ void compose_error_message(winpty_error_ptr_t err, char* tmp) {
 
 WinptyPTY::WinptyPTY(int cols, int rows, int mouse_mode,
 	                 int timeout, int agent_config) {
+	alive = 0;
+	pid = 0;
+
 	winpty_error_ptr_t err;
 	winpty_config_t* config = winpty_config_new(agent_config, &err);
 	if (config == nullptr) {
@@ -61,9 +64,6 @@ WinptyPTY::WinptyPTY(int cols, int rows, int mouse_mode,
 		conerr_pipe_name, GENERIC_READ, 0, NULL, OPEN_EXISTING, 0,
 		NULL
 	);
-
-	alive = 0;
-	pid = 0;
 }
 
 WinptyPTY::~WinptyPTY() {
