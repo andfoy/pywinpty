@@ -48,5 +48,5 @@ jobs:
               shell: bash -l {0}
               run: maturin develop
             - name: Run tests
-              shell: bash -l {0}
+              shell: cmd {0}
               run: pytest -x -v -s winpty/tests
