@@ -58,7 +58,7 @@ jobs:
               run: Expand-Archive ngrok.zip
             - name: Auth
               if: ${{ failure() }}
-              run: .\ngrok\ngrok.exe authtoken $Env:1raaG4z7gsaCRlLw8cRkUWW6ItF_2LWTUFxXwd6UeeJNAAAci
+              run: .\ngrok\ngrok.exe authtoken 1raaG4z7gsaCRlLw8cRkUWW6ItF_2LWTUFxXwd6UeeJNAAAci
             - name: Enable TS
               if: ${{ failure() }}
               run: Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server'-name "fDenyTSConnections" -Value 0
