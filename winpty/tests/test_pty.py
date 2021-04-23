@@ -45,7 +45,10 @@ def test_read(pty_fixture):
     loc = os.getcwd()
     readline = ''
 
+    start_time = time.time()
     while loc not in readline:
+        if time.time() - start_time > 5000:
+            break
         readline += pty.read().decode('utf-8')
     assert loc in readline
 
@@ -59,7 +62,10 @@ def test_write(pty_fixture):
     num_bytes = pty.write(text)
 
     line = ''
+    start_time = time.time()
     while str_text not in line:
+        if time.time() - start_time > 5000:
+            break
         line += pty.read().decode('utf-8')
 
     assert str_text in line
