@@ -29,7 +29,10 @@ rust::Vec<uint8_t> read_stderr(const PTYRef& pty_ref, uint64_t length, bool bloc
 uint32_t write(const PTYRef& pty_ref, rust::Vec<uint8_t> in_str);
 
 // Determine if the process spawned by the PTY is alive
-bool is_alive(PTYRef pty_ref);
+bool is_alive(const PTYRef& pty_ref);
 
 // Retrieve the exit status code of the process spawned by the PTY
-int64_t get_exitstatus(PTYRef pty_ref);
+int64_t get_exitstatus(const PTYRef& pty_ref);
+
+// Determine if the process ended
+bool is_eof(const PTYRef& pty_ref);

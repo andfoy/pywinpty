@@ -21,8 +21,51 @@ fn string_to_static_str(s: String) -> &'static str {
 }
 
 
-create_exception!(pywinpty, PyWinptyError, PyException);
+create_exception!(pywinpty, WinptyError, PyException);
 
+/// Create a pseudo terminal (PTY) of a given size.
+///
+/// The pseudo-terminal must define a non-zero, positive size for both columns and rows.
+///
+/// Arguments
+/// ---------
+/// cols: int
+///     Number of columns (width) that the pseudo-terminal should have in characters.
+/// rows: int
+///     Number of rows (height) that the pseudo-terminal should have in characters.
+/// encoding: Optional[str]
+///     Encoding used by the program to be spawned on the terminal, see `winpty.Encoding`.
+///     Default: utf-8
+/// backend: Optional[int]
+///     Pseudo-terminal backend to use, see `winpty.Backend`. If None, then the backend
+///     will be set automatically based on the available APIs.
+/// mouse_mode: Optional[int]
+///     Set the mouse mode to one of the WINPTY_MOUSE_MODE_xxx constants.
+///     See `winpty.MouseMode`. Default: 0.
+/// timeout: Optional[int]
+///     Amount of time to wait for the agent (in ms) to startup and to wait for any given
+///     agent RPC request.  Must be greater than 0. Default: 30000.
+/// agent_config: Optional[int]
+///     A set of zero or more WINPTY_FLAG_xxx values. See `winpty.AgentConfig`.
+///     Default: WINPTY_FLAG_COLOR_ESCAPES
+///
+/// Raises
+/// ------
+/// WinptyError:
+///     If an error occurred whilist creating the pseudo terminal instance.
+///
+/// Notes
+/// -----
+/// 1. Optional argument values will take effect if and only if the backend is set to
+/// `winpty.Backend.Winpty`, either automatically or manually.
+///
+/// 2. ConPTY backend will take precedence over WinPTY, as it is native to Windows
+/// and therefore is faster.
+///
+/// 3. Automatic backend selection will be determined based on both the compilation
+/// flags used to compile pywinpty and the availability of the APIs on the runtime
+/// system.
+///
 #[pyclass]
 struct PTY {
     pty: pywinptyrs::PTYRef
@@ -31,24 +74,18 @@ struct PTY {
 #[pymethods]
 impl PTY {
     #[new]
-    #[args(encoding="\"utf-8\".to_owned()", backend = "None", input_mode = "512", output_mode = "4",
-           override_pipes = "true", mouse_mode = "0", timeout = "1000", agent_config = "4")]
+    #[args(encoding="\"utf-8\".to_owned()", backend = "None",
+           mouse_mode = "0", timeout = "30000", agent_config = "4")]
     fn new(
         cols: i32,
         rows: i32,
         encoding: String,
         backend: Option<i32>,
-        input_mode: i32,
-        output_mode: i32,
-        override_pipes: bool,
         mouse_mode: i32,
 		timeout: i32,
         agent_config: i32) -> PyResult<Self> {
         
         let config = pywinptyrs::PTYConfig {
-            input_mode,
-            output_mode,
-            override_pipes,
             mouse_mode,
 	    	timeout,
             agent_config,
@@ -71,11 +108,48 @@ impl PTY {
 			}  
             Err(error) => {
                 let error_str: String = error.what().to_owned();
-                Err(PyWinptyError::new_err(string_to_static_str(error_str)))
+                Err(WinptyError::new_err(string_to_static_str(error_str)))
 			}
 		}
 	}
 
+
+    /// Start an application that will communicate through the pseudo-terminal.
+    ///
+    /// Arguments
+    /// ---------
+    /// appname: bytes
+    ///     Byte string that contains the path to the application that will
+    ///     be started.
+    /// cmdline: Optional[bytes]
+    ///     Byte string that contains the parameters to start the application,
+    ///     separated by whitespace.
+    /// cwd: Optional[bytes]
+    ///     Byte string that contains the working directory that the application
+    ///     should have. If None, the application will inherit the current working
+    ///     directory of the Python interpreter.
+    /// env: Optional[bytes]
+    ///     Byte string that contains the name and values of the environment
+    ///     variables that the application should have. Each (name, value) pair
+    ///     should be declared as `name=value` and each pair must be separated
+    ///     by an empty byte `\0`. If None, then the application will inherit
+    ///     the environment variables of the Python interpreter.
+    ///
+    /// Returns
+    /// -------
+    /// spawned: bool
+    ///     True if the application was started successfully and False otherwise.
+    ///
+    /// Raises
+    /// ------
+    /// WinptyError
+    ///     If an error occurred when trying to start the application process.
+    ///
+    /// Notes
+    /// -----
+    /// For a more detailed information about the values of the arguments, see:
+    /// https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-createprocessw
+    ///
     #[args(cmdline = "None", cwd = "None", env = "None")]
     fn spawn(&self, appname: Vec<u8>, cmdline: Option<Vec<u8>>, cwd: Option<Vec<u8>>, env: Option<Vec<u8>>) -> PyResult<bool> {
         let result: Result<bool, Exception> = pywinptyrs::spawn(
@@ -85,22 +159,66 @@ impl PTY {
             Ok(bool_result) => Ok(bool_result),
             Err(error) => {
                 let error_str: String = error.what().to_owned();
-                Err(PyWinptyError::new_err(string_to_static_str(error_str)))
+                Err(WinptyError::new_err(string_to_static_str(error_str)))
 			}
 		}
     }
 
+    /// Modify the size of the pseudo terminal.
+    ///
+    /// The value for the columns and rows should be non-zero and positive.
+    ///
+    /// Arguments
+    /// ---------
+    /// cols: int
+    ///     Size in characters that the pseudo terminal should have.
+    /// rows: int
+    ///     Size in characters that the pseudo terminal should have.
+    ///
+    /// Raises
+    /// ------
+    /// WinptyError
+    ///     If an error occurred whilist resizing the pseudo terminal.
+    ///
     fn set_size(&self, cols: i32, rows: i32) -> PyResult<()> {
        let result: Result<(), Exception> = pywinptyrs::set_size(&self.pty, cols, rows);
        match result {
             Ok(()) => Ok(()),
             Err(error) => {
                 let error_str: String = error.what().to_owned();
-                Err(PyWinptyError::new_err(string_to_static_str(error_str)))
+                Err(WinptyError::new_err(string_to_static_str(error_str)))
 			}
 		}
 	}
 
+    /// Read a number of bytes from the pseudoterminal output stream.
+    ///
+    /// Arguments
+    /// ---------
+    /// length: int
+    ///     Maximum number of bytes to read from the pseudoterminal.
+    /// blocking: bool
+    ///     If True, the call will be blocked until the requested number of bytes
+    ///     are available to read. Otherwise, it will return an empty byte string
+    ///     if there are no available bytes to read.
+    ///
+    /// Returns
+    /// -------
+    /// output: bytes
+    ///     A byte string that contains the output of the pseudoterminal.
+    ///
+    /// Raises
+    /// ------
+    /// WinptyError
+    ///     If there was an error whilist trying to read the requested number of bytes
+    ///     from the pseudoterminal.
+    ///
+    /// Notes
+    /// -----
+    /// Use the `blocking=True` mode only if the process is awaiting on a thread, otherwise
+    /// this call may block your application, which only can be interrupted by killing the
+    /// process.
+    ///
     #[args(length = "1000", blocking = "false")]
     fn read<'p>(&self, length: u64, blocking: bool, py: Python<'p>) -> PyResult<&'p PyBytes> {
         let result: Result<Vec<u8>, Exception> = pywinptyrs::read(&self.pty, length, blocking);
@@ -110,11 +228,41 @@ impl PTY {
             },
             Err(error) => {
                 let error_str: String = error.what().to_owned();
-                Err(PyWinptyError::new_err(string_to_static_str(error_str)))
+                Err(WinptyError::new_err(string_to_static_str(error_str)))
 			}
 		}
 	}
 
+    /// Read a number of bytes from the pseudoterminal error stream.
+    ///
+    /// Arguments
+    /// ---------
+    /// length: int
+    ///     Maximum number of bytes to read from the pseudoterminal.
+    /// blocking: bool
+    ///     If True, the call will be blocked until the requested number of bytes
+    ///     are available to read. Otherwise, it will return an empty byte string
+    ///     if there are no available bytes to read.
+    ///
+    /// Returns
+    /// -------
+    /// output: bytes
+    ///     A byte string that contains the output of the pseudoterminal.
+    ///
+    /// Raises
+    /// ------
+    /// WinptyError
+    ///     If there was an error whilist trying to read the requested number of bytes
+    ///     from the pseudoterminal.
+    ///
+    /// Notes
+    /// -----
+    /// 1. Use the `blocking=True` mode only if the process is awaiting on a thread, otherwise
+    /// this call may block your application, which only can be interrupted by killing the
+    /// process.
+    ///
+    /// 2. This call is only available when using the WinPTY backend.
+    ///
     #[args(length = "1000", blocking = "false")]
     fn read_stderr<'p>(&self, length: u64, blocking: bool, py: Python<'p>) -> PyResult<&'p PyBytes> {
         let result: Result<Vec<u8>, Exception> = pywinptyrs::read_stderr(&self.pty, length, blocking);
@@ -124,11 +272,29 @@ impl PTY {
             },
             Err(error) => {
                 let error_str: String = error.what().to_owned();
-                Err(PyWinptyError::new_err(string_to_static_str(error_str)))
+                Err(WinptyError::new_err(string_to_static_str(error_str)))
 			}
 		}
 	}
 
+    /// Write a byte string into the pseudoterminal input stream.
+    ///
+    /// Arguments
+    /// ---------
+    /// to_write: bytes
+    ///     The byte sequence that is going to be sent to the pseudoterminal.
+    ///
+    /// Returns
+    /// -------
+    /// num_bytes: int
+    ///     The number of bytes that were written successfully.
+    ///
+    /// Raises
+    /// ------
+    /// WinptyError
+    ///     If there was an error whilist trying to write the requested number of bytes
+    ///     into the pseudoterminal.
+    ///
     fn write(&self, to_write: Vec<u8>) -> PyResult<u32> {
         //let utf16_str: Vec<u16> = to_write.encode_utf16().collect();
         let result: Result<u32, Exception> = pywinptyrs::write(&self.pty, to_write);
@@ -136,7 +302,82 @@ impl PTY {
             Ok(bytes) => Ok(bytes),
             Err(error) => {
                 let error_str: String = error.what().to_owned();
-                Err(PyWinptyError::new_err(string_to_static_str(error_str)))
+                Err(WinptyError::new_err(string_to_static_str(error_str)))
+			}
+		}
+	}
+
+    /// Determine if the application process that is running behind the pseudoterminal is alive.
+    ///
+    /// Returns
+    /// -------
+    /// alive: bool
+    ///     True, the process is alive. False, otherwise.
+    ///
+    /// Raises
+    /// ------
+    /// WinptyError
+    ///     If there was an error whilist trying to determine the status of the process.
+    ///
+    fn is_alive(&self) -> PyResult<bool> {
+        let result: Result<bool, Exception> = pywinptyrs::is_alive(&self.pty);
+        match result {
+            Ok(alive) => Ok(alive),
+            Err(error) => {
+                let error_str: String = error.what().to_owned();
+                Err(WinptyError::new_err(string_to_static_str(error_str)))
+			}
+		}
+	}
+
+    /// Determine the exit status code of the process that is running behind the pseudoterminal.
+    ///
+    /// Returns
+    /// -------
+    /// status: Optional[int]
+    ///     None if the process has not started nor finished, otherwise it corresponds to the
+    ///     status code at the time of exit.
+    ///
+    /// Raises
+    /// ------
+    /// WinptyError
+    ///     If there was an error whilist trying to determine the exit status of the process.
+    ///
+    fn get_exitstatus(&self) -> PyResult<Option<i64>> {
+        let result: Result<i64, Exception> = pywinptyrs::get_exitstatus(&self.pty);
+        match result {
+            Ok(status) => {
+                match status {
+                    -1 => Ok(None),
+                    _ => Ok(Some(status))
+				}
+            },
+            Err(error) => {
+                let error_str: String = error.what().to_owned();
+                Err(WinptyError::new_err(string_to_static_str(error_str)))
+			}
+		}
+	}
+
+    /// Determine if the application process that is running behind the pseudoterminal reached EOF.
+    ///
+    /// Returns
+    /// -------
+    /// eof: False
+    ///     True, if the process emitted the end-of-file escape sequence. False, otherwise.
+    ///
+    /// Raises
+    /// ------
+    /// WinptyError
+    ///     If there was an error whilist trying to determine the EOF status of the process.
+    ///
+    fn is_eof(&self) -> PyResult<bool> {
+        let result: Result<bool, Exception> = pywinptyrs::is_eof(&self.pty);
+        match result {
+            Ok(eof) => Ok(eof),
+            Err(error) => {
+                let error_str: String = error.what().to_owned();
+                Err(WinptyError::new_err(string_to_static_str(error_str)))
 			}
 		}
 	}
@@ -146,7 +387,7 @@ impl PTY {
 
 #[pymodule]
 fn winpty(py: Python, m: &PyModule) -> PyResult<()> {
-    m.add("PyWinptyError", py.get_type::<PyWinptyError>())?;
+    m.add("WinptyError", py.get_type::<WinptyError>())?;
     m.add_class::<PTY>()?;
     Ok(())
 }

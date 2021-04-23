@@ -10,7 +10,7 @@ extern "C" {
 
 struct WinptyPTY: BaseProcess {
 	// Main constructor
-	WinptyPTY(int cols, int rows, bool override_pipes = true, int mouse_mode = WINPTY_MOUSE_MODE_NONE,
+	WinptyPTY(int cols, int rows, int mouse_mode = WINPTY_MOUSE_MODE_NONE,
 		int timeout = 30000, int agent_config = WINPTY_FLAG_COLOR_ESCAPES);
 
 	// Destructor
@@ -30,7 +30,7 @@ struct WinptyPTY: BaseProcess {
 #else 
 struct WinptyPTY: BaseProcess {
 	// Main constructor
-	WinptyPTY(int cols, int rows, bool override_pipes, int mouse_mode,
+	WinptyPTY(int cols, int rows, int mouse_mode,
 		      int timeout, int agent_config);
 
 	// Destructor

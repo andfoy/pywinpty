@@ -8,8 +8,7 @@
 #endif
 
 
-PTY::PTY(int cols, int rows, int input_mode, int output_mode, bool override_pipes, int mouse_mode,
-	     int timeout, int agent_config) {
+PTY::PTY(int cols, int rows, int mouse_mode, int timeout, int agent_config) {
 	winpty = NULL;
 	conpty = NULL;
 	used_backend = Backend::NONE;
@@ -20,8 +19,7 @@ PTY::PTY(int cols, int rows, int input_mode, int output_mode, bool override_pipe
 		auto kernel32 = GetModuleHandleW(L"kernel32.dll");
 		auto conpty_addr = GetProcAddress(kernel32, "CreatePseudoConsole");
 		if (conpty_addr != NULL) {
-			conpty = new ConPTY(cols, rows, input_mode, output_mode);
-			//conpty = &conpty_ref;
+			conpty = new ConPTY(cols, rows);
 			initialized = true;
 			used_backend = Backend::CONPTY;
 		}
@@ -29,8 +27,7 @@ PTY::PTY(int cols, int rows, int input_mode, int output_mode, bool override_pipe
 
 	if (!initialized && WINPTY_ENABLED) {
 		// Fallback to winpty API
-		auto winpty_ref = WinptyPTY(cols, rows, override_pipes, mouse_mode, timeout, agent_config);
-		winpty = &winpty_ref;
+		winpty = new WinptyPTY(cols, rows, mouse_mode, timeout, agent_config);
 		used_backend = Backend::WINPTY;
 	}
 	else if (!initialized && !WINPTY_ENABLED && CONPTY_ENABLED) {
@@ -41,8 +38,7 @@ PTY::PTY(int cols, int rows, int input_mode, int output_mode, bool override_pipe
 	}
 }
 
-PTY::PTY(int cols, int rows, Backend backend, int input_mode, int output_mode, bool override_pipes, int mouse_mode,
-	     int timeout, int agent_config) {
+PTY::PTY(int cols, int rows, Backend backend, int mouse_mode, int timeout, int agent_config) {
 	winpty = NULL;
 	conpty = NULL;
 	used_backend = Backend::NONE;
@@ -51,7 +47,7 @@ PTY::PTY(int cols, int rows, Backend backend, int input_mode, int output_mode, b
 		auto kernel32 = GetModuleHandleW(L"kernel32.dll");
 		auto conpty_addr = GetProcAddress(kernel32, "CreatePseudoConsole");
 		if (conpty_addr != NULL) {
-			conpty = new ConPTY(cols, rows, input_mode, output_mode);
+			conpty = new ConPTY(cols, rows);
 			used_backend = Backend::CONPTY;
 		}
 		else {
@@ -62,8 +58,7 @@ PTY::PTY(int cols, int rows, Backend backend, int input_mode, int output_mode, b
 		throw std::runtime_error("pywinpty was compiled without ConPTY support");
 	}
 	else if (backend == Backend::WINPTY && WINPTY_ENABLED) {
-		auto winpty_ref = WinptyPTY(cols, rows, override_pipes, mouse_mode, timeout, agent_config);
-		winpty = &winpty_ref;
+		winpty = new WinptyPTY(cols, rows, mouse_mode, timeout, agent_config);
 		used_backend = Backend::WINPTY;
 	}
 	else if (backend == Backend::WINPTY && !WINPTY_ENABLED) {

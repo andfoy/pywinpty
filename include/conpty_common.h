@@ -8,8 +8,7 @@
 // Handle to a ConPTY instance.
 struct ConPTY: BaseProcess {
 	// Main constructor
-	ConPTY(int cols, int rows, int input_mode = ENABLE_VIRTUAL_TERMINAL_INPUT,
-		   int output_mode = ENABLE_VIRTUAL_TERMINAL_PROCESSING);
+	ConPTY(int cols, int rows);
 
 	// Main destructor
 	~ConPTY();

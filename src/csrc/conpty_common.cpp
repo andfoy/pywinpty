@@ -1,6 +1,12 @@
 #include "conpty_common.h"
 #include <string>
 
+/**
+Native ConPTY calls.
+
+See: https://docs.microsoft.com/en-us/windows/console/creating-a-pseudoconsole-session
+**/
+
 #ifdef ENABLE_CONPTY
 
 HRESULT SetUpPseudoConsole(HPCON* hPC, COORD size, HANDLE* inputReadSide, HANDLE* outputWriteSide,
@@ -66,12 +72,12 @@ HRESULT PrepareStartupInformation(HPCON hpc, STARTUPINFOEX* psi)
 }
 
 
-ConPTY::ConPTY(int cols, int rows, int input_mode, int output_mode) {
+ConPTY::ConPTY(int cols, int rows) {
     pty_started = false;
 	pty_created = false;
 	using_pipes = true;
+	pid = 0;
 
-    wchar_t szCommand[]{ L"c:\\windows\\system32\\cmd.exe" };
     HRESULT hr{ E_UNEXPECTED };
     
 	// Create communication channels
@@ -206,7 +212,7 @@ void ConPTY::set_size(int cols, int rows) {
     }
 }
 #else
-ConPTY::ConPTY(int cols, int rows, int input_mode, int output_mode) {
+ConPTY::ConPTY(int cols, int rows) {
     throw std::runtime_error("pywinpty was compiled without ConPTY support");
 }
 

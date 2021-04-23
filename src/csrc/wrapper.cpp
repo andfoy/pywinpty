@@ -24,8 +24,8 @@ Encoding str_to_encoding(std::string enc_str) {
 PTYRef create_pty(int cols, int rows, PTYConfig config) {
 	std::string enc_str(config.encoding.data(), config.encoding.size());
 	Encoding enc = str_to_encoding(enc_str);
-	std::shared_ptr<PTY> shared_ptr(new PTY(cols, rows, config.input_mode, config.output_mode,
-		config.override_pipes, config.mouse_mode, config.timeout, config.agent_config));
+	std::shared_ptr<PTY> shared_ptr(new PTY(
+		cols, rows, config.mouse_mode, config.timeout, config.agent_config));
 	return PTYRef{
 		shared_ptr,
 		enc
@@ -36,8 +36,8 @@ PTYRef create_pty(int cols, int rows, PTYConfig config) {
 PTYRef create_pty(int cols, int rows, int backend, PTYConfig config) {
 	std::string enc_str(config.encoding.data(), config.encoding.size());
 	Encoding enc = str_to_encoding(enc_str);
-	std::shared_ptr<PTY> shared_ptr(new PTY(cols, rows, static_cast<Backend>(backend), config.input_mode, config.output_mode,
-		config.override_pipes, config.mouse_mode, config.timeout, config.agent_config));
+	std::shared_ptr<PTY> shared_ptr(new PTY(cols, rows, static_cast<Backend>(backend),
+		config.mouse_mode, config.timeout, config.agent_config));
 	return PTYRef{
 		shared_ptr,
 		enc
@@ -85,7 +85,7 @@ bool spawn(const PTYRef& pty_ref, rust::Vec<uint8_t> appname, rust::Vec<uint8_t>
 
 void set_size(const PTYRef& pty_ref, int cols, int rows) {
 	auto pty_ptr = pty_ref.pty;
-	*PTY pty = pty_ptr.get();
+	PTY* pty = pty_ptr.get();
 	pty->set_size(cols, rows);
 }
 
@@ -108,7 +108,6 @@ rust::Vec<uint8_t> read_stderr(const PTYRef& pty_ref, uint64_t length, bool bloc
 	auto pty_ptr = pty_ref.pty;
 	PTY* pty = pty_ptr.get();
 
-	//const DWORD BUFF_SIZE{ 512 };
 	char* szBuffer = new char[length];
 	uint32_t size = pty->read_stderr(szBuffer, length, blocking);
 
@@ -135,15 +134,22 @@ uint32_t write(const PTYRef& pty_ref, rust::Vec<uint8_t> in_str) {
 }
 
 
-bool is_alive(PTYRef pty_ref) {
+bool is_alive(const PTYRef& pty_ref) {
 	auto pty_ptr = pty_ref.pty;
 	PTY* pty = pty_ptr.get();
 	return pty->is_alive();
 }
 
 
-int64_t get_exitstatus(PTYRef pty_ref) {
+int64_t get_exitstatus(const PTYRef& pty_ref) {
 	auto pty_ptr = pty_ref.pty;
 	PTY* pty = pty_ptr.get();
 	return pty->get_exitstatus();
+}
+
+
+bool is_eof(const PTYRef& pty_ref) {
+	auto pty_ptr = pty_ref.pty;
+	PTY* pty = pty_ptr.get();
+	return pty->is_eof();
 }

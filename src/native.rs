@@ -3,15 +3,14 @@ extern crate cxx;
 /// Native bindings for ConPTY/WinPTY
 #[cxx::bridge]
 pub mod pywinptyrs {
+    // Shared struct that contains a shared pointer to a pseudo terminal
     struct PTYRef {
         pty: SharedPtr<PTY>,
         encoding: i32,
 	}
 
+    // Shared struct that contains the configuration values for the pseudo terminal
     struct PTYConfig {
-        input_mode: i32,
-        output_mode: i32,
-        override_pipes: bool,
         mouse_mode: i32,
 		timeout: i32,
         agent_config: i32,
@@ -56,10 +55,13 @@ pub mod pywinptyrs {
         fn write(pty: &PTYRef, in_str: Vec<u8>) -> Result<u32>;
 
         /// Determine if the process spawned by the PTY is alive
-        fn is_alive(pty: PTYRef) -> bool;
+        fn is_alive(pty: &PTYRef) -> Result<bool>;
 
         /// Retrieve the exit status code of the process spawned by the PTY
-        fn get_exitstatus(pty: PTYRef) -> i64;
+        fn get_exitstatus(pty: &PTYRef) -> Result<i64>;
+
+        /// Determine if the process spawned by the PTY reached the end of file
+        fn is_eof(pty: &PTYRef) -> Result<bool>;
     }
 }
 

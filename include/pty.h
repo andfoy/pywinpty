@@ -19,12 +19,10 @@ enum Encoding {
 // Wrapper struct around ConPTY and WinPTY
 struct PTY {
 	// Partial constructor with automatic backend selection and extended parameters.
-	PTY(int cols, int rows, int input_mode, int output_mode, bool override_pipes, int mouse_mode,
-		int timeout, int agent_config);
+	PTY(int cols, int rows, int mouse_mode, int timeout, int agent_config);
 
 	// Main constructor
-	PTY(int cols, int rows, Backend backend, int input_mode, int output_mode, bool override_pipes, int mouse_mode,
-		int timeout, int agent_config);
+	PTY(int cols, int rows, Backend backend, int mouse_mode, int timeout, int agent_config);
 	
 	// Main destructor
 	~PTY();
@@ -58,5 +56,3 @@ struct PTY {
 	WinptyPTY* winpty;
 	Backend used_backend;
 };
-
-

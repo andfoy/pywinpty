@@ -11,7 +11,7 @@ void compose_error_message(winpty_error_ptr_t err, char* tmp) {
 	sprintf(tmp, "%ls", error.c_str());
 }
 
-WinptyPTY::WinptyPTY(int cols, int rows, bool override_pipes, int mouse_mode,
+WinptyPTY::WinptyPTY(int cols, int rows, int mouse_mode,
 	                 int timeout, int agent_config) {
 	winpty_error_ptr_t err;
 	winpty_config_t* config = winpty_config_new(agent_config, &err);
@@ -77,9 +77,25 @@ WinptyPTY::~WinptyPTY() {
 
 bool WinptyPTY::spawn(std::wstring appname, std::wstring cmdline,
 	                  std::wstring cwd, std::wstring env) {
+
+	LPCWSTR command_line = L"";
+	if (cmdline.length() > 0) {
+		command_line = cmdline.c_str();
+	}
+
+	LPCWSTR environment = NULL;
+	if (env.length() > 0) {
+		environment = env.c_str();
+	}
+
+	LPCWSTR working_dir = NULL;
+	if (cwd.length() > 0) {
+		working_dir = cwd.c_str();
+	}
+
 	winpty_error_ptr_t spawn_conf_err;
 	winpty_spawn_config_t* spawn_config = winpty_spawn_config_new(WINPTY_SPAWN_FLAG_MASK,
-		appname.c_str(), cmdline.c_str(), cwd.c_str(), env.c_str(), &spawn_conf_err);
+		appname.c_str(), command_line, working_dir, environment, &spawn_conf_err);
 	
 	if (spawn_config == nullptr) {
 		char tmp[256];
@@ -122,7 +138,7 @@ void WinptyPTY::set_size(int cols, int rows) {
 	}
 }
 #else
-WinptyPTY::WinptyPTY(int cols, int rows, bool override_pipes, int mouse_mode,
+WinptyPTY::WinptyPTY(int cols, int rows, int mouse_mode,
 	int timeout, int agent_config) {
 	throw std::runtime_error("pywinpty was compiled without winpty support");
 }
