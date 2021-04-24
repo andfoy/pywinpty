@@ -87,6 +87,44 @@ ConPTY::ConPTY(int cols, int rows) {
 
     HRESULT hr{ E_UNEXPECTED };
 
+    // Recreate the standard stream inputs in case the parent process
+    // has redirected them
+    HANDLE hConsole = CreateFile(
+        L"CONOUT$",
+        GENERIC_READ | GENERIC_WRITE,
+        FILE_SHARE_READ | FILE_SHARE_WRITE,
+        NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+
+    HANDLE hIn = CreateFile(
+        L"CONIN$",
+        GENERIC_READ | GENERIC_WRITE,
+        FILE_SHARE_READ, 0, OPEN_EXISTING, 0, 0);
+
+    if (hConsole != INVALID_HANDLE_VALUE) {
+        // Enable Console VT Processing
+        DWORD consoleMode{};
+        hr = GetConsoleMode(hConsole, &consoleMode)
+            ? S_OK
+            : GetLastError();
+
+        if (hr != S_OK) {
+            throw_runtime_error(hr);
+        }
+
+        // Enable stream to accept VT100 input sequences
+        hr = SetConsoleMode(hConsole, consoleMode | ENABLE_VIRTUAL_TERMINAL_PROCESSING)
+            ? S_OK
+            : GetLastError();
+
+        if (hr != S_OK) {
+            throw_runtime_error(hr);
+        }
+
+        // Set new streams
+        SetStdHandle(STD_OUTPUT_HANDLE, hConsole);
+        SetStdHandle(STD_INPUT_HANDLE, hIn);
+    }
+
     // Create communication channels
     // - Close these after CreateProcess of child application with pseudoconsole object.
     HANDLE inputReadSide{ INVALID_HANDLE_VALUE };
