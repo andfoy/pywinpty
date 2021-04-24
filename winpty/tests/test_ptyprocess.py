@@ -4,6 +4,7 @@
 # Standard library imports
 import os
 import signal
+import time
 import sys
 
 # Third party imports
@@ -54,6 +55,9 @@ def test_isalive(pty_fixture):
     while text not in data:
         data += pty.read()
 
+    while pty.isalive():
+        continue
+
     assert not pty.isalive()
     pty.terminate()
 
@@ -92,6 +96,7 @@ def test_send_control(pty_fixture):
     pty = pty_fixture(cmd=[sys.executable, 'import time; time.sleep(10)'])
     pty.sendcontrol('d')
     assert pty.wait() != 0
+
 
 @pytest.mark.skipif(which('cat') is None, reason="Requires cat on the PATH")
 def test_send_eof(pty_fixture):
