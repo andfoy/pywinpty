@@ -106,7 +106,15 @@ cywinpty.c
 # Winpty binaries
 *.exe
 *.dll
-*.h
 
 # Git giles
 *.orig
+
+# Added by cargo
+
+/target
+Cargo.lock
+
+# Visual Studio files
+.vs/
+CppProperties.json

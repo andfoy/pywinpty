@@ -1,0 +1,15 @@
+[package]
+name = "pywinpty_findlib"
+version = "0.1.0"
+authors = ["Edgar Andres Margffoy Tuay <andfoy@gmail.com>"]
+edition = "2018"
+license = "MIT"
+keywords = ["pwyinpty", "windows", "findlib"]
+description = "Crate that exposes GetProcAddress and GetModuleHandleW to detect Win32 API availability."
+repository = "https://github.com/spyder-ide/pywinpty"
+
+[dependencies]
+windows = "0.8.0"
+
+[build-dependencies]
+windows = "0.8.0"

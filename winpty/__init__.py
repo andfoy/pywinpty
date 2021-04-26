@@ -2,17 +2,22 @@
 """
 Pywinpty
 ========
-This package provides a Cython wrapper around winpty C++ library.
+This package provides low and high level APIs to create
+pseudo terminals in Windows.
 """
 
-# yapf: disable
-
 # Local imports
+from .winpty import PTY, WinptyError, __version__
 from .ptyprocess import PtyProcess
-from .winpty_wrapper import PTY
+from .enums import Backend, Encoding, MouseMode, AgentConfig
 
 
 PTY
 PtyProcess
-VERSION_INFO = (0, 6, 0, 'dev0')
-__version__ = '.'.join(map(str, VERSION_INFO))
+Backend
+Encoding
+MouseMode
+AgentConfig
+WinptyError
+
+__version__
