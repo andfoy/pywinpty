@@ -264,8 +264,8 @@ impl PTY {
     ///
     /// Returns
     /// -------
-    /// output: bytes
-    ///     A byte string that contains the output of the pseudoterminal.
+    /// error: bytes
+    ///     A byte string that contains the error of the pseudoterminal.
     ///
     /// Raises
     /// ------
