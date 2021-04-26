@@ -22,7 +22,7 @@ pub mod pywinptyrs {
     unsafe extern "C++" {
         include!("wrapper.h");
 
-        /// Reference to a torch tensor in memory
+        /// Reference to a pseudoterminal
         type PTY;
 
         /// Create an automatic-backend pseudo terminal with given columns, rows and settings

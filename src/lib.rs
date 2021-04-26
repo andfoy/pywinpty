@@ -228,7 +228,7 @@ impl PTY {
     /// Raises
     /// ------
     /// WinptyError
-    ///     If there was an error whilist trying to read the requested number of bytes
+    ///     If there was an error whilst trying to read the requested number of bytes
     ///     from the pseudoterminal.
     ///
     /// Notes
@@ -270,7 +270,7 @@ impl PTY {
     /// Raises
     /// ------
     /// WinptyError
-    ///     If there was an error whilist trying to read the requested number of bytes
+    ///     If there was an error whilst trying to read the requested number of bytes
     ///     from the pseudoterminal.
     ///
     /// Notes
@@ -314,7 +314,7 @@ impl PTY {
     /// Raises
     /// ------
     /// WinptyError
-    ///     If there was an error whilist trying to write the requested number of bytes
+    ///     If there was an error whilst trying to write the requested number of bytes
     ///     into the pseudoterminal.
     ///
     fn write(&self, to_write: Vec<u8>, py: Python) -> PyResult<u32> {
@@ -340,7 +340,7 @@ impl PTY {
     /// Raises
     /// ------
     /// WinptyError
-    ///     If there was an error whilist trying to determine the status of the process.
+    ///     If there was an error whilst trying to determine the status of the process.
     ///
     fn isalive(&self, py: Python) -> PyResult<bool> {
         let result: Result<bool, Exception> = py.allow_threads(|| pywinptyrs::is_alive(&self.pty));
@@ -364,7 +364,7 @@ impl PTY {
     /// Raises
     /// ------
     /// WinptyError
-    ///     If there was an error whilist trying to determine the exit status of the process.
+    ///     If there was an error whilst trying to determine the exit status of the process.
     ///
     fn get_exitstatus(&self, py: Python) -> PyResult<Option<i64>> {
         let result: Result<i64, Exception> =
@@ -391,7 +391,7 @@ impl PTY {
     /// Raises
     /// ------
     /// WinptyError
-    ///     If there was an error whilist trying to determine the EOF status of the process.
+    ///     If there was an error whilst trying to determine the EOF status of the process.
     ///
     fn iseof(&self, py: Python) -> PyResult<bool> {
         let result: Result<bool, Exception> = py.allow_threads(|| pywinptyrs::is_eof(&self.pty));

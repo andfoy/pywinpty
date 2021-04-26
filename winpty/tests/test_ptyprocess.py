@@ -24,7 +24,6 @@ def pty_fixture(request):
     return _pty_factory
 
 
-# @flaky(max_runs=4, min_passes=1)
 def test_read(pty_fixture):
     pty = pty_fixture()
     loc = os.getcwd()

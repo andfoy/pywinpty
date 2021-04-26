@@ -39,7 +39,6 @@ def pty_fixture(request):
     return pty
 
 
-#@flaky(max_runs=4, min_passes=1)
 def test_read(pty_fixture, capsys):
     pty = pty_fixture
     loc = os.getcwd()
@@ -87,7 +86,7 @@ def test_isalive(pty_fixture):
 
     assert not pty.isalive()
 
-"""
+
 def test_agent_spawn_fail(pty_fixture):
     pty = pty_fixture
     try:
@@ -95,7 +94,7 @@ def test_agent_spawn_fail(pty_fixture):
         assert False
     except WinptyError:
         pass
-"""
+
 
 @pytest.mark.parametrize(
     'backend_name,backend',
