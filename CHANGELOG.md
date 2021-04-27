@@ -1,3 +1,19 @@
+## Version 1.0.1 (2021/04/27)
+
+### Issues Closed
+
+* [Issue 145](https://github.com/spyder-ide/pywinpty/issues/145) - Release v1.0.1
+* [Issue 143](https://github.com/spyder-ide/pywinpty/issues/143) - Pip attempts to install pywinpty on Python 2.7 ([PR 144](https://github.com/spyder-ide/pywinpty/pull/144) by [@andfoy](https://github.com/andfoy))
+
+In this release 2 issues were closed.
+
+### Pull Requests Merged
+
+* [PR 144](https://github.com/spyder-ide/pywinpty/pull/144) - PR: Add requires-python key in pyproject.toml, by [@andfoy](https://github.com/andfoy) ([143](https://github.com/spyder-ide/pywinpty/issues/143))
+
+In this release 1 pull request was closed.
+
+
 ## Version 1.0.0 (2021/04/26)
 
 ### Issues Closed
