@@ -1,4 +1,4 @@
-# PyWinpty: Pseudoterminals for windows in Python
+# PyWinpty: Pseudoterminals for Windows in Python
 
 [![Project License - MIT](https://img.shields.io/pypi/l/pywinpty.svg)](./LICENSE.txt)
 [![pypi version](https://img.shields.io/pypi/v/pywinpty.svg)](https://pypi.org/project/pywinpty/)
@@ -20,7 +20,7 @@ PyWinpty allows creating and communicating with Windows processes that receive i
 
 ## Dependencies
 To compile pywinpty sources, you must have [Rust](https://rustup.rs/) and MSVC installed.
-You can also optionally have Winpty's C header and library files available on your include path.
+Optionally, you can also have Winpty's C header and library files available on your include path.
 
 
 ## Installation
