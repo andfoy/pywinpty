@@ -1,4 +1,4 @@
-name: Windows release
+name: Linux sdist
 
 on:
     release:
@@ -6,8 +6,8 @@ on:
         - created
 
 jobs:
-    windows:
-        name: Windows Py${{ matrix.PYTHON_VERSION }}
+    linux:
+        name: Linux Py${{ matrix.PYTHON_VERSION }}
         runs-on: ubuntu-latest
         env:
             PYTHON_VERSION: ${{ matrix.PYTHON_VERSION }}
