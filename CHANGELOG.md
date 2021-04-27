@@ -1,3 +1,27 @@
+## Version 1.0.0 (2021/04/26)
+
+### Issues Closed
+
+* [Issue 141](https://github.com/spyder-ide/pywinpty/issues/141) - Update RELEASE instructions and add release github actions ([PR 142](https://github.com/spyder-ide/pywinpty/pull/142) by [@andfoy](https://github.com/andfoy))
+* [Issue 140](https://github.com/spyder-ide/pywinpty/issues/140) - Release v1.0.0
+* [Issue 138](https://github.com/spyder-ide/pywinpty/issues/138) - Update Readme ([PR 139](https://github.com/spyder-ide/pywinpty/pull/139) by [@andfoy](https://github.com/andfoy))
+* [Issue 136](https://github.com/spyder-ide/pywinpty/issues/136) - Update CIs to use Github Actions ([PR 137](https://github.com/spyder-ide/pywinpty/pull/137) by [@andfoy](https://github.com/andfoy))
+* [Issue 134](https://github.com/spyder-ide/pywinpty/issues/134) - Will it provide Python 3.9 version support? ([PR 137](https://github.com/spyder-ide/pywinpty/pull/137) by [@andfoy](https://github.com/andfoy))
+* [Issue 133](https://github.com/spyder-ide/pywinpty/issues/133) - MNT: Stop using ci-helpers in appveyor.yml ([PR 137](https://github.com/spyder-ide/pywinpty/pull/137) by [@andfoy](https://github.com/andfoy))
+* [Issue 122](https://github.com/spyder-ide/pywinpty/issues/122) - Support ConPTY on Windows 10 ([PR 137](https://github.com/spyder-ide/pywinpty/pull/137) by [@andfoy](https://github.com/andfoy))
+* [Issue 121](https://github.com/spyder-ide/pywinpty/issues/121) - Expose winpty conerr pipe ([PR 137](https://github.com/spyder-ide/pywinpty/pull/137) by [@andfoy](https://github.com/andfoy))
+
+In this release 8 issues were closed.
+
+### Pull Requests Merged
+
+* [PR 142](https://github.com/spyder-ide/pywinpty/pull/142) - PR: Update release instructions and add release workflows in github actions, by [@andfoy](https://github.com/andfoy) ([141](https://github.com/spyder-ide/pywinpty/issues/141))
+* [PR 139](https://github.com/spyder-ide/pywinpty/pull/139) - PR: Update README and instructions, by [@andfoy](https://github.com/andfoy) ([138](https://github.com/spyder-ide/pywinpty/issues/138))
+* [PR 137](https://github.com/spyder-ide/pywinpty/pull/137) - PR: Add support for ConPTY and Python 3.9 , by [@andfoy](https://github.com/andfoy) ([136](https://github.com/spyder-ide/pywinpty/issues/136), [134](https://github.com/spyder-ide/pywinpty/issues/134), [133](https://github.com/spyder-ide/pywinpty/issues/133), [133](https://github.com/spyder-ide/pywinpty/issues/133), [131](https://github.com/spyder-ide/pywinpty/issues/131), [122](https://github.com/spyder-ide/pywinpty/issues/122), [121](https://github.com/spyder-ide/pywinpty/issues/121))
+
+In this release 3 pull requests were closed.
+
+
 ## Version 0.5.7 (2019/11/26)
 
 ### Issues Closed
