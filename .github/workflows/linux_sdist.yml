@@ -40,7 +40,7 @@ jobs:
             shell: bash -l {0}
             run: maturin sdist
           - name: Upload to PyPi
-            shell: bash - l {0}
+            shell: bash -l {0}
             env:
                 TWINE_PASSWORD: ${{secrets.MATURIN_PASSWORD}}
                 TWINE_USERNAME: ${{secrets.MATURIN_USERNAME}}

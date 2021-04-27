@@ -50,4 +50,4 @@ jobs:
                 MATURIN_PASSWORD: ${{secrets.MATURIN_PASSWORD}}
                 MATURIN_USERNAME: ${{secrets.MATURIN_USERNAME}}
               shell: bash -l {0}
-              run: maturin publish -i $(which python) -u $MATURIN_USERNAME --skip-sdist
+              run: maturin publish -i $(which python) -u $MATURIN_USERNAME --no-sdist
