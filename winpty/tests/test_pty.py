@@ -6,7 +6,6 @@ import os
 import time
 
 # Third party imports
-from flaky import flaky
 from winpty import PTY, WinptyError
 from winpty.enums import Backend
 from winpty.ptyprocess import which

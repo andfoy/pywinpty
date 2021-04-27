@@ -1,28 +1,26 @@
-# PyWinpty: Python bindings for winpty
+# PyWinpty: Pseudoterminals for windows in Python
 
 [![Project License - MIT](https://img.shields.io/pypi/l/pywinpty.svg)](./LICENSE.txt)
 [![pypi version](https://img.shields.io/pypi/v/pywinpty.svg)](https://pypi.org/project/pywinpty/)
 [![conda version](https://img.shields.io/conda/vn/conda-forge/pywinpty.svg)](https://www.anaconda.com/download/)
 [![download count](https://img.shields.io/conda/dn/conda-forge/pywinpty.svg)](https://www.anaconda.com/download/)
+[![Downloads](https://pepy.tech/badge/pywinpty)](https://pepy.tech/project/pywinpty)
 [![OpenCollective Backers](https://opencollective.com/spyder/backers/badge.svg?color=blue)](#backers)
 [![Join the chat at https://gitter.im/spyder-ide/public](https://badges.gitter.im/spyder-ide/spyder.svg)](https://gitter.im/spyder-ide/public)<br>
 [![PyPI status](https://img.shields.io/pypi/status/pywinpty.svg)](https://github.com/spyder-ide/pywinpty)
-[![Build status](https://ci.appveyor.com/api/projects/status/cowkuaebgeeq45v1?svg=true)](https://ci.appveyor.com/project/spyder-ide/pywinpty)
-[![Coverage Status](https://coveralls.io/repos/github/spyder-ide/pywinpty/badge.svg?branch=master)](https://coveralls.io/github/spyder-ide/pywinpty?branch=master)
-[![codecov](https://codecov.io/gh/spyder-ide/pywinpty/branch/master/graph/badge.svg)](https://codecov.io/gh/spyder-ide/pywinpty)
+[![Windows tests](https://github.com/spyder-ide/pywinpty/actions/workflows/windows_build.yml/badge.svg)](https://github.com/spyder-ide/pywinpty/actions/workflows/windows_build.yml)
 
-*Copyright © 2017–2018 Spyder Project Contributors*
+*Copyright © 2017– Spyder Project Contributors*
 
 
 ## Overview
 
-Python bindings for the [winpty](https://github.com/rprichard/winpty) pseudo terminal library.
-PyWinpty allows creating and communicating with Windows processes that receive input and print outputs via console input and output pipes.
+PyWinpty allows creating and communicating with Windows processes that receive input and print outputs via console input and output pipes. PyWinpty supports both the native [ConPTY](https://devblogs.microsoft.com/commandline/windows-command-line-introducing-the-windows-pseudo-console-conpty/) interface and the previous, fallback [winpty](https://github.com/rprichard/winpty) library.
 
 
 ## Dependencies
-To compile pywinpty sources, you must have [Cython](https://github.com/cython/cython) and MSYS2/MinGW-w64 installed (alongside the corresponding Python MSVC Runtime).
-You must also have Winpty's C header and library files available on your include path.
+To compile pywinpty sources, you must have [Rust](https://rustup.rs/) and MSVC installed.
+You can also optionally have Winpty's C header and library files available on your include path.
 
 
 ## Installation
@@ -38,45 +36,39 @@ Using pip:
 pip install pywinpty
 ```
 
-
 ## Building from source
 
-To build from sources, we recommend to use conda to install the following packages:
+To build from sources, you will require both a working stable or nightly Rust toolchain with
+target `x86_64-pc-windows-msvc`, which can be installed using [rustup](https://rustup.rs/).
+Additionally, you will require a working installation of [Microsoft Visual Studio C/C++](https://visualstudio.microsoft.com/es/vs/features/cplusplus/) compiler.
+
+Optionally, this library can be linked against winpty library, which you can install using conda-forge:
 
 ```batch
-conda install --file requirements.txt
+conda install winpty -c conda-forge
 ```
 
-Make sure that you are installing packages from the ``default`` channel.
-If you don't want to use conda, you will need to have the MSYS2/MinGW-w64-flavoured GCC compiler available on your PATH.
+If you don't want to use conda, you will need to have the winpty binaries and headers available on your PATH.
 
-You will need to setup the following environment variables:
+Finally, pywinpty uses [Maturin](https://github.com/PyO3/maturin) as the build backend, which can be installed using `pip`:
 
-### Conda compilation:
 ```batch
-set LIBRARY_INC=<Path to your anaconda installation>\envs\<environment name>\Library\include
-set LIBRARY_LIB=<Path to your anaconda installation>\envs\<environment name>\Library\lib
+pip install maturin
 ```
 
-### Manual compilation:
-```batch
-set LIBRARY_INC=<Path to the folder that contains wintpty headers>
-set LIBRARY_LIB=<Path to the folder that contains wintpty library files>
-```
-
-To test your compilation environment settings, you can build pywinpty Cython sources locally, by
+To test your compilation environment settings, you can build pywinpty sources locally, by
 executing:
 
 ```bash
-python setup.py build_ext -i --compiler=mingw32
+maturin develop
 ```
 
-If everything works correctly, you can install winpty by using ``pip``:
+This package depends on the following Rust crates:
 
-```bash
-pip install -U .
-```
-
+* [PyO3](https://github.com/PyO3/pyo3): Library used to produce Python bindings from Rust code.
+* [CXX](https://github.com/dtolnay/cxx): Call C++ libraries from Rust.
+* [Maturin](https://github.com/PyO3/maturin): Build system to build and publish Rust-based Python packages.
+* [Windows](https://github.com/microsoft/windows-rs): Rust for Windows.
 
 ## Package usage
 Pywinpty offers a single python wrapper around winpty library functions.
@@ -100,13 +92,13 @@ cols, rows = 80, 25
 process = PTY(cols, rows)
 
 # Spawn a new console process, e.g., CMD
-process.spawn(ur'C:\windows\system32\cmd.exe')
+process.spawn(br'C:\windows\system32\cmd.exe')
 
 # Read console output (Unicode)
 process.read()
 
 # Write input to console (Unicode)
-process.write(u'Text')
+process.write(b'Text')
 
 # Resize console size
 new_cols, new_rows = 90, 30
@@ -115,11 +107,22 @@ process.set_size(new_cols, new_rows)
 # Know if the process is alive
 alive = process.isalive()
 
-# Close console pipes
-process.close()
-
 # End winpty-agent process
 del process
+```
+
+## Running tests
+We use pytest to run tests as it follows (after calling ``maturin develop``), the test suite depends
+on pytest-lazy-fixture, which can be installed via pip:
+
+```batch
+pip install pytest pytest-lazy-fixture
+```
+
+All the tests can be exceuted using the following command
+
+```bash
+python runtests.py
 ```
 
 
@@ -128,8 +131,7 @@ Visit our [CHANGELOG](CHANGELOG.md) file to learn more about our new features an
 
 
 ## Contribution guidelines
-We follow PEP8 and PEP257 for pure python packages and Cython/VS to compile extensions. Feel free
-to send a PR or create an issue if you have any problem/question.
+We follow PEP8 and PEP257 for pure python packages and Rust to compile extensions. We use MyPy type annotations for all functions and classes declared on this package. Feel free to send a PR or create an issue if you have any problem/question.
 
 
 ## Backers
