@@ -1,6 +1,6 @@
 [package]
 name = "pywinpty"
-version = "1.0.0"
+version = "1.0.1-dev0"
 authors = ["Edgar Andrés Margffoy Tuay <andfoy@gmail.com>"]
 description = "Pseudo terminal support for Windows from Python."
 repository = "https://github.com/spyder-ide/pywinpty"
