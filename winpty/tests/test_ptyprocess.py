@@ -8,7 +8,6 @@ import time
 import sys
 
 # Third party imports
-from flaky import flaky
 from winpty.enums import Backend
 from winpty.ptyprocess import PtyProcess, which
 import pytest
