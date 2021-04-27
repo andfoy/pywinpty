@@ -1,0 +1,47 @@
+name: Windows release
+
+on:
+    release:
+      types:
+        - created
+
+jobs:
+    windows:
+        name: Windows Py${{ matrix.PYTHON_VERSION }}
+        runs-on: ubuntu-latest
+        env:
+            PYTHON_VERSION: ${{ matrix.PYTHON_VERSION }}
+            RUNNER_OS: "linux"
+        strategy:
+            fail-fast: false
+            matrix:
+                PYTHON_VERSION: ["3.9"]
+        steps:
+          - name: Checkout branch
+            uses: actions/checkout@v2
+          - name: Install latest Rust stable
+            uses: actions-rs/toolchain@v1
+            with:
+              toolchain: stable
+              target: x86_64-pc-windows-msvc
+              override: true
+              components: rustfmt, clippy
+          - name: Install miniconda
+            uses: conda-incubator/setup-miniconda@v2
+            with:
+              auto-update-conda: true
+              activate-environment: test
+              channels: conda-forge,defaults
+              python-version: ${{ matrix.PYTHON_VERSION }}
+          - name: Install twine/maturin
+            shell: bash -l {0}
+            run: pip install twine maturin
+          - name: Build sdist distribution
+            shell: bash -l {0}
+            run: maturin sdist
+          - name: Upload to PyPi
+            shell: bash - l {0}
+            env:
+                TWINE_PASSWORD: ${{secrets.MATURIN_PASSWORD}}
+                TWINE_USERNAME: ${{secrets.MATURIN_USERNAME}}
+            run: twine upload target/wheels/*.tar.gz
