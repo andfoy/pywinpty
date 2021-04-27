@@ -1,51 +1,19 @@
 To release a new version of pywinpty:
 
-## General steps
+1. git fetch upstream && git checkout upstream/master
+2. Close milestone on GitHub
+3. git clean -xfdi
+4. Update CHANGELOG.md with loghub
+5. git add -A && git commit -m "Update Changelog"
+6. Update release version in ``Cargo.toml`` (set release version, remove 'dev0')
+7. git add -A && git commit -m "Release vX.X.X"
+10. git tag -a vX.X.X -m "Release vX.X.X"
+11. Update development version in ``Cargo.toml`` (add '-dev0' and increment minor, see [1](#explanation))
+12. git add -A && git commit -m "Back to work"
+13. git push upstream master
+14. git push upstream --tags
+15. Create release in GitHub
+16. Wait for GitHub actions to publish the wheels and the sdist distribution
 
-* git fetch upstream && git merge upstream/master
-
-* Close release issue on github
-
-* Update CHANGELOG.md with loghub
-
-* Update VERSION_INFO in `__init__.py` (set release version, remove 'dev0')
-
-* git add and git commit
-
-* Open MSVC Command Prompt or execute msvarsall.bat script
-
-* set DISTUTILS_USE_SDK=1
-
-* python setup.py sdist
-
-## Per each PY3 version (3.5/3.6) and each architecture (amd64/win32) we should do
-
-* conda install winpty -c spyder-ide
-
-* set PYWINPTY_WHL=1
-
-* set LIBRARY_INC=<CONDA_ENV_PATH>\Library\include
-
-* set LIBRARY_LIB=<CONDA_ENV_PATH>\Library\lib
-
-* Copy binary files ``winpty-agent.exe`` and ``winpty.dll`` to winpty folder
-
-* python setup.py bdist_wheel
-
-## Uploading wheels
-
-* twine upload dist\\*
-
-**Note:** Do not forget to update conda packages
-
-## Create github release
-
-* git tag -a vX.X.X -m 'comment'
-
-* Update VERSION_INFO in `__init__.py` (add 'dev0' and increment minor)
-
-* git add and git commit
-
-* git push upstream master
-
-* git push upstream --tags
+[<a name="explanation">1</a>] We need to append '-dev0', as Cargo does not support the '.dev0'
+syntax.
