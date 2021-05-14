@@ -46,9 +46,7 @@ def test_write(pty_fixture):
 
 def test_isalive(pty_fixture):
     pty = pty_fixture()
-    pty.write('exit\r\n')
 
-    text = 'exit'
     pty.write('echo \"foo\"\r\nexit\r\n')
     data = ''
     while True:
