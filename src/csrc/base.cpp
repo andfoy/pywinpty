@@ -48,7 +48,13 @@ std::pair<bool, DWORD> BaseProcess::write(const char* str, size_t length) {
 }
 
 bool BaseProcess::is_eof() {
-    bool succ = PeekNamedPipe(conout, NULL, false, NULL, NULL, NULL);
+    DWORD available_bytes;
+    bool succ = PeekNamedPipe(conout, NULL, 0, NULL, &available_bytes, NULL);
+    if (succ) {
+        if (available_bytes == 0 && !is_alive()) {
+            succ = false;
+        }
+    }
     return !succ;
 }
 
