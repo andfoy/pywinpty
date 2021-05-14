@@ -43,7 +43,7 @@ jobs:
               run: conda install -y winpty
             - name: Install build/test dependencies
               shell: bash -l {0}
-              run: pip install maturin toml pytest pytest-lazy-fixture
+              run: pip install maturin toml pytest pytest-lazy-fixture flaky
             - name: Build pywinpty
               shell: bash -l {0}
               run: maturin develop

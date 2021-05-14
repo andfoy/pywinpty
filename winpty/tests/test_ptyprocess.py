@@ -8,9 +8,12 @@ import time
 import sys
 
 # Third party imports
+import pytest
+from flaky import flaky
+
+# Local imports
 from winpty.enums import Backend
 from winpty.ptyprocess import PtyProcess, which
-import pytest
 
 
 @pytest.fixture(scope='module', params=['ConPTY', 'WinPTY'])
@@ -44,6 +47,7 @@ def test_write(pty_fixture):
     pty.terminate()
 
 
+@flaky(max_runs=3, min_passes=1)
 def test_isalive(pty_fixture):
     pty = pty_fixture()
 
