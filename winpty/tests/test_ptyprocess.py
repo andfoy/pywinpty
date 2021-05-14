@@ -49,13 +49,15 @@ def test_isalive(pty_fixture):
     pty.write('exit\r\n')
 
     text = 'exit'
+    pty.write('echo \"foo\"\r\nexit\r\n')
     data = ''
-    while text not in data:
-        data += pty.read()
+    while True:
+        try:
+            data += pty.read()
+        except EOFError:
+            break
 
-    while pty.isalive():
-        continue
-
+    assert 'foo' in data
     assert not pty.isalive()
     pty.terminate()
 
