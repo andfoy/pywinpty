@@ -48,7 +48,7 @@ class PtyProcess(object):
 
         # Read from the pty in a thread.
         self._thread = threading.Thread(target=_read_in_thread,
-            args=(address, self.pty, self.read_blocking))
+            args=(address, self.pty))
         self._thread.setDaemon(True)
         self._thread.start()
 
@@ -317,28 +317,37 @@ class PtyProcess(object):
         self.pty.set_size(cols, rows)
 
 
-def _read_in_thread(address, pty, blocking):
+def _read_in_thread(address, pty):
     """Read data from the pty in a thread.
     """
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client.connect(address)
 
     while 1:
-        data = pty.read(4096, blocking=blocking)
+        data = pty.read(4096, blocking=False)
 
-        if not data and not pty.isalive():
-            while not data and not pty.iseof():
-                data += pty.read(4096, blocking=blocking)
+        if not pty.isalive():
+            while not pty.iseof():
+                data += pty.read(4096, blocking=False)
+                time.sleep(1e-3)
 
-            if not data:
-                try:
-                    client.send(b'')
-                except socket.error:
-                    pass
+            try:
+                client.send(data)
+            except socket.error:
                 break
-        try:
-            client.send(data)
-        except socket.error:
+
+            try:
+                client.send(b'')
+            except socket.error:
+                pass
             break
+
+        if data:
+            try:
+                client.send(data)
+            except socket.error:
+                break
+
+        time.sleep(1e-3)
 
     client.close()

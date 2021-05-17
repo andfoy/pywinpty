@@ -116,7 +116,7 @@ We use pytest to run tests as it follows (after calling ``maturin develop``), th
 on pytest-lazy-fixture, which can be installed via pip:
 
 ```batch
-pip install pytest pytest-lazy-fixture
+pip install pytest pytest-lazy-fixture flaky
 ```
 
 All the tests can be exceuted using the following command
