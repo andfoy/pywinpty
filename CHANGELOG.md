@@ -1,3 +1,20 @@
+## Version 1.1.0 (2021/05/17)
+
+### Issues Closed
+
+* [Issue 152](https://github.com/spyder-ide/pywinpty/issues/152) - Release v1.1.0
+
+In this release 1 issue was closed.
+
+### Pull Requests Merged
+
+* [PR 151](https://github.com/spyder-ide/pywinpty/pull/151) - Update windows requirement from 0.8.0 to 0.10.0 in /findlib, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 150](https://github.com/spyder-ide/pywinpty/pull/150) - PR: Enable dependabot updates, by [@andfoy](https://github.com/andfoy)
+* [PR 149](https://github.com/spyder-ide/pywinpty/pull/149) - PR: Improve EOF detection when the pipes are not automatically closed, by [@andfoy](https://github.com/andfoy)
+
+In this release 3 pull requests were closed.
+
+
 ## Version 1.0.1 (2021/04/27)
 
 ### Issues Closed
