@@ -1,3 +1,19 @@
+## Version 1.1.1 (2021/05/18)
+
+### Issues Closed
+
+* [Issue 155](https://github.com/spyder-ide/pywinpty/issues/155) - Release v1.1.1
+* [Issue 153](https://github.com/spyder-ide/pywinpty/issues/153) - pywinpty on Pypi does not show supported Python versions or dependent packages ([PR 154](https://github.com/spyder-ide/pywinpty/pull/154) by [@andfoy](https://github.com/andfoy))
+
+In this release 2 issues were closed.
+
+### Pull Requests Merged
+
+* [PR 154](https://github.com/spyder-ide/pywinpty/pull/154) - PR: Add requires-python to Cargo.toml, by [@andfoy](https://github.com/andfoy) ([153](https://github.com/spyder-ide/pywinpty/issues/153))
+
+In this release 1 pull request was closed.
+
+
 ## Version 1.1.0 (2021/05/17)
 
 ### Issues Closed
