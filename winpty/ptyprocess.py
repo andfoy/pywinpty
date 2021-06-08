@@ -49,7 +49,7 @@ class PtyProcess(object):
         # Read from the pty in a thread.
         self._thread = threading.Thread(target=_read_in_thread,
             args=(address, self.pty))
-        self._thread.setDaemon(True)
+        self._thread.daemon = True
         self._thread.start()
 
         self.fileobj, _ = self._server.accept()
