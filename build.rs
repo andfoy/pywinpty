@@ -1,7 +1,5 @@
 use cxx_build::CFG;
-use pywinpty_findlib::win_calls::Windows::Win32::System::SystemServices::{
-    GetModuleHandleW, GetProcAddress,
-};
+use pywinpty_findlib::{GetModuleHandleW, GetProcAddress};
 use std::env;
 use std::i64;
 use std::path::Path;
