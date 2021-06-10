@@ -1,3 +1,20 @@
+## Version 1.1.2 (2021/06/10)
+
+### Issues Closed
+
+* [Issue 160](https://github.com/spyder-ide/pywinpty/issues/160) - Release v1.1.2
+* [Issue 157](https://github.com/spyder-ide/pywinpty/issues/157) - threading.Thread.setDaemon has been deprecated in favor of setting daemon attribute directly in Python 3.10 ([PR 158](https://github.com/spyder-ide/pywinpty/pull/158) by [@tirkarthi](https://github.com/tirkarthi))
+
+In this release 2 issues were closed.
+
+### Pull Requests Merged
+
+* [PR 159](https://github.com/spyder-ide/pywinpty/pull/159) - PR: Update windows requirement from 0.10.0 to 0.11.0 in /findlib, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 158](https://github.com/spyder-ide/pywinpty/pull/158) - PR: Set daemon attribute instead of using setDaemon method that was deprecated in Python 3.10, by [@tirkarthi](https://github.com/tirkarthi) ([157](https://github.com/spyder-ide/pywinpty/issues/157))
+
+In this release 2 pull requests were closed.
+
+
 ## Version 1.1.1 (2021/05/18)
 
 ### Issues Closed
