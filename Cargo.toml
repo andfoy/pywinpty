@@ -24,7 +24,7 @@ features = ["extension-module"]
 
 [build-dependencies]
 cxx-build = {version = "1.0.45", features = ["parallel"]}
-pywinpty_findlib = { version = "=0.1.0", path = "findlib" }
+pywinpty_findlib = { version = "=0.3.0", path = "findlib" }
 which = "4.1.0"
 
 [package.metadata.docs.rs]
