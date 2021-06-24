@@ -1,3 +1,22 @@
+## Version 1.1.3 (2021/06/24)
+
+### Issues Closed
+
+* [Issue 167](https://github.com/spyder-ide/pywinpty/issues/167) - Release v1.1.3
+* [Issue 163](https://github.com/spyder-ide/pywinpty/issues/163) - Fix ConPTY stderr redirection ([PR 164](https://github.com/spyder-ide/pywinpty/pull/164) by [@andfoy](https://github.com/andfoy))
+
+In this release 2 issues were closed.
+
+### Pull Requests Merged
+
+* [PR 166](https://github.com/spyder-ide/pywinpty/pull/166) - PR: Pin maturin version in pyproject.toml, by [@andfoy](https://github.com/andfoy)
+* [PR 165](https://github.com/spyder-ide/pywinpty/pull/165) - PR: Fix ConPTY when pywinpty runs behind a GUI application, by [@andfoy](https://github.com/andfoy)
+* [PR 164](https://github.com/spyder-ide/pywinpty/pull/164) - PR: Redirect stderr to stdout in ConPTY, by [@andfoy](https://github.com/andfoy) ([163](https://github.com/spyder-ide/pywinpty/issues/163))
+* [PR 162](https://github.com/spyder-ide/pywinpty/pull/162) - Update windows requirement from 0.11.0 to 0.12.0 in /findlib, by [@dependabot[bot]](https://github.com/apps/dependabot)
+
+In this release 4 pull requests were closed.
+
+
 ## Version 1.1.2 (2021/06/10)
 
 ### Issues Closed
