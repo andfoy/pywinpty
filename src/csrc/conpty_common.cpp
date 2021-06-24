@@ -122,6 +122,7 @@ ConPTY::ConPTY(int cols, int rows) {
 
         // Set new streams
         SetStdHandle(STD_OUTPUT_HANDLE, hConsole);
+        SetStdHandle(STD_ERROR_HANDLE, hConsole);
         SetStdHandle(STD_INPUT_HANDLE, hIn);
     }
 
