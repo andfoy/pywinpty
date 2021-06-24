@@ -87,6 +87,10 @@ ConPTY::ConPTY(int cols, int rows) {
 
     HRESULT hr{ E_UNEXPECTED };
 
+    // Create a console window in case ConPTY is running in a GUI application
+    AllocConsole();
+    ShowWindow(GetConsoleWindow(), SW_HIDE);
+
     // Recreate the standard stream inputs in case the parent process
     // has redirected them
     HANDLE hConsole = CreateFile(
@@ -95,36 +99,44 @@ ConPTY::ConPTY(int cols, int rows) {
         FILE_SHARE_READ | FILE_SHARE_WRITE,
         NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 
+    if (hConsole == INVALID_HANDLE_VALUE) {
+        hr = GetLastError();
+        throw_runtime_error(hr);
+    }
+
     HANDLE hIn = CreateFile(
         L"CONIN$",
         GENERIC_READ | GENERIC_WRITE,
         FILE_SHARE_READ, 0, OPEN_EXISTING, 0, 0);
 
-    if (hConsole != INVALID_HANDLE_VALUE) {
-        // Enable Console VT Processing
-        DWORD consoleMode{};
-        hr = GetConsoleMode(hConsole, &consoleMode)
-            ? S_OK
-            : GetLastError();
-
-        if (hr != S_OK) {
-            throw_runtime_error(hr);
-        }
-
-        // Enable stream to accept VT100 input sequences
-        hr = SetConsoleMode(hConsole, consoleMode | ENABLE_VIRTUAL_TERMINAL_PROCESSING)
-            ? S_OK
-            : GetLastError();
-
-        if (hr != S_OK) {
-            throw_runtime_error(hr);
-        }
-
-        // Set new streams
-        SetStdHandle(STD_OUTPUT_HANDLE, hConsole);
-        SetStdHandle(STD_ERROR_HANDLE, hConsole);
-        SetStdHandle(STD_INPUT_HANDLE, hIn);
+    if (hIn == INVALID_HANDLE_VALUE) {
+        hr = GetLastError();
+        throw_runtime_error(hr);
     }
+
+    // Enable Console VT Processing
+    DWORD consoleMode{};
+    hr = GetConsoleMode(hConsole, &consoleMode)
+        ? S_OK
+        : GetLastError();
+
+    if (hr != S_OK) {
+        throw_runtime_error(hr);
+    }
+
+    // Enable stream to accept VT100 input sequences
+    hr = SetConsoleMode(hConsole, consoleMode | ENABLE_VIRTUAL_TERMINAL_PROCESSING)
+        ? S_OK
+        : GetLastError();
+
+    if (hr != S_OK) {
+        throw_runtime_error(hr);
+    }
+
+    // Set new streams
+    SetStdHandle(STD_OUTPUT_HANDLE, hConsole);
+    SetStdHandle(STD_ERROR_HANDLE, hConsole);
+    SetStdHandle(STD_INPUT_HANDLE, hIn);
 
     // Create communication channels
     // - Close these after CreateProcess of child application with pseudoconsole object.
@@ -151,7 +163,6 @@ ConPTY::ConPTY(int cols, int rows) {
     this->outputReadSide = outputReadSide;
     this->inputWriteSide = inputWriteSide;
     pty_created = true;
-
 }
 
 ConPTY::~ConPTY() {
@@ -167,6 +178,7 @@ ConPTY::~ConPTY() {
     if (pty_created) {
         // Close ConPTY - this will terminate client process if running
         ClosePseudoConsole(pty_handle);
+        FreeConsole();
 
         // Clean-up the pipes
         if (INVALID_HANDLE_VALUE != outputReadSide) CloseHandle(outputReadSide);
