@@ -1,3 +1,21 @@
+## Version 1.1.4 (2021-07-08)
+
+### Issues Closed
+
+* [Issue 176](https://github.com/spyder-ide/pywinpty/issues/176) - Release v1.1.4
+
+In this release 1 issue was closed.
+
+### Pull Requests Merged
+
+* [PR 175](https://github.com/spyder-ide/pywinpty/pull/175) - PR: Pin maturin version to v0.11.3, by [@andfoy](https://github.com/andfoy)
+* [PR 174](https://github.com/spyder-ide/pywinpty/pull/174) - Update windows requirement from 0.17.0 to 0.19.0 in /findlib, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 169](https://github.com/spyder-ide/pywinpty/pull/169) - PR: Define project.name attribute in pyproject.toml, by [@andfoy](https://github.com/andfoy)
+* [PR 168](https://github.com/spyder-ide/pywinpty/pull/168) - Update windows requirement from 0.12.0 to 0.13.0 in /findlib, by [@dependabot[bot]](https://github.com/apps/dependabot)
+
+In this release 4 pull requests were closed.
+
+
 ## Version 1.1.3 (2021/06/24)
 
 ### Issues Closed
