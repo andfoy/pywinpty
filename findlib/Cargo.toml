@@ -9,7 +9,7 @@ description = "Crate that exposes GetProcAddress and GetModuleHandleW to detect 
 repository = "https://github.com/spyder-ide/pywinpty"
 
 [dependencies]
-windows = "0.20.1"
+windows = "0.21.1"
 
 [build-dependencies]
-windows = "0.20.1"
+windows = "0.21.1"
