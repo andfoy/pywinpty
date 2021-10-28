@@ -1,3 +1,23 @@
+## Version 1.1.5 (2021/10/28)
+
+### Issues Closed
+
+* [Issue 190](https://github.com/spyder-ide/pywinpty/issues/190) - Release v1.1.5
+* [Issue 185](https://github.com/spyder-ide/pywinpty/issues/185) - The wheel for Python 3.10 is not available ([PR 186](https://github.com/spyder-ide/pywinpty/pull/186) by [@joseph-roitman](https://github.com/joseph-roitman))
+
+In this release 2 issues were closed.
+
+### Pull Requests Merged
+
+* [PR 186](https://github.com/spyder-ide/pywinpty/pull/186) - Build and publish with Python 3.10 in GitHub actions., by [@joseph-roitman](https://github.com/joseph-roitman) ([185](https://github.com/spyder-ide/pywinpty/issues/185))
+* [PR 182](https://github.com/spyder-ide/pywinpty/pull/182) - Update windows requirement from 0.20.1 to 0.21.1 in /findlib, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 180](https://github.com/spyder-ide/pywinpty/pull/180) - Update windows requirement from 0.19.0 to 0.20.1 in /findlib, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 172](https://github.com/spyder-ide/pywinpty/pull/172) - Update windows requirement from 0.13.0 to 0.17.0 in /findlib, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 170](https://github.com/spyder-ide/pywinpty/pull/170) - Update pyo3 requirement from 0.13.2 to 0.14.1, by [@dependabot[bot]](https://github.com/apps/dependabot)
+
+In this release 5 pull requests were closed.
+
+
 ## Version 1.1.4 (2021-07-08)
 
 ### Issues Closed
