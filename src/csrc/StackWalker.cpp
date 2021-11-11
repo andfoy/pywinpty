@@ -82,7 +82,7 @@
  *
  **********************************************************************/
 
-#ifdef DEBUG
+#if DEBUG
 #include "StackWalker.h"
 
 #include <stdio.h>

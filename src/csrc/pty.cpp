@@ -1,6 +1,6 @@
 #include "pty.h"
 
-#ifdef DEBUG
+#if DEBUG
 // Debug utilities used to print a stack trace
 // In order to use it:
 // MyStackWalker sw; sw.ShowCallstack();
