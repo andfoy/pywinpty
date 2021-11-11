@@ -131,5 +131,7 @@ fn main() {
         .extra_warnings(false)
         .compile("winptywrapper");
 
-    println!("cargo:rustc-link-lib=dylib=winpty");
+    if winpty_enabled == "1" {
+        println!("cargo:rustc-link-lib=dylib=winpty");
+    }
 }

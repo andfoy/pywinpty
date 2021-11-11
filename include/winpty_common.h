@@ -2,7 +2,8 @@
 #include "base.h"
 
 
-#ifdef ENABLE_WINPTY
+#if ENABLE_WINPTY
+
 extern "C" {
     #include <winpty.h>
     #include <winpty_constants.h>

@@ -13,13 +13,13 @@
 #include <iostream>
 
 
-#ifdef ENABLE_WINPTY
+#if ENABLE_WINPTY
 static constexpr bool WINPTY_ENABLED = true;
 #else
 static constexpr bool WINPTY_ENABLED = false;
 #endif // ENABLE_WINPTY
 
-#ifdef ENABLE_CONPTY
+#if ENABLE_CONPTY
 static constexpr bool CONPTY_ENABLED = true;
 #else
 static constexpr bool CONPTY_ENABLED = false;

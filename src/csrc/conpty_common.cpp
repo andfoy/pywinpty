@@ -7,7 +7,7 @@ Native ConPTY calls.
 See: https://docs.microsoft.com/en-us/windows/console/creating-a-pseudoconsole-session
 **/
 
-#ifdef ENABLE_CONPTY
+#if ENABLE_CONPTY
 
 HRESULT SetUpPseudoConsole(HPCON* hPC, COORD size, HANDLE* inputReadSide, HANDLE* outputWriteSide,
                            HANDLE* outputReadSide, HANDLE* inputWriteSide) {
