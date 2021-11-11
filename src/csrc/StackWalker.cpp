@@ -1191,6 +1191,14 @@ BOOL StackWalker::ShowCallstack(HANDLE                    hThread,
     s.AddrBStore.Mode = AddrModeFlat;
     s.AddrStack.Offset = c.IntSp;
     s.AddrStack.Mode = AddrModeFlat;
+#elif _M_ARM64
+    imageType = IMAGE_FILE_MACHINE_ARM64;
+    // PC is not directly accessible for ARM64
+    s.AddrPC.Mode = AddrModeFlat;
+    s.AddrFrame.Offset = c.Fp;
+    s.AddrFrame.Mode = AddrModeFlat;
+    s.AddrStack.Offset = c.Sp;
+    s.AddrStack.Mode = AddrModeFlat;
 #else
 #error "Platform not supported!"
 #endif
