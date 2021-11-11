@@ -37,7 +37,7 @@ HRESULT PrepareStartupInformation(HPCON hpc, STARTUPINFOEX* psi)
 
     // Discover the size required for the list
     size_t bytesRequired;
-    InitializeProcThreadAttributeList(NULL, 1, 0, &bytesRequired);
+    InitializeProcThreadAttributeList(NULL, 1, 0, (PSIZE_T)&bytesRequired);
 
     // Allocate memory to represent the list
     si.lpAttributeList = (PPROC_THREAD_ATTRIBUTE_LIST)HeapAlloc(GetProcessHeap(), 0, bytesRequired);
@@ -47,7 +47,7 @@ HRESULT PrepareStartupInformation(HPCON hpc, STARTUPINFOEX* psi)
     }
 
     // Initialize the list memory location
-    if (!InitializeProcThreadAttributeList(si.lpAttributeList, 1, 0, &bytesRequired))
+    if (!InitializeProcThreadAttributeList(si.lpAttributeList, 1, 0, (PSIZE_T)&bytesRequired))
     {
         HeapFree(GetProcessHeap(), 0, si.lpAttributeList);
         return HRESULT_FROM_WIN32(GetLastError());
