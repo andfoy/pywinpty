@@ -1,6 +1,6 @@
 #include "winpty_common.h"
 
-#ifdef ENABLE_WINPTY
+#if ENABLE_WINPTY
 void compose_error_message(winpty_error_ptr_t err, char* tmp) {
     std::wstring err_msg = winpty_error_msg(err);
     std::wstring err_code = std::to_wstring(winpty_error_code(err));
