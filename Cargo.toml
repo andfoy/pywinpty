@@ -24,8 +24,15 @@ features = ["extension-module"]
 
 [build-dependencies]
 cxx-build = {version = "1.0.45", features = ["parallel"]}
-pywinpty_findlib = { version = "=0.3.0", path = "findlib" }
+# pywinpty_findlib = { version = "=0.3.0", path = "findlib" }
 which = "4.1.0"
+
+[build-dependencies.windows]
+version = "0.26.0"
+features = [
+    "Win32_Foundation",
+    "Win32_System_LibraryLoader"
+]
 
 [package.metadata.docs.rs]
 default-target = "x86_64-pc-windows-msvc"
