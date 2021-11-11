@@ -1,11 +1,53 @@
 use cxx_build::CFG;
 use windows::Win32::System::LibraryLoader::{GetProcAddress, GetModuleHandleW};
+use windows::Win32::Foundation::{PWSTR, PSTR};
 use std::env;
 use std::i64;
 use std::path::Path;
 use std::process::Command;
 use std::str;
 use which::which;
+
+trait IntoPWSTR {
+    fn into_pwstr(self) -> PWSTR;
+}
+
+trait IntoPSTR {
+    fn into_pstr(self) -> PSTR;
+}
+
+impl IntoPWSTR for &str {
+    fn into_pwstr(self) -> PWSTR {
+        let mut encoded = self
+            .encode_utf16()
+            .chain([0u16])
+            .collect::<Vec<u16>>();
+
+        PWSTR(encoded.as_mut_ptr())    }
+}
+
+impl IntoPSTR for &str {
+     fn into_pstr(self) -> PSTR {
+        let mut encoded = self
+            .as_bytes()
+            .iter()
+            .cloned()
+            .chain([0u8])
+            .collect::<Vec<u8>>();
+
+        PSTR(encoded.as_mut_ptr())    }
+}
+
+impl IntoPWSTR for String {
+    fn into_pwstr(self) -> PWSTR {
+        let mut encoded = self
+            .encode_utf16()
+            .chain([0u16])
+            .collect::<Vec<u16>>();
+
+        PWSTR(encoded.as_mut_ptr())
+    }
+}
 
 fn command_ok(cmd: &mut Command) -> bool {
     cmd.status().ok().map_or(false, |s| s.success())
@@ -56,8 +98,8 @@ fn main() {
     println!("Windows build number: {:?}", build_version);
 
     let conpty_enabled;
-    let kernel32 = unsafe { GetModuleHandleW("kernel32.dll") };
-    let conpty = unsafe { GetProcAddress(kernel32, "CreatePseudoConsole") };
+    let kernel32 = unsafe { GetModuleHandleW("kernel32.dll".into_pwstr()) };
+    let conpty = unsafe { GetProcAddress(kernel32, "CreatePseudoConsole".into_pstr()) };
     match conpty {
         Some(_) => {
             conpty_enabled = "1";
