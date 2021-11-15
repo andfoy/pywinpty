@@ -1,3 +1,22 @@
+## Version 1.1.6 (2021-11-15)
+
+### Issues Closed
+
+* [Issue 201](https://github.com/spyder-ide/pywinpty/issues/201) - Release v1.1.6
+
+In this release 1 issue was closed.
+
+### Pull Requests Merged
+
+* [PR 199](https://github.com/spyder-ide/pywinpty/pull/199) - add support for arm64 compilation, by [@nsait-linaro](https://github.com/nsait-linaro)
+* [PR 198](https://github.com/spyder-ide/pywinpty/pull/198) - enable building pywinpty without winpty and debug code, by [@nsait-linaro](https://github.com/nsait-linaro)
+* [PR 196](https://github.com/spyder-ide/pywinpty/pull/196) - Update windows requirement from 0.21.1 to 0.26.0 in /findlib, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 194](https://github.com/spyder-ide/pywinpty/pull/194) - Update pyo3 requirement from 0.14.1 to 0.15.0, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 192](https://github.com/spyder-ide/pywinpty/pull/192) - Fix compile error C2664 on win32, by [@cgohlke](https://github.com/cgohlke)
+
+In this release 5 pull requests were closed.
+
+
 ## Version 1.1.5 (2021/10/28)
 
 ### Issues Closed
