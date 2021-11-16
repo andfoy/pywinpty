@@ -28,7 +28,7 @@ cxx-build = {version = "1.0.45", features = ["parallel"]}
 which = "4.1.0"
 
 [build-dependencies.windows]
-version = "0.26.0"
+version = "0.27.0"
 features = [
     "Win32_Foundation",
     "Win32_System_LibraryLoader"
