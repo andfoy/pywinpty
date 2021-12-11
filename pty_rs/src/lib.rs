@@ -1,3 +1,7 @@
+
+pub mod pty;
+pub use pty::{PTY, PTYArgs, PTYBackend};
+
 #[cfg(test)]
 mod tests {
     #[test]

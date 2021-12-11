@@ -1,5 +1,5 @@
 
-/// This crate declares the [`self::PTY`] struct, which enables a Rust 
+/// This module declares the [`self::PTY`] struct, which enables a Rust
 /// program to create a pseudoterminal (PTY) in Windows.
 
 // External imports
@@ -10,6 +10,7 @@ extern crate num_traits;
 // Local modules
 mod winpty;
 mod conpty;
+pub mod base;
 
 // Local imports
 use self::winpty::{WinPTY, MouseMode, AgentConfig};
@@ -25,7 +26,7 @@ pub enum PTYBackend {
 	ConPTY,
 	/// Use the [winpty](https://github.com/rprichard/winpty) library, useful in older Windows systems.
 	WinPTY,
-    /// Placeholder value used to select the PTY backend automatically 
+    /// Placeholder value used to select the PTY backend automatically
 	Auto,
 	/// Placeholder value used to declare that a PTY was created with no backend.
 	NoBackend
@@ -52,7 +53,7 @@ pub struct PTYArgs {
 /// Pseudoterminal struct that communicates with a spawned process.
 pub struct PTY {
 	 /// Backend used by the current pseudoterminal, must be one of [`self::PTYBackend`].
-	 /// If the value is [`self::PTYBackend::None`], then no operations will be available. 
+	 /// If the value is [`self::PTYBackend::None`], then no operations will be available.
 	 backend: PTYBackend,
 	 /// Reference to the winpty PTY handler when [`backend`] is [`self::PTYBackend::WinPTY`].
 	 winpty: Option(WinPTY),
@@ -61,7 +62,7 @@ pub struct PTY {
 }
 
 impl PTY {
-	/// Create a new pseudoterminal setting the backend automatically. 
+	/// Create a new pseudoterminal setting the backend automatically.
 	pub fn new(args: PTYArgs) -> Result<PTY, &str> {
 		let mut errors = "There were some errors trying to instantiate a PTY:";
 		// Try to create a PTY using the ConPTY backend
@@ -133,10 +134,9 @@ impl PTY {
 					},
 					Err(err) => Err(err)
 				}
-			}
+			},
 			PTYBackend::Auto => PTY::new(args),
 			PTYBackend::NoBackend => Err("NoBackend is not a valid option")
-		}		
+		}
 	}
 };
-
