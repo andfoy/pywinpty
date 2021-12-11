@@ -1,6 +1,6 @@
 /// Base struct used to generalize some of the PTY I/O operations.
 
-use windows::Win32::Foundation::{PWSTR, HANDLE, S_OK, GetLastError, HRESULT, STATUS_PENDING};
+use windows::Win32::Foundation::{PWSTR, HANDLE, S_OK, GetLastError, STATUS_PENDING};
 use windows::Win32::Storage::FileSystem::{GetFileSizeEx, ReadFile};
 use windows::Win32::System::Pipes::PeekNamedPipe;
 use windows::Win32::System::Threading::{GetExitCodeProcess, GetProcessId};
