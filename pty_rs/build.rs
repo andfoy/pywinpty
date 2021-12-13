@@ -1,8 +1,6 @@
 use windows::Win32::System::LibraryLoader::{GetProcAddress, GetModuleHandleW};
 use windows::Win32::Foundation::{PWSTR, PSTR};
-use std::env;
 use std::i64;
-use std::path::Path;
 use std::process::Command;
 use std::str;
 use which::which;
@@ -123,7 +121,7 @@ fn main() {
         let winpty_location = which("winpty-agent").unwrap();
         let winpty_path = winpty_location.parent().unwrap();
         let winpty_root = winpty_path.parent().unwrap();
-        let winpty_include = winpty_root.join("include");
+        // let winpty_include = winpty_root.join("include");
 
         let winpty_lib = winpty_root.join("lib");
 

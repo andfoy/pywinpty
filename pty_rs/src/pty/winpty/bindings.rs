@@ -22,12 +22,19 @@
  * IN THE SOFTWARE.
  */
 
-use std::ptr;
-use windows::Win32::Foundation::HANDLE;
+//use std::ptr;
+use std::ffi::c_void;
+//use windows::Win32::Foundation::HANDLE;
 
 // Error handling
-/// An error object,
-pub struct winpty_error_t {};
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct winpty_error_s {
+    _unused: [u8; 0],
+}
+
+/// An error object.
+pub type winpty_error_t = winpty_error_s;
 
 extern "C" {
     /// Gets the error code from the error object.
@@ -43,8 +50,13 @@ extern "C" {
 }
 
 // Configuration of a new agent.
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct winpty_config_s {
+    _unused: [u8; 0],
+}
 /// Agent configuration object (not thread-safe).
-pub struct winpty_config_t {};
+pub type winpty_config_t = winpty_config_s;
 
 extern "C" {
     /// Allocate a winpty_config_t value.  Returns NULL on error.  There are no
@@ -69,18 +81,24 @@ extern "C" {
 
 // Start the agent
 
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct winpty_s {
+    _unused: [u8; 0],
+}
+
 /// Agent object (thread-safe)
-pub struct winpty_t {};
+pub type winpty_t = winpty_s;
 
 extern "C" {
     ///  Starts the agent.  Returns NULL on error.  This process will connect to the
     /// agent over a control pipe, and the agent will open data pipes (e.g. CONIN
     /// and CONOUT).
-    pub fn winpty_open(cfg: *const winpty_config_t, *mut winpty_error_t) -> *mut winpty_t;
+    pub fn winpty_open(cfg: *const winpty_config_t, err: *mut winpty_error_t) -> *mut winpty_t;
 
     /// A handle to the agent process.  This value is valid for the lifetime of the
     /// winpty_t object.  Do not close it.
-    pub fn winpty_agent_process(wp: *mut winpty_t) -> HANDLE;
+    pub fn winpty_agent_process(wp: *mut winpty_t) -> *const c_void;
 
 }
 
@@ -97,9 +115,14 @@ extern "C" {
 }
 
 // winpty agent RPC call: process creation.
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct winpty_spawn_config_s {
+    _unused: [u8; 0],
+}
 
 /// Configuration object (not thread-safe)
-pub struct winpty_spawn_config_t {};
+pub type winpty_spawn_config_t = winpty_spawn_config_s;
 
 extern "C" {
     /// winpty_spawn_config strings do not need to live as long as the config
@@ -150,8 +173,8 @@ extern "C" {
     pub fn winpty_spawn(
         wp: *mut winpty_t,
         cfg: *const winpty_spawn_config_t,
-        process_handle: *mut HANDLE,
-        thread_handle: *mut HANDLE,
+        process_handle: *mut c_void,
+        thread_handle: *mut c_void,
         create_process_error: *mut u32,
         err: *mut winpty_error_t) -> bool;
 }

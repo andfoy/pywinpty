@@ -3,11 +3,9 @@
 /// This backend is useful as a fallback implementation to the newer ConPTY
 /// backend, which is only available on Windows 10 starting on build number 1809.
 
-#[macro_use]
-extern crate enum_primitive_derive;
-extern crate num_traits;
-
 use bitflags::bitflags;
+use enum_primitive_derive::Primitive;
+use std::ffi::OsString;
 
 // Actual implementation if winpty is available
 #[cfg(feature="winpty")]
@@ -28,8 +26,8 @@ pub struct WinPTY {}
 
 #[cfg(not(feature="winpty"))]
 impl WinPTY {
-    pub fn new(args: PTYArgs) -> Result<WinPTY, &str> {
-        Err("pty_rs was compiled without WinPTY enabled")
+    pub fn new(args: &mut PTYArgs) -> Result<WinPTY, OsString> {
+        Err(OsString::from("pty_rs was compiled without WinPTY enabled"))
     }
 }
 
@@ -39,18 +37,18 @@ pub enum MouseMode {
     /// QuickEdit mode is initially disabled, and the agent does not send mouse
     /// mode sequences to the terminal.  If it receives mouse input, though, it
     // still writes MOUSE_EVENT_RECORD values into CONIN.
-    WINPTY_MOUSE_MODE_NONE,
+    WINPTY_MOUSE_MODE_NONE = 0,
 
     /// QuickEdit mode is initially enabled.  As CONIN enters or leaves mouse
     /// input mode (i.e. where ENABLE_MOUSE_INPUT is on and
     /// ENABLE_QUICK_EDIT_MODE is off), the agent enables or disables mouse
     /// input on the terminal.
-    WINPTY_MOUSE_MODE_AUTO,
+    WINPTY_MOUSE_MODE_AUTO = 1,
 
     /// QuickEdit mode is initially disabled, and the agent enables the
     /// terminal's mouse input mode.  It does not disable terminal
     /// mouse mode (until exit).
-    WINPTY_MOUSE_MODE_FORCE
+    WINPTY_MOUSE_MODE_FORCE = 2,
 }
 
 bitflags! {
