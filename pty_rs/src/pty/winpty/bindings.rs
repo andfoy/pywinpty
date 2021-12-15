@@ -24,6 +24,7 @@
 
 //use std::ptr;
 use std::ffi::c_void;
+use std::os::windows::raw::HANDLE;
 //use windows::Win32::Foundation::HANDLE;
 
 // Error handling
@@ -35,18 +36,19 @@ pub struct winpty_error_s {
 
 /// An error object.
 pub type winpty_error_t = winpty_error_s;
+pub type winpty_error_ptr_t = *mut winpty_error_t;
 
 extern "C" {
     /// Gets the error code from the error object.
-    pub fn winpty_error_code(err: *mut winpty_error_t) -> u32;
+    pub fn winpty_error_code(err: *mut winpty_error_ptr_t) -> u32;
 
     /// Returns a textual representation of the error.  The string is freed when
     /// the error is freed.
-    pub fn winpty_error_msg(err: *mut winpty_error_t) -> *const u16;
+    pub fn winpty_error_msg(err: *mut winpty_error_ptr_t) -> *const u16;
 
     /// Free the error object.  Every error returned from the winpty API must be
     /// freed.
-    pub fn winpty_error_free(err: *mut winpty_error_t);
+    pub fn winpty_error_free(err: *mut winpty_error_ptr_t);
 }
 
 // Configuration of a new agent.
@@ -63,7 +65,7 @@ extern "C" {
     /// required settings -- the object may immediately be used.  agentFlags is a
     /// set of zero or more WINPTY_FLAG_xxx values.  An unrecognized flag results
     /// in an assertion failure.
-    pub fn winpty_config_new(flags: u64, err: *mut winpty_error_t) -> *mut winpty_config_t;
+    pub fn winpty_config_new(flags: u64, err: *mut winpty_error_ptr_t) -> *mut winpty_config_t;
 
     /// Free the cfg object after passing it to winpty_open.
     pub fn winpty_config_free(cfg: *mut winpty_config_t);
@@ -94,7 +96,7 @@ extern "C" {
     ///  Starts the agent.  Returns NULL on error.  This process will connect to the
     /// agent over a control pipe, and the agent will open data pipes (e.g. CONIN
     /// and CONOUT).
-    pub fn winpty_open(cfg: *const winpty_config_t, err: *mut winpty_error_t) -> *mut winpty_t;
+    pub fn winpty_open(cfg: *const winpty_config_t, err: *mut winpty_error_ptr_t) -> *mut winpty_t;
 
     /// A handle to the agent process.  This value is valid for the lifetime of the
     /// winpty_t object.  Do not close it.
@@ -142,7 +144,7 @@ extern "C" {
         cmdline: *const u16,
         cwd: *const u16,
         env: *const u16,
-        err: *mut winpty_error_t) -> *mut winpty_spawn_config_t;
+        err: *mut winpty_error_ptr_t) -> *mut winpty_spawn_config_t;
 
     /// Free the cfg object after passing it to winpty_spawn.
     pub fn winpty_spawn_config_free(cfg: *mut winpty_spawn_config_t);
@@ -173,16 +175,16 @@ extern "C" {
     pub fn winpty_spawn(
         wp: *mut winpty_t,
         cfg: *const winpty_spawn_config_t,
-        process_handle: *mut c_void,
-        thread_handle: *mut c_void,
+        process_handle: *mut HANDLE,
+        thread_handle: *mut HANDLE,
         create_process_error: *mut u32,
-        err: *mut winpty_error_t) -> bool;
+        err: *mut winpty_error_ptr_t) -> bool;
 }
 
 // winpty agent RPC calls: everything else
 extern "C" {
     /// Change the size of the Windows console window.
-    pub fn winpty_set_size(wp: *mut winpty_t, cols: i32, rows: i32, err: *mut winpty_error_t) -> bool;
+    pub fn winpty_set_size(wp: *mut winpty_t, cols: i32, rows: i32, err: *mut winpty_error_ptr_t) -> bool;
 
     /// Frees the winpty_t object and the OS resources contained in it.  This
     /// call breaks the connection with the agent, which should then close its

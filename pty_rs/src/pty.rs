@@ -7,7 +7,7 @@
 // Local modules
 mod winpty;
 mod conpty;
-pub mod base;
+mod base;
 
 use std::ffi::OsString;
 
@@ -15,12 +15,11 @@ use std::ffi::OsString;
 use self::winpty::WinPTY;
 pub use self::winpty::{MouseMode, AgentConfig};
 use self::conpty::ConPTY;
-
-// Windows imports
-use windows::Win32::Foundation::PWSTR;
+pub use base::{PTYImpl, PTYProcess};
 
 /// Available backends to create pseudoterminals.
 #[derive(Primitive)]
+#[derive(Copy, Clone, Debug)]
 pub enum PTYBackend {
 	/// Use the native Windows API, available from Windows 10 (Build version 1809).
 	ConPTY = 0,
@@ -53,27 +52,24 @@ pub struct PTYArgs {
 /// Pseudoterminal struct that communicates with a spawned process.
 pub struct PTY {
 	 /// Backend used by the current pseudoterminal, must be one of [`self::PTYBackend`].
-	 /// If the value is [`self::PTYBackend::None`], then no operations will be available.
+	 /// If the value is [`self::PTYBackend::NoBackend`], then no operations will be available.
 	 backend: PTYBackend,
-	 /// Reference to the winpty PTY handler when [`backend`] is [`self::PTYBackend::WinPTY`].
-	 winpty: Option<WinPTY>,
-	 /// Reference to the conpty PTY handler when [`backend`] is [`self::PTYBackend::ConPTY`].
-	 conpty: Option<ConPTY>
+	 /// Reference to the PTY handler which depends on the value of `backend`.
+	 pty: Box<dyn PTYImpl>
 }
 
 impl PTY {
 	/// Create a new pseudoterminal setting the backend automatically.
-	pub fn new(args: &mut PTYArgs) -> Result<PTY, OsString> {
+	pub fn new(args: &PTYArgs) -> Result<PTY, OsString> {
 		let mut errors: OsString = OsString::from("There were some errors trying to instantiate a PTY:");
 		// Try to create a PTY using the ConPTY backend
-		let conpty_instance: Result<ConPTY, OsString> = ConPTY::new(args);
-	 	let mut pty: Option<PTY> =
+		let conpty_instance: Result<Box<dyn PTYImpl>, OsString> = ConPTY::new(args);
+	 	let pty: Option<PTY> =
 			match conpty_instance {
 				Ok(conpty) => {
 					let pty_instance = PTY {
 						backend: PTYBackend::ConPTY,
-						winpty: None,
-						conpty: Some(conpty)
+						pty: conpty
 					};
 					Some(pty_instance)
 				},
@@ -87,13 +83,12 @@ impl PTY {
 		match pty {
 			Some(pty) => Ok(pty),
 			None => {
-				let winpty_instance: Result<WinPTY, OsString> = WinPTY::new(args);
+				let winpty_instance: Result<Box<dyn PTYImpl>, OsString> = WinPTY::new(args);
 				match winpty_instance {
 					Ok(winpty) => {
 						let pty_instance = PTY {
 							backend: PTYBackend::WinPTY,
-							winpty: Some(winpty),
-							conpty: None
+							pty: winpty
 						};
 						Ok(pty_instance)
 					},
@@ -107,15 +102,14 @@ impl PTY {
 	}
 
 	/// Create a new pseudoterminal using a given backend
-	pub fn new_with_backend(args: &mut PTYArgs, backend: PTYBackend) -> Result<PTY, OsString> {
+	pub fn new_with_backend(args: &PTYArgs, backend: PTYBackend) -> Result<PTY, OsString> {
 		match backend {
 			PTYBackend::ConPTY => {
 				match ConPTY::new(args) {
 					Ok(conpty) => {
 						let pty = PTY {
 							backend: backend,
-							winpty: None,
-							conpty: Some(conpty),
+							pty: conpty
 						};
 						Ok(pty)
 					},
@@ -127,8 +121,7 @@ impl PTY {
 					Ok(winpty) => {
 						let pty = PTY {
 							backend: backend,
-							winpty: Some(winpty),
-							conpty: None,
+							pty: winpty
 						};
 						Ok(pty)
 					},
@@ -139,4 +132,84 @@ impl PTY {
 			PTYBackend::NoBackend => Err(OsString::from("NoBackend is not a valid option"))
 		}
 	}
+
+	/// Spawn a process inside the PTY.
+	///
+	/// # Arguments
+	/// * `appname` - Full path to the executable binary to spawn.
+	/// * `cmdline` - Optional space-delimited arguments to provide to the executable.
+	/// * `cwd` - Optional path from where the executable should be spawned.
+	/// * `env` - Optional environment variables to provide to the process. Each
+	/// variable should be declared as `VAR=VALUE` and be separated by a NUL (0) character.
+	///
+	/// # Returns
+	/// `true` if the call was successful, else an error will be returned.
+	pub fn spawn(&mut self, appname: OsString, cmdline: Option<OsString>, cwd: Option<OsString>, env: Option<OsString>) -> Result<bool, OsString> {
+		self.pty.spawn(appname, cmdline, cwd, env)
+	}
+
+	/// Change the PTY size.
+    ///
+    /// # Arguments
+    /// * `cols` - Number of character columns to display.
+    /// * `rows` - Number of line rows to display.
+	pub fn set_size(&self, cols: i32, rows: i32) -> Result<(), OsString> {
+		self.pty.set_size(cols, rows)
+	}
+
+	/// Get the backend used by the current PTY.
+	pub fn get_backend(&self) -> PTYBackend {
+		self.backend
+	}
+
+	/// Read at most `length` characters from a process standard output.
+    ///
+    /// # Arguments
+    /// * `length` - Upper limit on the number of characters to read.
+    /// * `blocking` - Block the reading thread if no bytes are available.
+    ///
+    /// # Notes
+    /// * If `blocking = false`, then the function will check how much characters are available on
+    /// the stream and will read the minimum between the input argument and the total number of
+    /// characters available.
+    ///
+    /// * The bytes returned are represented using a [`OsString`] since Windows operates over
+    /// `u16` strings.
+	pub fn read(&self, length: u32, blocking: bool) -> Result<OsString, OsString> {
+        self.pty.read(length, blocking)
+    }
+
+	/// Write a (possibly) UTF-16 string into the standard input of a process.
+    ///
+    /// # Arguments
+    /// * `buf` - [`OsString`] containing the string to write.
+    ///
+    /// # Returns
+    /// The total number of characters written if the call was successful, else
+    /// an [`OsString`] containing an human-readable error.
+    pub fn write(&self, buf: OsString) -> Result<u32, OsString> {
+        self.pty.write(buf)
+    }
+
+	/// Check if a process reached End-of-File (EOF).
+    ///
+    /// # Returns
+    /// `true` if the process reached EOL, false otherwise. If an error occurs, then a [`OsString`]
+    /// containing a human-readable error is raised.
+    pub fn is_eof(&mut self) -> Result<bool, OsString> {
+		self.pty.is_eof()
+    }
+
+	/// Retrieve the exit status of the process.
+    ///
+    /// # Returns
+    /// `None` if the process has not exited, else the exit code of the process.
+    pub fn get_exitstatus(&mut self) -> Result<Option<u32>, OsString> {
+        self.pty.get_exitstatus()
+    }
+
+	/// Determine if the process is still alive.
+    pub fn is_alive(&mut self) -> Result<bool, OsString> {
+        self.pty.is_alive()
+    }
 }

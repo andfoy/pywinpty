@@ -5,7 +5,6 @@
 
 use bitflags::bitflags;
 use enum_primitive_derive::Primitive;
-use std::ffi::OsString;
 
 // Actual implementation if winpty is available
 #[cfg(feature="winpty")]
@@ -22,11 +21,42 @@ pub use pty_impl::WinPTY;
 use super::PTYArgs;
 
 #[cfg(not(feature="winpty"))]
+use super::base::PTYImpl;
+
+#[cfg(not(feature="winpty"))]
 pub struct WinPTY {}
 
 #[cfg(not(feature="winpty"))]
-impl WinPTY {
-    pub fn new(args: &mut PTYArgs) -> Result<WinPTY, OsString> {
+impl PTYImpl for WinPTY {
+    fn new(_args: &PTYArgs) -> Result<Box<dyn PTYImpl>, OsString> {
+        Err(OsString::from("pty_rs was compiled without WinPTY enabled"))
+    }
+
+    fn spawn(&mut self, _appname: OsString, _cmdline: Option<OsString>, _cwd: Option<OsString>, _env: Option<OsString>) -> Result<bool, OsString> {
+        Err(OsString::from("pty_rs was compiled without WinPTY enabled"))
+    }
+
+    fn set_size(&self, cols: i32, rows: i32) -> Result<(), OsString> {
+        Err(OsString::from("pty_rs was compiled without WinPTY enabled"))
+    }
+
+    fn read(&self, length: u32, blocking: bool) -> Result<OsString, OsString> {
+        Err(OsString::from("pty_rs was compiled without WinPTY enabled"))
+    }
+
+    fn write(&self, buf: OsString) -> Result<u32, OsString> {
+        Err(OsString::from("pty_rs was compiled without WinPTY enabled"))
+    }
+
+    fn is_eof(&mut self) -> Result<bool, OsString> {
+        Err(OsString::from("pty_rs was compiled without WinPTY enabled"))
+    }
+
+    fn get_exitstatus(&mut self) -> Result<Option<u32>, OsString> {
+        Err(OsString::from("pty_rs was compiled without WinPTY enabled"))
+    }
+
+    fn is_alive(&mut self) -> Result<bool, OsString> {
         Err(OsString::from("pty_rs was compiled without WinPTY enabled"))
     }
 }

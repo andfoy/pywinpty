@@ -1,4 +1,8 @@
 {
     //"rust.rustflags": "-L native=C:\\Users\\andfoy-windows\\AppData\\Local\\Continuum\\miniconda3\\envs\\pywinpty\\Library\\lib -L native=C:\\Users\\andfoy-windows\\AppData\\Local\\Continuum\\miniconda3\\envs\\pywinpty\\Library\\bin --cfg \"feature=\"conpty\"\" --cfg \"feature=\"winpty\"\" -l dylib=winpty"
-    "rust.features": ["winpty", "conpty"]
+    "rust.features": ["winpty", "conpty"],
+    "terminal.integrated.env.windows": {
+        "PATH": "${env:PATH};C:\\Users\\andfoy-windows\\AppData\\Local\\Continuum\\miniconda3\\envs\\pywinpty\\Library\\bin"
+    },
+    "debug.allowBreakpointsEverywhere": true
 }

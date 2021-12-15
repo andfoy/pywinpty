@@ -1,5 +1,5 @@
 [package]
-name = "pty_rs"
+name = "winpty_rs"
 version = "0.1.0"
 edition = "2021"
 links = "winpty"
@@ -20,7 +20,8 @@ features = [
     "Win32_System_IO",
     "Win32_System_Pipes",
     "Win32_System_Threading",
-    "Win32_Security"
+    "Win32_Security",
+    "Win32_Globalization"
 ]
 
 [build-dependencies.windows]
@@ -37,3 +38,11 @@ targets = ["x86_64-pc-windows-msvc"]
 [features]
 conpty = []
 winpty = []
+
+[lib]
+name = "winptyrs"
+path = "src/lib.rs"
+
+[[bin]]
+name = "pty"
+path = "src/main.rs"
