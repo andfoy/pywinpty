@@ -51,6 +51,23 @@ fn main() {
                         Ok(alive) => println!("Is alive {}", alive),
                         Err(err) => panic!("{:?}", err)
                     }
+
+                    match pty.write(OsString::from("\r\n")) {
+                        Ok(bytes) => println!("Bytes written: {}", bytes),
+                        Err(err) => panic!("{:?}", err)
+                    }
+
+                    output = pty.read(1000, false);
+                    match output {
+                        Ok(out) => println!("{:?}", out),
+                        Err(err) => panic!("{:?}", err)
+                    }
+
+                    output = pty.read(1000, false);
+                    match output {
+                        Ok(out) => println!("{:?}", out),
+                        Err(err) => panic!("{:?}", err)
+                    }
                 },
                 Err(err) => {
                     println!("{:?}", err);

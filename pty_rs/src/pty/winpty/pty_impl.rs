@@ -213,7 +213,7 @@ impl PTYImpl for WinPTY {
 
         match self.ptr.spawn(app, cmd, working_dir, environ) {
             Ok(handle) => {
-                self.process.set_process(handle);
+                self.process.set_process(handle, true);
                 Ok(true)
             },
             Err(err) => {

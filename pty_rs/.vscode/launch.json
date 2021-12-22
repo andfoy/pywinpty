@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(Windows) Iniciar",
+            "name": "WinPTY",
             "type": "cppvsdbg",
             "request": "launch",
             "program": "${workspaceFolder}/target/debug/winpty_example.exe",

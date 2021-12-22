@@ -1,12 +1,12 @@
 /// Base struct used to generalize some of the PTY I/O operations.
 
-use windows::Win32::Foundation::{HANDLE, S_OK, GetLastError, STATUS_PENDING, CloseHandle, PSTR, PWSTR};
+use windows::Win32::Foundation::{HANDLE, S_OK, STATUS_PENDING, CloseHandle, PSTR, PWSTR};
 use windows::Win32::Storage::FileSystem::{GetFileSizeEx, ReadFile, WriteFile};
 use windows::Win32::System::Pipes::PeekNamedPipe;
 use windows::Win32::System::IO::OVERLAPPED;
 use windows::Win32::System::Threading::{GetExitCodeProcess, GetProcessId};
-use windows::Win32::Globalization::{MultiByteToWideChar, WideCharToMultiByte, MULTI_BYTE_TO_WIDE_CHAR_FLAGS, CP_UTF8};
-use windows::core::HRESULT;
+use windows::Win32::Globalization::{MultiByteToWideChar, WideCharToMultiByte, CP_UTF8};
+use windows::core::{HRESULT, Error};
 
 use std::ptr;
 use std::mem::MaybeUninit;
@@ -107,7 +107,7 @@ fn read(mut length: u32, blocking: bool, stream: HANDLE, using_pipes: bool) -> R
                                      ptr::null_mut::<u32>(), bytes_ptr, ptr::null_mut::<u32>()).as_bool() {
                         S_OK
                     } else {
-                        GetLastError().into()
+                        Error::from_win32().into()
                     };
 
 
@@ -127,7 +127,7 @@ fn read(mut length: u32, blocking: bool, stream: HANDLE, using_pipes: bool) -> R
             // let size_ptr: *mut i64 = ptr::null_mut();
             unsafe {
                 let size_ptr = ptr::addr_of_mut!(*size.as_mut_ptr());
-                result = if GetFileSizeEx(stream, size_ptr).as_bool() { S_OK } else { GetLastError().into() };
+                result = if GetFileSizeEx(stream, size_ptr).as_bool() { S_OK } else { Error::from_win32().into() };
 
                 if result.is_err() {
                     let result_msg = result.message();
@@ -146,10 +146,10 @@ fn read(mut length: u32, blocking: bool, stream: HANDLE, using_pipes: bool) -> R
     let os_str = "\0".repeat((length + 1) as usize);
     let mut buf_vec: Vec<u8> = os_str.as_str().as_bytes().to_vec();
     let mut chars_read = MaybeUninit::<u32>::uninit();
-    let mut total_bytes: u32 = 0;
+    let total_bytes: u32;
     //let chars_read: *mut u32 = ptr::null_mut();
     let null_overlapped: *mut OVERLAPPED = ptr::null_mut();
-    if length > 0 {
+    // if length > 0 {
         unsafe {
             let buf_ptr = buf_vec.as_mut_ptr();
             let buf_void = buf_ptr as *mut c_void;
@@ -158,7 +158,7 @@ fn read(mut length: u32, blocking: bool, stream: HANDLE, using_pipes: bool) -> R
                 if ReadFile(stream, buf_void, length, chars_read_ptr, null_overlapped).as_bool() {
                     S_OK
                 } else {
-                    GetLastError().into()
+                    Error::from_win32().into()
                 };
             total_bytes = *chars_read_ptr;
             chars_read.assume_init();
@@ -170,7 +170,7 @@ fn read(mut length: u32, blocking: bool, stream: HANDLE, using_pipes: bool) -> R
                 return Err(string);
             }
         }
-    }
+    // }
 
     // let os_str = OsString::with_capacity(buf_vec.len());
     let mut vec_buf: Vec<u16> = std::iter::repeat(0).take(buf_vec.len()).collect();
@@ -178,7 +178,7 @@ fn read(mut length: u32, blocking: bool, stream: HANDLE, using_pipes: bool) -> R
     let pstr = PSTR(buf_vec.as_mut_ptr());
     let pwstr = PWSTR(vec_ptr);
     unsafe {
-        MultiByteToWideChar(CP_UTF8, MULTI_BYTE_TO_WIDE_CHAR_FLAGS(0), pstr, -1, pwstr, (total_bytes + 1) as i32);
+        MultiByteToWideChar(CP_UTF8, 0, pstr, -1, pwstr, (total_bytes + 1) as i32);
     }
 
     let os_str = OsString::from_wide(&vec_buf[..]);
@@ -201,7 +201,9 @@ pub struct PTYProcess {
     /// Attribute that declares if the process is alive.
     alive: bool,
     /// Process is using Windows pipes and not files.
-    using_pipes: bool
+    using_pipes: bool,
+    // Close process when the struct is dropped.
+    close_process: bool
 }
 
 impl PTYProcess {
@@ -213,8 +215,8 @@ impl PTYProcess {
             pid: 0,
             exitstatus: None,
             alive: false,
-            using_pipes
-
+            using_pipes,
+            close_process: true
         }
     }
 
@@ -269,7 +271,7 @@ impl PTYProcess {
                 if WriteFile(self.conin, bytes_buf[..].as_ptr() as *const c_void, bytes_buf.len() as u32, bytes_ptr, null_overlapped).as_bool() {
                     S_OK
                 } else {
-                    GetLastError().into()
+                    Error::from_win32().into()
                 };
 
             if result.is_err() {
@@ -312,7 +314,7 @@ impl PTYProcess {
                         (true, S_OK)
                     }
                 } else {
-                    (false, GetLastError().into())
+                    (false, Error::from_win32().into())
                 };
 
                 if result.is_err() {
@@ -365,13 +367,13 @@ impl PTYProcess {
             if succ {
                 let actual_exit = *exit_ptr;
                 exit.assume_init();
-                self.alive = actual_exit == STATUS_PENDING.0;
+                self.alive = actual_exit == STATUS_PENDING.0 as u32;
                 if !self.alive {
                     self.exitstatus = Some(actual_exit);
                 }
                 Ok(self.alive)
             } else {
-                let err: HRESULT = GetLastError().into();
+                let err: HRESULT = Error::from_win32().into();
                 let result_msg = err.message();
                 let err_msg: &[u16] = result_msg.as_wide();
                 let string = OsString::from_wide(err_msg);
@@ -381,8 +383,9 @@ impl PTYProcess {
     }
 
     /// Set the running process behind the PTY.
-    pub fn set_process(&mut self, process: HANDLE) {
+    pub fn set_process(&mut self, process: HANDLE, close_process: bool) {
         self.process = process;
+        self.close_process = close_process;
         unsafe {
             self.pid = GetProcessId(self.process);
             self.alive = true;
@@ -394,9 +397,17 @@ impl PTYProcess {
 impl Drop for PTYProcess {
     fn drop(&mut self) {
         unsafe {
-            CloseHandle(self.conin);
-            CloseHandle(self.conout);
-            CloseHandle(self.process);
+            if !self.conin.is_invalid() {
+                CloseHandle(self.conin);
+            }
+
+            if !self.conout.is_invalid() {
+                CloseHandle(self.conout);
+            }
+
+            if self.close_process && !self.process.is_invalid() {
+                CloseHandle(self.process);
+            }
         }
     }
 }
