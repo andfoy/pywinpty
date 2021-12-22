@@ -23,12 +23,12 @@ struct WinPTYPtr {
 }
 
 impl WinPTYPtr {
-    pub fn get_agent_process(&self) -> HANDLE {
-        unsafe {
-            let void_mem = winpty_agent_process(self.ptr);
-            HANDLE(void_mem as isize)
-        }
-    }
+    // pub fn get_agent_process(&self) -> HANDLE {
+    //     unsafe {
+    //         let void_mem = winpty_agent_process(self.ptr);
+    //         HANDLE(void_mem as isize)
+    //     }
+    // }
 
     pub fn get_conin_name(&self) -> *const u16 {
         unsafe { winpty_conin_name(self.ptr) }
@@ -179,7 +179,7 @@ impl PTYImpl for WinPTY {
             );
 
             let process = PTYProcess::new(conin, conout, false);
-            Ok(Box::new(WinPTY { ptr: pty_ptr, process: process }) as Box<dyn PTYImpl>)
+            Ok(Box::new(WinPTY { ptr: pty_ptr, process }) as Box<dyn PTYImpl>)
         }
     }
 
@@ -192,18 +192,18 @@ impl PTYImpl for WinPTY {
         let cmdline_oss_buf: Vec<u16> = cmdline_oss.encode_wide().collect();
         let mut cmd = cmdline_oss_buf.as_ptr();
 
-        if env.is_some() {
-            let env_buf: Vec<u16> = env.unwrap().encode_wide().collect();
+        if let Some(env_opt) = env {
+            let env_buf: Vec<u16> = env_opt.encode_wide().collect();
             environ = env_buf.as_ptr();
         }
 
-        if cwd.is_some() {
-            let cwd_buf: Vec<u16> = cwd.unwrap().encode_wide().collect();
+        if let Some(cwd_opt) = cwd {
+            let cwd_buf: Vec<u16> = cwd_opt.encode_wide().collect();
             working_dir = cwd_buf.as_ptr();
         }
 
-        if cmdline.is_some() {
-            let cmd_buf: Vec<u16> = cmdline.unwrap().encode_wide().collect();
+        if let Some(cmdline_opt) = cmdline {
+            let cmd_buf: Vec<u16> = cmdline_opt.encode_wide().collect();
             cmd = cmd_buf.as_ptr();
         }
 

@@ -18,51 +18,14 @@ pub use pty_impl::WinPTY;
 
 // Default implementation if winpty is not available
 #[cfg(not(feature="winpty"))]
-use super::PTYArgs;
+mod default_impl;
 
 #[cfg(not(feature="winpty"))]
-use super::base::PTYImpl;
-
-#[cfg(not(feature="winpty"))]
-pub struct WinPTY {}
-
-#[cfg(not(feature="winpty"))]
-impl PTYImpl for WinPTY {
-    fn new(_args: &PTYArgs) -> Result<Box<dyn PTYImpl>, OsString> {
-        Err(OsString::from("pty_rs was compiled without WinPTY enabled"))
-    }
-
-    fn spawn(&mut self, _appname: OsString, _cmdline: Option<OsString>, _cwd: Option<OsString>, _env: Option<OsString>) -> Result<bool, OsString> {
-        Err(OsString::from("pty_rs was compiled without WinPTY enabled"))
-    }
-
-    fn set_size(&self, cols: i32, rows: i32) -> Result<(), OsString> {
-        Err(OsString::from("pty_rs was compiled without WinPTY enabled"))
-    }
-
-    fn read(&self, length: u32, blocking: bool) -> Result<OsString, OsString> {
-        Err(OsString::from("pty_rs was compiled without WinPTY enabled"))
-    }
-
-    fn write(&self, buf: OsString) -> Result<u32, OsString> {
-        Err(OsString::from("pty_rs was compiled without WinPTY enabled"))
-    }
-
-    fn is_eof(&mut self) -> Result<bool, OsString> {
-        Err(OsString::from("pty_rs was compiled without WinPTY enabled"))
-    }
-
-    fn get_exitstatus(&mut self) -> Result<Option<u32>, OsString> {
-        Err(OsString::from("pty_rs was compiled without WinPTY enabled"))
-    }
-
-    fn is_alive(&mut self) -> Result<bool, OsString> {
-        Err(OsString::from("pty_rs was compiled without WinPTY enabled"))
-    }
-}
+pub use default_impl::WinPTY;
 
 ///  Mouse capture settings for the winpty backend.
 #[derive(Primitive)]
+#[allow(non_camel_case_types)]
 pub enum MouseMode {
     /// QuickEdit mode is initially disabled, and the agent does not send mouse
     /// mode sequences to the terminal.  If it receives mouse input, though, it

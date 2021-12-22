@@ -26,6 +26,7 @@ pub trait PTYImpl {
     ///
     /// # Returns
     /// * `pty`: The instantiated PTY struct.
+    #[allow(clippy::new_ret_no_self)]
     fn new(args: &PTYArgs) -> Result<Box<dyn PTYImpl>, OsString>
         where Self: Sized;
 
@@ -96,7 +97,8 @@ fn read(mut length: u32, blocking: bool, stream: HANDLE, using_pipes: bool) -> R
     let mut result: HRESULT;
     if !blocking {
         if using_pipes {
-            let bytes_ptr: *mut u32 = ptr::null_mut();
+            let mut bytes_u = MaybeUninit::<u32>::uninit();
+            let bytes_ptr = bytes_u.as_mut_ptr();
             //let mut available_bytes = Box::<>::new_uninit();
             //let bytes_ptr: *mut u32 = &mut *available_bytes;
             unsafe {
@@ -115,7 +117,8 @@ fn read(mut length: u32, blocking: bool, stream: HANDLE, using_pipes: bool) -> R
                     let string = OsString::from_wide(err_msg);
                     return Err(string);
                 }
-                length = min(length, *bytes_ptr);
+                let num_bytes = bytes_u.assume_init();
+                length = min(length, num_bytes);
             }
         } else {
             //let mut size: Box<i64> = Box::new_uninit();
@@ -133,35 +136,40 @@ fn read(mut length: u32, blocking: bool, stream: HANDLE, using_pipes: bool) -> R
                     return Err(string);
                 }
                 length = min(length, *size_ptr as u32);
+                size.assume_init();
             }
         }
     }
 
     //let mut buf: Vec<u16> = Vec::with_capacity((length + 1) as usize);
     //buf.fill(1);
-    let os_str = std::iter::repeat("\0").take((length + 1) as usize).collect::<String>();
+    let os_str = "\0".repeat((length + 1) as usize);
     let mut buf_vec: Vec<u8> = os_str.as_str().as_bytes().to_vec();
     let mut chars_read = MaybeUninit::<u32>::uninit();
-    let total_bytes: u32;
+    let mut total_bytes: u32 = 0;
     //let chars_read: *mut u32 = ptr::null_mut();
     let null_overlapped: *mut OVERLAPPED = ptr::null_mut();
-    unsafe {
-        let buf_ptr = buf_vec.as_mut_ptr();
-        let buf_void = buf_ptr as *mut c_void;
-        let chars_read_ptr = ptr::addr_of_mut!(*chars_read.as_mut_ptr());
-        result =
-            if ReadFile(stream, buf_void, length, chars_read_ptr, null_overlapped).as_bool() {
-                S_OK
-            } else {
-                GetLastError().into()
-            };
-        total_bytes = *chars_read_ptr;
-    }
-    if result.is_err() {
-        let result_msg = result.message();
-        let err_msg: &[u16] = result_msg.as_wide();
-        let string = OsString::from_wide(err_msg);
-        return Err(string);
+    if length > 0 {
+        unsafe {
+            let buf_ptr = buf_vec.as_mut_ptr();
+            let buf_void = buf_ptr as *mut c_void;
+            let chars_read_ptr = ptr::addr_of_mut!(*chars_read.as_mut_ptr());
+            result =
+                if ReadFile(stream, buf_void, length, chars_read_ptr, null_overlapped).as_bool() {
+                    S_OK
+                } else {
+                    GetLastError().into()
+                };
+            total_bytes = *chars_read_ptr;
+            chars_read.assume_init();
+
+            if result.is_err() {
+                let result_msg = result.message();
+                let err_msg: &[u16] = result_msg.as_wide();
+                let string = OsString::from_wide(err_msg);
+                return Err(string);
+            }
+        }
     }
 
     // let os_str = OsString::with_capacity(buf_vec.len());
@@ -200,12 +208,12 @@ impl PTYProcess {
     pub fn new(conin: HANDLE, conout: HANDLE, using_pipes: bool) -> PTYProcess {
         PTYProcess {
             process: HANDLE(0),
-            conin: conin,
-            conout: conout,
+            conin,
+            conout,
             pid: 0,
             exitstatus: None,
             alive: false,
-            using_pipes: using_pipes
+            using_pipes
 
         }
     }
@@ -270,7 +278,8 @@ impl PTYProcess {
                 let string = OsString::from_wide(err_msg);
                 return Err(string);
             }
-            Ok(*bytes_ptr)
+            let total_bytes = written_bytes.assume_init();
+            Ok(total_bytes)
         }
     }
 
@@ -282,9 +291,10 @@ impl PTYProcess {
     pub fn is_eof(&mut self) -> Result<bool, OsString> {
         // let mut available_bytes: Box<u32> = Box::new_uninit();
         // let bytes_ptr: *mut u32 = &mut *available_bytes;
-        let bytes_ptr: *mut u32 = ptr::null_mut();
-
+        // let bytes_ptr: *mut u32 = ptr::null_mut();
+        let mut bytes = MaybeUninit::<u32>::uninit();
         unsafe {
+            let bytes_ptr: *mut u32 = ptr::addr_of_mut!(*bytes.as_mut_ptr());
             let (succ, result) =
                 if PeekNamedPipe(self.conout, ptr::null_mut::<c_void>(), 0,
                                  ptr::null_mut::<u32>(), bytes_ptr, ptr::null_mut::<u32>()).as_bool() {
@@ -311,6 +321,7 @@ impl PTYProcess {
                     let string = OsString::from_wide(err_msg);
                     return Err(string);
                 }
+                bytes.assume_init();
                 Ok(succ)
         }
 
@@ -346,12 +357,14 @@ impl PTYProcess {
     pub fn is_alive(&mut self) -> Result<bool, OsString> {
         // let mut exit_code: Box<u32> = Box::new_uninit();
         // let exit_ptr: *mut u32 = &mut *exit_code;
-        let exit_ptr: *mut u32 = ptr::null_mut();
+        let mut exit = MaybeUninit::<u32>::uninit();
         unsafe {
+            let exit_ptr: *mut u32 = ptr::addr_of_mut!(*exit.as_mut_ptr());
             let succ = GetExitCodeProcess(self.process, exit_ptr).as_bool();
 
             if succ {
                 let actual_exit = *exit_ptr;
+                exit.assume_init();
                 self.alive = actual_exit == STATUS_PENDING.0;
                 if !self.alive {
                     self.exitstatus = Some(actual_exit);
@@ -383,6 +396,7 @@ impl Drop for PTYProcess {
         unsafe {
             CloseHandle(self.conin);
             CloseHandle(self.conout);
+            CloseHandle(self.process);
         }
     }
 }

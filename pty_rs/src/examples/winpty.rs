@@ -47,7 +47,10 @@ fn main() {
                         Err(err) => panic!("{:?}", err)
                     }
 
-                    assert!(true);
+                    match pty.is_alive() {
+                        Ok(alive) => println!("Is alive {}", alive),
+                        Err(err) => panic!("{:?}", err)
+                    }
                 },
                 Err(err) => {
                     println!("{:?}", err);

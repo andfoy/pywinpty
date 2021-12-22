@@ -89,7 +89,7 @@ fn main() {
             .arg("CurrentBuildNumber"),
     );
     let build_parts: Vec<&str> = build_version.split("REG_SZ").collect();
-    let build_version = i64::from_str_radix(build_parts[1].trim(), 10).unwrap();
+    let build_version = build_parts[1].trim().parse::<i64>().unwrap();
 
     println!("Windows major version: {:?}", major_version);
     println!("Windows build number: {:?}", build_version);

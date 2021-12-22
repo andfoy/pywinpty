@@ -1,3 +1,4 @@
+#![allow(non_camel_case_types)]
 /// WinPTY C bindings.
 
 /*
@@ -23,7 +24,7 @@
  */
 
 //use std::ptr;
-use std::ffi::c_void;
+// use std::ffi::c_void;
 use std::os::windows::raw::HANDLE;
 //use windows::Win32::Foundation::HANDLE;
 
@@ -40,7 +41,7 @@ pub type winpty_error_ptr_t = *mut winpty_error_t;
 
 extern "C" {
     /// Gets the error code from the error object.
-    pub fn winpty_error_code(err: *mut winpty_error_ptr_t) -> u32;
+    // pub fn winpty_error_code(err: *mut winpty_error_ptr_t) -> u32;
 
     /// Returns a textual representation of the error.  The string is freed when
     /// the error is freed.
@@ -98,9 +99,9 @@ extern "C" {
     /// and CONOUT).
     pub fn winpty_open(cfg: *const winpty_config_t, err: *mut winpty_error_ptr_t) -> *mut winpty_t;
 
-    /// A handle to the agent process.  This value is valid for the lifetime of the
-    /// winpty_t object.  Do not close it.
-    pub fn winpty_agent_process(wp: *mut winpty_t) -> *const c_void;
+    // A handle to the agent process.  This value is valid for the lifetime of the
+    // winpty_t object.  Do not close it.
+    // pub fn winpty_agent_process(wp: *mut winpty_t) -> *const c_void;
 
 }
 
@@ -113,7 +114,7 @@ extern "C" {
     /// `winpty_conerr_name` returns NULL unless `WINPTY_FLAG_CONERR` is specified.
     pub fn winpty_conin_name(wp: *mut winpty_t) -> *const u16;
     pub fn winpty_conout_name(wp: *mut winpty_t) -> *const u16;
-    pub fn winpty_conerr_name(wp: *mut winpty_t) -> *const u16;
+    // pub fn winpty_conerr_name(wp: *mut winpty_t) -> *const u16;
 }
 
 // winpty agent RPC call: process creation.

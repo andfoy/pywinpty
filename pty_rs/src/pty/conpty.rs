@@ -1,42 +1,17 @@
+/// This module provides a [`super::PTY`] backend that uses
+/// [conpty](https://docs.microsoft.com/en-us/windows/console/creating-a-pseudoconsole-session) as its implementation.
+/// This backend is available on Windows 10 starting from build number 1809.
 
-use std::ffi::OsString;
+// Actual implementation if winpty is available
+#[cfg(feature="conpty")]
+mod pty_impl;
+
+#[cfg(feature="conpty")]
+pub use pty_impl::ConPTY;
 
 // Default implementation if winpty is not available
-use super::PTYArgs;
-use super::base::PTYImpl;
+#[cfg(not(feature="conpty"))]
+mod default_impl;
 
-pub struct ConPTY {}
-
-impl PTYImpl for ConPTY {
-    fn new(args: &PTYArgs) -> Result<Box<dyn PTYImpl>, OsString> {
-        Err(OsString::from("pty_rs was compiled without ConPTY enabled"))
-    }
-
-    fn spawn(&mut self, appname: OsString, cmdline: Option<OsString>, cwd: Option<OsString>, env: Option<OsString>) -> Result<bool, OsString> {
-        Err(OsString::from("pty_rs was compiled without ConPTY enabled"))
-    }
-
-    fn set_size(&self, cols: i32, rows: i32) -> Result<(), OsString> {
-        Err(OsString::from("pty_rs was compiled without ConPTY enabled"))
-    }
-
-    fn read(&self, length: u32, blocking: bool) -> Result<OsString, OsString> {
-        Err(OsString::from("pty_rs was compiled without ConPTY enabled"))
-    }
-
-    fn write(&self, buf: OsString) -> Result<u32, OsString> {
-        Err(OsString::from("pty_rs was compiled without ConPTY enabled"))
-    }
-
-    fn is_eof(&mut self) -> Result<bool, OsString> {
-        Err(OsString::from("pty_rs was compiled without ConPTY enabled"))
-    }
-
-    fn get_exitstatus(&mut self) -> Result<Option<u32>, OsString> {
-        Err(OsString::from("pty_rs was compiled without ConPTY enabled"))
-    }
-
-    fn is_alive(&mut self) -> Result<bool, OsString> {
-        Err(OsString::from("pty_rs was compiled without ConPTY enabled"))
-    }
-}
+#[cfg(not(feature="conpty"))]
+pub use default_impl::WinPTY;

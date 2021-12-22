@@ -108,7 +108,7 @@ impl PTY {
 				match ConPTY::new(args) {
 					Ok(conpty) => {
 						let pty = PTY {
-							backend: backend,
+							backend,
 							pty: conpty
 						};
 						Ok(pty)
@@ -120,7 +120,7 @@ impl PTY {
 				match WinPTY::new(args) {
 					Ok(winpty) => {
 						let pty = PTY {
-							backend: backend,
+							backend,
 							pty: winpty
 						};
 						Ok(pty)
