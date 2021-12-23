@@ -20,30 +20,30 @@ fn main() {
                 Ok(_) => {
                     let mut output = pty.read(1000, false);
                     match output {
-                        Ok(out) => println!("{:?}", out),
+                        Ok(out) => println!("{}", out.to_str().unwrap()),
                         Err(err) => panic!("{:?}", err)
                     }
 
                     output = pty.read(1000, false);
                     match output {
-                        Ok(out) => println!("{:?}", out),
+                        Ok(out) => println!("{}", out.to_str().unwrap()),
                         Err(err) => panic!("{:?}", err)
                     }
 
-                    match pty.write(OsString::from("echo \"aaaa\"")) {
+                    match pty.write(OsString::from("echo \"aaaa 😀\"")) {
                         Ok(bytes) => println!("Bytes written: {}", bytes),
                         Err(err) => panic!("{:?}", err)
                     }
 
                     output = pty.read(1000, false);
                     match output {
-                        Ok(out) => println!("{:?}", out),
+                        Ok(out) => println!("{}", out.to_str().unwrap()),
                         Err(err) => panic!("{:?}", err)
                     }
 
                     output = pty.read(1000, false);
                     match output {
-                        Ok(out) => println!("{:?}", out),
+                        Ok(out) => println!("{}", out.to_str().unwrap()),
                         Err(err) => panic!("{:?}", err)
                     }
 
@@ -59,13 +59,13 @@ fn main() {
 
                     output = pty.read(1000, false);
                     match output {
-                        Ok(out) => println!("{:?}", out),
+                        Ok(out) => println!("{}", out.to_str().unwrap()),
                         Err(err) => panic!("{:?}", err)
                     }
 
                     output = pty.read(1000, false);
                     match output {
-                        Ok(out) => println!("{:?}", out),
+                        Ok(out) => println!("{}", out.to_str().unwrap()),
                         Err(err) => panic!("{:?}", err)
                     }
                 },
