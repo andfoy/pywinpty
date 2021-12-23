@@ -1,6 +1,11 @@
 
-/// This module declares the [`self::PTY`] struct, which enables a Rust
-/// program to create a pseudoterminal (PTY) in Windows.
+//! This module declares the [`PTY`] struct, which enables a Rust
+//! program to create a pseudoterminal (PTY) in Windows.
+//!
+//! Additionally, this module also contains several generic structs used to
+//! perform I/O operations with a process, [`PTYProcess`]. Also it defines
+//! the main interface ([`PTYImpl`]) that a PTY backend should comply with.
+//! These structs and traits should be used in order to extend the library.
 
 // External imports
 
@@ -50,6 +55,68 @@ pub struct PTYArgs {
 
 
 /// Pseudoterminal struct that communicates with a spawned process.
+///
+/// This struct spawns a terminal given a set of arguments, as well as a backend,
+/// which can be determined automatically or be given automatically using one of the values
+/// listed on the [`PTYBackend`] struct.
+///
+/// # Examples
+///
+/// ## Creating a PTY setting the backend automatically
+/// ```
+/// use std::ffi::OsString;
+/// use winptyrs::{PTY, PTYArgs, MouseMode, AgentConfig};
+///
+/// let cmd = OsString::from("c:\\windows\\system32\\cmd.exe");
+/// let pty_args = PTYArgs {
+///     cols: 80,
+///     rows: 25,
+///     mouse_mode: MouseMode::WINPTY_MOUSE_MODE_NONE,
+///     timeout: 10000,
+///     agent_config: AgentConfig::WINPTY_FLAG_COLOR_ESCAPES
+/// };
+///
+/// // Initialize a pseudoterminal.
+/// let mut pty = PTY::new(&pty_args).unwrap();
+///
+/// // Spawn a process inside the pseudoterminal.
+/// pty.spawn(cmd, None, None, None).unwrap();
+///
+/// // Read the spawned process standard output (non-blocking).
+/// let output = pty.read(1000, false);
+///
+/// // Write to the spawned process standard input.
+/// let to_write = OsString::from("echo \"some str\"\r\n");
+/// let num_bytes = pty.write(to_write).unwrap();
+///
+/// // Change the PTY size.
+/// pty.set_size(80, 45).unwrap();
+///
+/// // Know if the process running inside the PTY is alive.
+/// let is_alive = pty.is_alive().unwrap();
+///
+/// // Get the process exit status (if the process has stopped).
+/// let exit_status = pty.get_exitstatus().unwrap();
+/// ```
+///
+/// ## Creating a pseudoterminal using a specific backend.
+/// ```
+/// use std::ffi::OsString;
+/// use winptyrs::{PTY, PTYArgs, MouseMode, AgentConfig, PTYBackend};
+///
+/// let cmd = OsString::from("c:\\windows\\system32\\cmd.exe");
+/// let pty_args = PTYArgs {
+///     cols: 80,
+///     rows: 25,
+///     mouse_mode: MouseMode::WINPTY_MOUSE_MODE_NONE,
+///     timeout: 10000,
+///     agent_config: AgentConfig::WINPTY_FLAG_COLOR_ESCAPES
+/// };
+///
+/// // Initialize a winpty and a conpty pseudoterminal.
+/// let winpty = PTY::new_with_backend(&pty_args, PTYBackend::WinPTY).unwrap();
+/// let conpty = PTY::new_with_backend(&pty_args, PTYBackend::ConPTY).unwrap();
+/// ```
 pub struct PTY {
 	 /// Backend used by the current pseudoterminal, must be one of [`self::PTYBackend`].
 	 /// If the value is [`self::PTYBackend::NoBackend`], then no operations will be available.

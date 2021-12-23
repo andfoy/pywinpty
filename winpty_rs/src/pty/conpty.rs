@@ -14,4 +14,4 @@ pub use pty_impl::ConPTY;
 mod default_impl;
 
 #[cfg(not(feature="conpty"))]
-pub use default_impl::WinPTY;
+pub use default_impl::ConPTY;
