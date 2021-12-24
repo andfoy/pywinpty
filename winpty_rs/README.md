@@ -44,7 +44,7 @@ let pty_args = PTYArgs {
 let mut pty = PTY::new(&pty_args).unwrap();
 ```
 
-## Creating a pseudoterminal using a specific backend.
+### Creating a pseudoterminal using a specific backend.
 ```rust
 use std::ffi::OsString;
 use winptyrs::{PTY, PTYArgs, MouseMode, AgentConfig, PTYBackend};
@@ -63,7 +63,7 @@ let winpty = PTY::new_with_backend(&pty_args, PTYBackend::WinPTY).unwrap();
 let conpty = PTY::new_with_backend(&pty_args, PTYBackend::ConPTY).unwrap();
 ```
 
-## General PTY operations
+### General PTY operations
 The `PTY` provides a set of operations to spawn and communicating with a process inside the PTY,
 as well to get information about its status.
 
