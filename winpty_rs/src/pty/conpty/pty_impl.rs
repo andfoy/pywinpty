@@ -370,7 +370,8 @@ impl Drop for ConPTY {
             DeleteProcThreadAttributeList(self.startup_info.lpAttributeList);
 
             ClosePseudoConsole(self.handle);
-            FreeConsole();
+
+            // FreeConsole();
         }
     }
 }

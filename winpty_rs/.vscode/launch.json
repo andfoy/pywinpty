@@ -38,6 +38,24 @@
                 "value": "trace"
             }],
             "console": "externalTerminal"
+        },
+
+        {
+            "name": "ConPTY (Test)",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/target/debug/deps/conpty-6be6d5804d42adea.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [{
+                "name": "PATH",
+                "value": "C:\\Users\\andfoy-windows\\AppData\\Local\\Continuum\\miniconda3\\envs\\pywinpty;C:\\Users\\andfoy-windows\\AppData\\Local\\Continuum\\miniconda3\\envs\\pywinpty\\Library\\mingw-w64\\bin;C:\\Users\\andfoy-windows\\AppData\\Local\\Continuum\\miniconda3\\envs\\pywinpty\\Library\\usr\\bin;C:\\Users\\andfoy-windows\\AppData\\Local\\Continuum\\miniconda3\\envs\\pywinpty\\Library\\bin;C:\\Users\\andfoy-windows\\AppData\\Local\\Continuum\\miniconda3\\envs\\pywinpty\\Scripts;C:\\Users\\andfoy-windows\\AppData\\Local\\Continuum\\miniconda3\\envs\\pywinpty\\bin"
+            }, {
+                "name": "WINPTY_DEBUG",
+                "value": "trace"
+            }],
+            "console": "externalTerminal"
         }
     ]
 }

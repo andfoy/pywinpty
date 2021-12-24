@@ -1,12 +1,14 @@
-#![cfg(feature="winpty")]
+#![cfg(feature="conpty")]
 
 use std::ffi::OsString;
+use std::{thread, time};
 use regex::Regex;
 
 use winptyrs::{PTY, PTYArgs, PTYBackend, MouseMode, AgentConfig};
 
 #[test]
-fn spawn_winpty() {
+#[ignore]
+fn spawn_conpty() {
     let pty_args = PTYArgs {
         cols: 80,
         rows: 25,
@@ -16,12 +18,15 @@ fn spawn_winpty() {
     };
 
     let appname = OsString::from("C:\\Windows\\System32\\cmd.exe");
-    let mut pty = PTY::new_with_backend(&pty_args, PTYBackend::WinPTY).unwrap();
+    let mut pty = PTY::new_with_backend(&pty_args, PTYBackend::ConPTY).unwrap();
     pty.spawn(appname, None, None, None).unwrap();
+
+    let ten_millis = time::Duration::from_millis(10);
+    thread::sleep(ten_millis);
 }
 
 #[test]
-fn read_write_winpty() {
+fn read_write_conpty() {
     let pty_args = PTYArgs {
         cols: 80,
         rows: 25,
@@ -31,7 +36,7 @@ fn read_write_winpty() {
     };
 
     let appname = OsString::from("C:\\Windows\\System32\\cmd.exe");
-    let mut pty = PTY::new_with_backend(&pty_args, PTYBackend::WinPTY).unwrap();
+    let mut pty = PTY::new_with_backend(&pty_args, PTYBackend::ConPTY).unwrap();
     pty.spawn(appname, None, None, None).unwrap();
 
     let regex = Regex::new(r".*Microsoft Windows.*").unwrap();
@@ -41,17 +46,19 @@ fn read_write_winpty() {
     while !regex.is_match(output_str) {
         out = pty.read(1000, false).unwrap();
         output_str = out.to_str().unwrap();
+        println!("{:?}", output_str);
     }
 
     assert!(regex.is_match(output_str));
 
     let echo_regex = Regex::new(".*echo \"This is a test stri.*").unwrap();
-    pty.write(OsString::from("echo \"This is a test string\"")).unwrap();
+    pty.write(OsString::from("echo \"This is a test string 😁\"")).unwrap();
 
     output_str = "";
     while !echo_regex.is_match(output_str) {
         out = pty.read(1000, false).unwrap();
         output_str = out.to_str().unwrap();
+        println!("{:?}", output_str);
     }
 
     assert!(echo_regex.is_match(output_str));
@@ -63,13 +70,15 @@ fn read_write_winpty() {
     while !out_regex.is_match(output_str) {
         out = pty.read(1000, false).unwrap();
         output_str = out.to_str().unwrap();
+        println!("{:?}", output_str);
     }
 
-    assert!(out_regex.is_match(output_str));
+    println!("!!!!!!!!!!!!!!!!!");
+    assert!(out_regex.is_match(output_str))
 }
 
 #[test]
-fn set_size_winpty() {
+fn set_size_conpty() {
     let pty_args = PTYArgs {
         cols: 80,
         rows: 25,
@@ -79,7 +88,7 @@ fn set_size_winpty() {
     };
 
     let appname = OsString::from("C:\\Windows\\System32\\cmd.exe");
-    let mut pty = PTY::new_with_backend(&pty_args, PTYBackend::WinPTY).unwrap();
+    let mut pty = PTY::new_with_backend(&pty_args, PTYBackend::ConPTY).unwrap();
     pty.spawn(appname, None, None, None).unwrap();
 
     pty.write("powershell -command \"&{(get-host).ui.rawui.WindowSize;}\"\r\n".into()).unwrap();
@@ -137,7 +146,7 @@ fn set_size_winpty() {
 }
 
 #[test]
-fn is_alive_exitstatus_winpty() {
+fn is_alive_exitstatus_conpty() {
     let pty_args = PTYArgs {
         cols: 80,
         rows: 25,
@@ -147,7 +156,7 @@ fn is_alive_exitstatus_winpty() {
     };
 
     let appname = OsString::from("C:\\Windows\\System32\\cmd.exe");
-    let mut pty = PTY::new_with_backend(&pty_args, PTYBackend::WinPTY).unwrap();
+    let mut pty = PTY::new_with_backend(&pty_args, PTYBackend::ConPTY).unwrap();
     pty.spawn(appname, None, None, None).unwrap();
 
     pty.write("echo wait\r\n".into()).unwrap();
