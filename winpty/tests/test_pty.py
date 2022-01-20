@@ -40,7 +40,7 @@ def pty_fixture(request):
 
 def test_read(pty_fixture, capsys):
     pty = pty_fixture
-    loc = os.getcwd() if os.environ.get('CI', None) is None else 'cmd'
+    loc = os.getcwd()
     readline = ''
 
     with capsys.disabled():
@@ -49,7 +49,7 @@ def test_read(pty_fixture, capsys):
             if time.time() - start_time > 5:
                 break
             readline += pty.read()
-    assert loc in readline
+    assert loc in readline or 'cmd' in readline
 
 
 def test_write(pty_fixture):
