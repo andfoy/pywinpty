@@ -21,7 +21,6 @@ winpty-rs = "0.3.0"
 version = "0.15.0"
 features = ["extension-module"]
 
-
 [package.metadata.docs.rs]
 default-target = "x86_64-pc-windows-msvc"
 targets = ["x86_64-pc-windows-msvc"]
