@@ -6,6 +6,7 @@ import os
 import signal
 import time
 import sys
+import re
 
 # Third party imports
 import pytest
@@ -33,6 +34,7 @@ def test_read(pty_fixture):
     while loc not in data:
         data += pty.read()
     pty.terminate()
+    time.sleep(2)
 
 
 def test_write(pty_fixture):
@@ -48,7 +50,7 @@ def test_write(pty_fixture):
 
 
 @pytest.mark.xfail(reason="It fails sometimes due to long strings")
-@flaky(max_runs=20, min_passes=1)
+# @flaky(max_runs=20, min_passes=1)
 def test_isalive(pty_fixture):
     pty = pty_fixture()
 
@@ -56,11 +58,13 @@ def test_isalive(pty_fixture):
     data = ''
     while True:
         try:
+            print('Stuck')
             data += pty.read()
         except EOFError:
             break
 
-    assert 'foo' in data
+    regex = re.compile(".*foo.*")
+    assert regex.findall(data)
     assert not pty.isalive()
     pty.terminate()
 

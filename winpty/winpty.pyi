@@ -47,3 +47,6 @@ class PTY:
 
     @property
     def pid(self) -> Optional[int]: ...
+
+    @property
+    def fd(self) -> Optional[int]: ...
