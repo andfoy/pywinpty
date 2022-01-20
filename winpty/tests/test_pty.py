@@ -40,8 +40,7 @@ def pty_fixture(request):
 
 def test_read(pty_fixture, capsys):
     pty = pty_fixture
-    print(os.environ.get('CI', None))
-    loc = os.getcwd()
+    loc = os.getcwd() if os.env.get('CI', None) is None else 'cmd'
     readline = ''
 
     with capsys.disabled():
