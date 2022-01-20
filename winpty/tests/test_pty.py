@@ -40,6 +40,7 @@ def pty_fixture(request):
 
 def test_read(pty_fixture, capsys):
     pty = pty_fixture
+    print(os.environ.get('CI', None))
     loc = os.getcwd()
     readline = ''
 
