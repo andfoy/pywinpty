@@ -15,7 +15,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 libc = "0.2.81"
-winpty-rs = "0.3.0"
+winpty-rs = "0.3.1"
 
 [dependencies.pyo3]
 version = "0.15.0"

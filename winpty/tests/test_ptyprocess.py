@@ -29,7 +29,7 @@ def pty_fixture(request):
 
 def test_read(pty_fixture):
     pty = pty_fixture()
-    loc = os.getcwd() if os.environ.get('CI', None) is None else 'cmd'
+    loc = os.getcwd()
     data = ''
     while loc not in data:
         data += pty.read()
