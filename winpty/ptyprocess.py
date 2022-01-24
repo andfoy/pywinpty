@@ -89,7 +89,7 @@ class PtyProcess(object):
         cmdline = ' ' + subprocess.list2cmdline(argv[1:])
         cwd = cwd or os.getcwd()
 
-        backend = os.environ.get('PYWINPTY_BACKEND', None)
+        backend = backend or os.environ.get('PYWINPTY_BACKEND', None)
         backend = int(backend) if backend is not None else backend
 
         proc = PTY(dimensions[1], dimensions[0],
