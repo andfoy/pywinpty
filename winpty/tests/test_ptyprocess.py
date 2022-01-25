@@ -90,6 +90,7 @@ def test_isalive(pty_fixture):
     pty.terminate()
 
 
+@pytest.mark.xfail(reason="It fails sometimes due to long strings")
 @flaky(max_runs=40, min_passes=1)
 def test_readline(pty_fixture):
     env = os.environ.copy()
