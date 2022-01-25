@@ -4,7 +4,6 @@
 # Standard library imports
 import os
 import time
-from turtle import back
 
 # Third party imports
 from winpty import PTY, WinptyError
