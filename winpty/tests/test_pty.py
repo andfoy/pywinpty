@@ -4,6 +4,7 @@
 # Standard library imports
 import os
 import time
+from turtle import back
 
 # Third party imports
 from winpty import PTY, WinptyError
@@ -16,6 +17,11 @@ CMD = which('cmd').lower()
 
 
 def pty_factory(backend):
+    if backend == Backend.ConPTY:
+        os.environ['CONPTY_CI'] = '1'
+    elif backend == Backend.WinPTY:
+        os.environ.pop('CONPTY_CI', None)
+
     @pytest.fixture(scope='function')
     def pty_fixture():
         pty = PTY(80, 20, backend=backend)
