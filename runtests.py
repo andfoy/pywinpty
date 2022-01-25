@@ -8,6 +8,7 @@ import os
 
 # Standard library imports
 import pytest
+import traceback
 
 
 def run_pytest(extra_args=None):

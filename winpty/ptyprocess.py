@@ -11,7 +11,6 @@ import threading
 import time
 from shutil import which
 
-
 # Local imports
 from .winpty import PTY
 
@@ -22,16 +21,15 @@ class PtyProcess(object):
     The main constructor is the :meth:`spawn` classmethod.
     """
 
-    def __init__(self, pty, encoding):
+    def __init__(self, pty):
         assert isinstance(pty, PTY)
         self.pty = pty
         self.pid = pty.pid
-        self.read_blocking = bool(os.environ.get('PYWINPTY_BLOCK', 1))
+        # self.fd = pty.fd
+
+        self.read_blocking = bool(int(os.environ.get('PYWINPTY_BLOCK', 1)))
         self.closed = False
         self.flag_eof = False
-        self.encoding = encoding
-
-        self.decoder = codecs.getincrementaldecoder(encoding)(errors='strict')
 
         # Used by terminate() to give kernel time to update process status.
         # Time in seconds.
@@ -48,7 +46,7 @@ class PtyProcess(object):
 
         # Read from the pty in a thread.
         self._thread = threading.Thread(target=_read_in_thread,
-            args=(address, self.pty))
+            args=(address, self.pty, self.read_blocking))
         self._thread.daemon = True
         self._thread.start()
 
@@ -57,7 +55,7 @@ class PtyProcess(object):
 
     @classmethod
     def spawn(cls, argv, cwd=None, env=None, dimensions=(24, 80),
-              encoding='utf-8', backend=None):
+              backend=None):
         """Start the given command in a child process in a pseudo terminal.
 
         This does all the setting up the pty, and returns an instance of
@@ -90,11 +88,11 @@ class PtyProcess(object):
         cmdline = ' ' + subprocess.list2cmdline(argv[1:])
         cwd = cwd or os.getcwd()
 
-        backend = os.environ.get('PYWINPTY_BACKEND', None)
+        backend = backend or os.environ.get('PYWINPTY_BACKEND', None)
         backend = int(backend) if backend is not None else backend
 
         proc = PTY(dimensions[1], dimensions[0],
-                   encoding=encoding, backend=backend)
+                   backend=backend)
 
         # Create the environemnt string.
         envStrs = []
@@ -102,17 +100,17 @@ class PtyProcess(object):
             envStrs.append('%s=%s' % (key, value))
         env = '\0'.join(envStrs) + '\0'
 
-        command = bytes(command, encoding)
-        cwd = bytes(cwd, encoding)
-        cmdline = bytes(cmdline, encoding)
-        env = bytes(env, encoding)
+        # command = bytes(command, encoding)
+        # cwd = bytes(cwd, encoding)
+        # cmdline = bytes(cmdline, encoding)
+        # env = bytes(env, encoding)
 
         if len(argv) == 1:
             proc.spawn(command, cwd=cwd, env=env)
         else:
             proc.spawn(command, cwd=cwd, env=env, cmdline=cmdline)
 
-        inst = cls(proc, encoding)
+        inst = cls(proc)
         inst._winsize = dimensions
 
         # Set some informational attributes
@@ -142,8 +140,6 @@ class PtyProcess(object):
         the child is terminated (SIGKILL is sent if the child ignores
         SIGINT)."""
         if not self.closed:
-            del self.pty
-            self.pty = None
             self.fileobj.close()
             self._server.close()
             # Give kernel time to update process status.
@@ -153,6 +149,7 @@ class PtyProcess(object):
                     raise IOError('Could not terminate the child.')
             self.fd = -1
             self.closed = True
+            # del self.pty
 
     def __del__(self):
         """This makes sure that no system resources are left open. Python only
@@ -185,12 +182,28 @@ class PtyProcess(object):
         Can block if there is nothing to read. Raises :exc:`EOFError` if the
         terminal was closed.
         """
+        # try:
+        #     data = self.pty.read(size, blocking=self.read_blocking)
+        # except Exception as e:
+        #     if "EOF" in str(e):
+        #         raise EOFError(e) from e
+        # return data
         data = self.fileobj.recv(size)
         if not data:
             self.flag_eof = True
             raise EOFError('Pty is closed')
 
-        return self.decoder.decode(data, final=False)
+        if data == b'0011Ignore':
+            data = ''
+
+        err = True
+        while err and data:
+            try:
+                data.decode('utf-8')
+                err = False
+            except UnicodeDecodeError:
+                data += self.fileobj.recv(1)
+        return data.decode('utf-8')
 
     def readline(self):
         """Read one line from the pseudoterminal as bytes.
@@ -213,10 +226,10 @@ class PtyProcess(object):
 
         Returns the number of bytes written.
         """
-        if not self.isalive():
+        if not self.pty.isalive():
             raise EOFError('Pty is closed')
 
-        nbytes = self.pty.write(bytes(s, self.encoding))
+        nbytes = self.pty.write(s)
         return nbytes
 
     def terminate(self, force=False):
@@ -249,7 +262,7 @@ class PtyProcess(object):
         exitstatus or signalstatus of the child. This returns True if the child
         process appears to be running or False if not.
         """
-        return self.pty and self.pty.isalive()
+        return self.pty.isalive()
 
     def kill(self, sig=None):
         """Kill the process with the given signal.
@@ -267,7 +280,7 @@ class PtyProcess(object):
         a = ord(char)
         if 97 <= a <= 122:
             a = a - ord('a') + 1
-            byte = bytes([a])
+            byte = str(bytes([a]))
             return self.pty.write(byte), byte
         d = {'@': 0, '`': 0,
             '[': 27, '{': 27,
@@ -277,9 +290,9 @@ class PtyProcess(object):
             '_': 31,
             '?': 127}
         if char not in d:
-            return 0, b''
+            return 0, ''
 
-        byte = bytes([d[char]])
+        byte = str(bytes([d[char]]))
         return self.pty.write(byte), byte
 
     def sendeof(self):
@@ -292,13 +305,13 @@ class PtyProcess(object):
         It is the responsibility of the caller to ensure the eof is sent at the
         beginning of a line."""
         # Send control character 4 (Ctrl-D)
-        self.pty.write(b'\x04'), '\x04'
+        self.pty.write('\x04'), '\x04'
 
     def sendintr(self):
         """This sends a SIGINT to the child. It does not require
         the SIGINT to be the first character on a line. """
         # Send control character 3 (Ctrl-C)
-        self.pty.write(b'\x03'), '\x03'
+        self.pty.write('\x03'), '\x03'
 
     def eof(self):
         """This returns True if the EOF exception was ever raised.
@@ -317,37 +330,24 @@ class PtyProcess(object):
         self.pty.set_size(cols, rows)
 
 
-def _read_in_thread(address, pty):
+def _read_in_thread(address, pty, blocking):
     """Read data from the pty in a thread.
     """
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client.connect(address)
 
+    call = 0
     while 1:
-        data = pty.read(4096, blocking=False)
-
-        if not pty.isalive():
-            while not pty.iseof():
-                data += pty.read(4096, blocking=False)
-                time.sleep(1e-3)
-
-            try:
-                client.send(data)
-            except socket.error:
-                break
-
-            try:
-                client.send(b'')
-            except socket.error:
-                pass
+        try:
+            data = pty.read(4096, blocking=blocking) or b'0011Ignore'
+            if data or not blocking:
+                try:
+                    client.send(bytes(data, 'utf-8'))
+                except socket.error:
+                    break
+            call += 1
+        except Exception as e:
             break
-
-        if data:
-            try:
-                client.send(data)
-            except socket.error:
-                break
-
         time.sleep(1e-3)
 
     client.close()

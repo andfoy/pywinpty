@@ -19,7 +19,7 @@ PyWinpty allows creating and communicating with Windows processes that receive i
 
 
 ## Dependencies
-To compile pywinpty sources, you must have [Rust](https://rustup.rs/) and MSVC installed.
+To compile pywinpty sources, you must have [Rust](https://rustup.rs/) installed.
 Optionally, you can also have Winpty's C header and library files available on your include path.
 
 
@@ -40,7 +40,6 @@ pip install pywinpty
 
 To build from sources, you will require both a working stable or nightly Rust toolchain with
 target `x86_64-pc-windows-msvc`, which can be installed using [rustup](https://rustup.rs/).
-Additionally, you will require a working installation of [Microsoft Visual Studio C/C++](https://visualstudio.microsoft.com/es/vs/features/cplusplus/) compiler.
 
 Optionally, this library can be linked against winpty library, which you can install using conda-forge:
 
@@ -66,9 +65,8 @@ maturin develop
 This package depends on the following Rust crates:
 
 * [PyO3](https://github.com/PyO3/pyo3): Library used to produce Python bindings from Rust code.
-* [CXX](https://github.com/dtolnay/cxx): Call C++ libraries from Rust.
+* [WinPTY-rs](https://github.com/andfoy/winpty-rs): Create and spawn processes inside a pseudoterminal in Windows from Rust.
 * [Maturin](https://github.com/PyO3/maturin): Build system to build and publish Rust-based Python packages.
-* [Windows](https://github.com/microsoft/windows-rs): Rust for Windows.
 
 ## Package usage
 Pywinpty offers a single python wrapper around winpty library functions.
