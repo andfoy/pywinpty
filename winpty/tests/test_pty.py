@@ -36,16 +36,36 @@ conpty_provider = pty_factory(Backend.ConPTY)
 winpty_provider = pty_factory(Backend.WinPTY)
 
 
-@pytest.fixture(scope='function', params=[
-    pytest.lazy_fixture('conpty_provider'),
-    pytest.lazy_fixture('winpty_provider')])
+@pytest.fixture(scope='module', params=['WinPTY', 'ConPTY'])
 def pty_fixture(request):
-    pty = request.param
-    return pty
+    backend = request.param
+    if backend == 'ConPTY':
+        os.environ['CI'] = '1'
+        os.environ['CONPTY_CI'] = '1'
+    if backend == 'WinPTY':
+        os.environ.pop('CI', None)
+        os.environ.pop('CONPTY_CI', None)
+
+    backend = getattr(Backend, backend)
+    def _pty_factory():
+        pty = PTY(80, 25, backend=backend)
+        assert pty.spawn(CMD)
+        time.sleep(0.3)
+        return pty
+    return _pty_factory
+
+
+
+# @pytest.fixture(scope='function', params=[
+#     pytest.lazy_fixture('conpty_provider'),
+#     pytest.lazy_fixture('winpty_provider')])
+# def pty_fixture(request):
+#     pty = request.param
+#     return pty
 
 
 def test_read(pty_fixture, capsys):
-    pty = pty_fixture
+    pty = pty_fixture()
     loc = os.getcwd()
     readline = ''
 
@@ -58,10 +78,11 @@ def test_read(pty_fixture, capsys):
             readline += pty.read()
             print('', repr(readline))
     assert loc in readline or 'cmd' in readline
+    del pty
 
 
 def test_write(pty_fixture):
-    pty = pty_fixture
+    pty = pty_fixture()
     line = pty.read()
 
     str_text = 'Eggs, ham and spam ünicode'
@@ -76,10 +97,11 @@ def test_write(pty_fixture):
         line += pty.read()
 
     assert str_text in line
+    del pty
 
 
 def test_isalive(pty_fixture):
-    pty = pty_fixture
+    pty = pty_fixture()
     pty.write('exit\r\n')
 
     text = 'exit'
@@ -98,6 +120,7 @@ def test_isalive(pty_fixture):
             break
 
     assert not pty.isalive()
+    del pty
 
 
 # def test_agent_spawn_fail(pty_fixture):
@@ -121,15 +144,17 @@ def test_pty_create_size_fail(backend_name, backend):
 
 
 def test_agent_resize_fail(pty_fixture):
-    pty = pty_fixture
+    pty = pty_fixture()
     try:
         pty.set_size(-80, 70)
         assert False
     except WinptyError:
         pass
+    finally:
+        del pty
 
 
 def test_agent_resize(pty_fixture):
-    pty = pty_fixture
+    pty = pty_fixture()
     pty.set_size(80, 70)
-
+    del pty
