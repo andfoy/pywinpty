@@ -284,7 +284,7 @@ impl PyPTY {
     /// WinptyError
     ///     If there was an error whilst trying to determine the status of the process.
     ///
-    fn isalive(&self, py: Python) -> PyResult<bool> {
+    fn isalive(&self) -> PyResult<bool> {
         // let result: Result<bool, OsString> = py.allow_threads(move || self.pty.is_alive());
         match self.pty.is_alive() {
             Ok(alive) => Ok(alive),

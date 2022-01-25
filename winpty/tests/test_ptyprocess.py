@@ -20,12 +20,13 @@ from winpty.ptyprocess import PtyProcess, which
 @pytest.fixture(scope='module', params=['WinPTY', 'ConPTY'])
 def pty_fixture(request):
     backend = request.param
-    if backend == 'ConPTY':
-        os.environ['CI'] = '1'
-        os.environ['CONPTY_CI'] = '1'
-    if backend == 'WinPTY':
-        os.environ.pop('CI', None)
-        os.environ.pop('CONPTY_CI', None)
+    if os.environ.get('CI_RUNNING', None) == '1':
+        if backend == 'ConPTY':
+            os.environ['CI'] = '1'
+            os.environ['CONPTY_CI'] = '1'
+        if backend == 'WinPTY':
+            os.environ.pop('CI', None)
+            os.environ.pop('CONPTY_CI', None)
 
     backend = getattr(Backend, backend)
     def _pty_factory(cmd=None, env=None):

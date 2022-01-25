@@ -16,10 +16,11 @@ CMD = which('cmd').lower()
 
 
 def pty_factory(backend):
-    if backend == Backend.ConPTY:
-        os.environ['CONPTY_CI'] = '1'
-    elif backend == Backend.WinPTY:
-        os.environ.pop('CONPTY_CI', None)
+    if os.environ.get('CI_RUNNING', None) == '1':
+        if backend == Backend.ConPTY:
+            os.environ['CONPTY_CI'] = '1'
+        elif backend == Backend.WinPTY:
+            os.environ.pop('CONPTY_CI', None)
 
     @pytest.fixture(scope='function')
     def pty_fixture():
@@ -38,12 +39,13 @@ winpty_provider = pty_factory(Backend.WinPTY)
 @pytest.fixture(scope='module', params=['WinPTY', 'ConPTY'])
 def pty_fixture(request):
     backend = request.param
-    if backend == 'ConPTY':
-        os.environ['CI'] = '1'
-        os.environ['CONPTY_CI'] = '1'
-    if backend == 'WinPTY':
-        os.environ.pop('CI', None)
-        os.environ.pop('CONPTY_CI', None)
+    if os.environ.get('CI_RUNNING', None) == '1':
+        if backend == 'ConPTY':
+            os.environ['CI'] = '1'
+            os.environ['CONPTY_CI'] = '1'
+        if backend == 'WinPTY':
+            os.environ.pop('CI', None)
+            os.environ.pop('CONPTY_CI', None)
 
     backend = getattr(Backend, backend)
     def _pty_factory():
