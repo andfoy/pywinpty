@@ -1,3 +1,18 @@
+## Version 2.0.1 (2022/01/25)
+
+### Issues Closed
+
+* [Issue 209](https://github.com/spyder-ide/pywinpty/issues/209) - Release v2.0.1
+
+In this release 1 issue was closed.
+
+### Pull Requests Merged
+
+* [PR 208](https://github.com/spyder-ide/pywinpty/pull/208) - PR: Remove .exe and .dll from gitignore when creating wheels, by [@andfoy](https://github.com/andfoy)
+
+In this release 1 pull request was closed.
+
+
 ## Version 2.0.0 (2022/01/25)
 
 ### Issues Closed
