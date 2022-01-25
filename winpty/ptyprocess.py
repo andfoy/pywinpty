@@ -11,7 +11,6 @@ import threading
 import time
 from shutil import which
 
-
 # Local imports
 from .winpty import PTY
 
@@ -47,7 +46,7 @@ class PtyProcess(object):
 
         # Read from the pty in a thread.
         self._thread = threading.Thread(target=_read_in_thread,
-            args=(address, self.pty))
+            args=(address, self.pty, self.read_blocking))
         self._thread.daemon = True
         self._thread.start()
 
@@ -194,8 +193,11 @@ class PtyProcess(object):
             self.flag_eof = True
             raise EOFError('Pty is closed')
 
+        if data == b'0011Ignore':
+            data = ''
+
         err = True
-        while err:
+        while err and data:
             try:
                 data.decode('utf-8')
                 err = False
@@ -328,7 +330,7 @@ class PtyProcess(object):
         self.pty.set_size(cols, rows)
 
 
-def _read_in_thread(address, pty):
+def _read_in_thread(address, pty, blocking):
     """Read data from the pty in a thread.
     """
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -337,8 +339,8 @@ def _read_in_thread(address, pty):
     call = 0
     while 1:
         try:
-            data = pty.read(4096, blocking=True)
-            if data:
+            data = pty.read(4096, blocking=blocking) or b'0011Ignore'
+            if data or not blocking:
                 try:
                     client.send(bytes(data, 'utf-8'))
                 except socket.error:

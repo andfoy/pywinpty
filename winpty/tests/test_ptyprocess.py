@@ -17,7 +17,7 @@ from winpty.enums import Backend
 from winpty.ptyprocess import PtyProcess, which
 
 
-@pytest.fixture(scope='module', params=['ConPTY', 'WinPTY'])
+@pytest.fixture(scope='module', params=['WinPTY', 'ConPTY'])
 def pty_fixture(request):
     backend = request.param
     backend = getattr(Backend, backend)
@@ -27,16 +27,24 @@ def pty_fixture(request):
     return _pty_factory
 
 
+@flaky(max_runs=40, min_passes=1)
 def test_read(pty_fixture):
     pty = pty_fixture()
     loc = os.getcwd()
     data = ''
-    while loc not in data:
-        data += pty.read()
+    tries = 0
+    while loc not in data and tries < 10:
+        try:
+            data += pty.read()
+        except EOFError:
+            pass
+        tries += 1
+    assert loc in data
     pty.terminate()
     time.sleep(2)
 
 
+@flaky(max_runs=40, min_passes=1)
 def test_write(pty_fixture):
     pty = pty_fixture()
 
@@ -44,13 +52,19 @@ def test_write(pty_fixture):
     pty.write(text)
 
     data = ''
-    while text not in data:
-        data += pty.read()
+    tries = 0
+    while text not in data and tries < 10:
+        try:
+            data += pty.read()
+        except EOFError:
+            pass
+        tries += 1
+    assert text in data
     pty.terminate()
 
 
 @pytest.mark.xfail(reason="It fails sometimes due to long strings")
-# @flaky(max_runs=20, min_passes=1)
+@flaky(max_runs=40, min_passes=1)
 def test_isalive(pty_fixture):
     pty = pty_fixture()
 
@@ -69,14 +83,20 @@ def test_isalive(pty_fixture):
     pty.terminate()
 
 
+@flaky(max_runs=40, min_passes=1)
 def test_readline(pty_fixture):
     env = os.environ.copy()
     env['foo'] = 'bar'
     pty = pty_fixture(env=env)
     pty.write('echo %foo%\r\n')
 
-    while 'bar' not in pty.readline():
-        pass
+    data = ''
+    tries = 0
+    while 'bar' not in data and tries < 10:
+        data = pty.readline()
+        tries += 1
+
+    assert 'bar' in data
 
     pty.terminate()
 
