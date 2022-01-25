@@ -27,7 +27,7 @@ class PtyProcess(object):
         self.pid = pty.pid
         # self.fd = pty.fd
 
-        self.read_blocking = bool(os.environ.get('PYWINPTY_BLOCK', 1))
+        self.read_blocking = bool(int(os.environ.get('PYWINPTY_BLOCK', 1)))
         self.closed = False
         self.flag_eof = False
 
