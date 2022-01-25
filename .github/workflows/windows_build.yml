@@ -50,7 +50,7 @@ jobs:
               run: maturin develop
             - name: Run tests
               shell: pwsh
-              run: python runtests.py -s
+              run: python runtests.py
             # Enable this to get RDP access to the worker.
             # - name: Download
             #   # if: ${{ failure() }}
