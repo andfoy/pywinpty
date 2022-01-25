@@ -48,28 +48,28 @@ jobs:
             - name: Build pywinpty
               shell: bash -l {0}
               run: maturin develop
-            # - name: Run tests
-            #   shell: pwsh
-            #   run: python runtests.py
+            - name: Run tests
+              shell: pwsh
+              run: python runtests.py -s
             # Enable this to get RDP access to the worker.
-            - name: Download
-              # if: ${{ failure() }}
-              run: Invoke-WebRequest https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
-            - name: Extract
-              # if: ${{ failure() }}
-              run: Expand-Archive ngrok.zip
-            - name: Auth
-              # if: ${{ failure() }}
-              run: .\ngrok\ngrok.exe authtoken 1raaG4z7gsaCRlLw8cRkUWW6ItF_2LWTUFxXwd6UeeJNAAAci
-            - name: Enable TS
-              # if: ${{ failure() }}
-              run: Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server'-name "fDenyTSConnections" -Value 0
-            - run: Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
-              # if: ${{ failure() }}
-            - run: Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -name "UserAuthentication" -Value 1
-              # if: ${{ failure() }}
-            - run: Set-LocalUser -Name "runneradmin" -Password (ConvertTo-SecureString -AsPlainText "P@ssw0rd!" -Force)
-              # if: ${{ failure() }}
-            - name: Create Tunnel
-              # if: ${{ failure() }}
-              run: .\ngrok\ngrok.exe tcp 3389
+            # - name: Download
+            #   # if: ${{ failure() }}
+            #   run: Invoke-WebRequest https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
+            # - name: Extract
+            #   # if: ${{ failure() }}
+            #   run: Expand-Archive ngrok.zip
+            # - name: Auth
+            #   # if: ${{ failure() }}
+            #   run: .\ngrok\ngrok.exe authtoken 1raaG4z7gsaCRlLw8cRkUWW6ItF_2LWTUFxXwd6UeeJNAAAci
+            # - name: Enable TS
+            #   # if: ${{ failure() }}
+            #   run: Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server'-name "fDenyTSConnections" -Value 0
+            # - run: Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+            #   # if: ${{ failure() }}
+            # - run: Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -name "UserAuthentication" -Value 1
+            #   # if: ${{ failure() }}
+            # - run: Set-LocalUser -Name "runneradmin" -Password (ConvertTo-SecureString -AsPlainText "P@ssw0rd!" -Force)
+            #   # if: ${{ failure() }}
+            # - name: Create Tunnel
+            #   # if: ${{ failure() }}
+            #   run: .\ngrok\ngrok.exe tcp 3389

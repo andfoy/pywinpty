@@ -49,6 +49,7 @@ def test_read(pty_fixture, capsys):
             if time.time() - start_time > 5:
                 break
             readline += pty.read()
+            print('', repr(readline))
     assert loc in readline or 'cmd' in readline
 
 
