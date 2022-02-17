@@ -12,7 +12,7 @@ import traceback
 
 
 def run_pytest(extra_args=None):
-    pytest_args = ['-v', '-x']
+    pytest_args = ['-v', '-x', '-s']
 
     # Allow user to pass a custom test path to pytest to e.g. run just one test
     if extra_args:
