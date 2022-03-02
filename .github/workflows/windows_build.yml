@@ -11,6 +11,7 @@ jobs:
     windows:
         name: Windows Py${{ matrix.PYTHON_VERSION }}
         runs-on: windows-latest
+        timeout-minutes: 10
         env:
             PYTHON_VERSION: ${{ matrix.PYTHON_VERSION }}
             RUNNER_OS: "windows"

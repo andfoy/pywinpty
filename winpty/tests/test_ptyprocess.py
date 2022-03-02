@@ -2,6 +2,7 @@
 """winpty wrapper tests."""
 
 # Standard library imports
+import asyncio
 import os
 import signal
 import time
@@ -15,6 +16,7 @@ from flaky import flaky
 # Local imports
 from winpty.enums import Backend
 from winpty.ptyprocess import PtyProcess, which
+
 
 
 @pytest.fixture(scope='module', params=['WinPTY', 'ConPTY'])
@@ -32,6 +34,7 @@ def pty_fixture(request):
     def _pty_factory(cmd=None, env=None):
         cmd = cmd or 'cmd'
         return PtyProcess.spawn(cmd, env=env, backend=backend)
+    _pty_factory.backend = request.param
     return _pty_factory
 
 
@@ -123,12 +126,16 @@ def test_flush(pty_fixture):
 
 
 def test_intr(pty_fixture):
+    if pty_fixture.backend == 'ConPTY':
+        pytest.xfail('Not supported on ConPTY')
     pty = pty_fixture(cmd=[sys.executable, 'import time; time.sleep(10)'])
     pty.sendintr()
     assert pty.wait() != 0
 
 
 def test_send_control(pty_fixture):
+    if pty_fixture.backend == 'ConPTY':
+        pytest.xfail('Not supported on ConPTY')
     pty = pty_fixture(cmd=[sys.executable, 'import time; time.sleep(10)'])
     pty.sendcontrol('d')
     assert pty.wait() != 0
@@ -136,6 +143,8 @@ def test_send_control(pty_fixture):
 
 @pytest.mark.skipif(which('cat') is None, reason="Requires cat on the PATH")
 def test_send_eof(pty_fixture):
+    if pty_fixture.backend == 'ConPTY':
+        pytest.xfail('Not supported on ConPTY')
     cat = pty_fixture('cat')
     cat.sendeof()
     assert cat.wait() == 0
@@ -149,6 +158,8 @@ def test_isatty(pty_fixture):
 
 
 def test_wait(pty_fixture):
+    if pty_fixture.backend == 'ConPTY':
+        pytest.xfail('Not supported on ConPTY')
     pty = pty_fixture(cmd=[sys.executable, '--version'])
     assert pty.wait() == 0
 
@@ -160,11 +171,79 @@ def test_exit_status(pty_fixture):
     assert pty.exitstatus == 1
 
 
-def test_kill(pty_fixture):
+@pytest.mark.timeout(30)
+def test_kill_sigterm(pty_fixture):
     pty = pty_fixture()
+    pty.write('echo \"foo\"\r\nsleep 1000\r\n')
+    pty.read()
     pty.kill(signal.SIGTERM)
+
+    while True:
+        try:
+            pty.read()
+        except EOFError:
+            break
+
     assert not pty.isalive()
     assert pty.exitstatus == signal.SIGTERM
+
+
+@pytest.mark.timeout(30)
+def test_terminate(pty_fixture):
+    pty = pty_fixture()
+    pty.write('echo \"foo\"\r\nsleep 1000\r\n')
+    pty.read()
+    pty.terminate()
+
+    while True:
+        try:
+            pty.read()
+        except EOFError:
+            break
+
+    assert not pty.isalive()
+
+
+@pytest.mark.timeout(30)
+def test_terminate_force(pty_fixture):
+    pty = pty_fixture()
+    pty.write('echo \"foo\"\r\nsleep 1000\r\n')
+    pty.read()
+    pty.terminate(force=True)
+
+    while True:
+        try:
+            pty.read()
+        except EOFError:
+            break
+
+    assert not pty.isalive()
+
+
+def test_terminate_loop(pty_fixture):
+    if pty_fixture.backend == 'ConPTY':
+        pytest.xfail('Not supported on ConPTY')
+    pty = pty_fixture()
+    loop = asyncio.SelectorEventLoop()
+    asyncio.set_event_loop(loop)
+
+    def reader():
+        try:
+            data = pty.read()
+        except EOFError:
+            loop.remove_reader(pty.fd)
+            loop.stop()
+
+    loop.add_reader(pty.fd, reader)
+    loop.call_soon(pty.write, 'echo \"foo\"\r\nsleep 1000\r\n')
+    loop.call_soon(pty.terminate, True)
+
+    try:
+        loop.run_forever()
+    finally:
+        loop.close()
+
+    assert not pty.isalive()
 
 
 def test_getwinsize(pty_fixture):
