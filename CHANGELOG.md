@@ -1,3 +1,20 @@
+## Version 2.0.3 (2022/03/02)
+
+### Issues Closed
+
+* [Issue 216](https://github.com/spyder-ide/pywinpty/issues/216) - Release v2.0.3
+
+In this release 1 issue was closed.
+
+### Pull Requests Merged
+
+* [PR 215](https://github.com/spyder-ide/pywinpty/pull/215) - Bump actions/checkout from 2 to 3, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 214](https://github.com/spyder-ide/pywinpty/pull/214) - Update pyo3 requirement from 0.15.0 to 0.16.0, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 213](https://github.com/spyder-ide/pywinpty/pull/213) - PR: Add test that terminate causes EOFError, by [@blink1073](https://github.com/blink1073)
+
+In this release 3 pull requests were closed.
+
+
 ## Version 2.0.2 (2022/02/03)
 
 ### Issues Closed
