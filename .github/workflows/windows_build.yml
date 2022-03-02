@@ -46,13 +46,13 @@ jobs:
               run: conda install -y winpty
             - name: Install build/test dependencies
               shell: bash -l {0}
-              run: pip install maturin toml "pytest<7" pytest-lazy-fixture flaky
+              run: pip install maturin toml pytest pytest-lazy-fixture flaky
             - name: Build pywinpty
               shell: bash -l {0}
               run: maturin develop
             - name: Run tests
               shell: pwsh
-              run: python -m pytest -v -x -s
+              run: python runtests.py
             # Enable this to get RDP access to the worker.
             # - name: Download
             #   # if: ${{ failure() }}

@@ -34,6 +34,7 @@ def pty_fixture(request):
     def _pty_factory(cmd=None, env=None):
         cmd = cmd or 'cmd'
         return PtyProcess.spawn(cmd, env=env, backend=backend)
+    _pty_factory.backend = request.param
     return _pty_factory
 
 
@@ -125,12 +126,16 @@ def test_flush(pty_fixture):
 
 
 def test_intr(pty_fixture):
+    if pty_fixture.backend == 'ConPTY':
+        pytest.xfail('Not supported on ConPTY')
     pty = pty_fixture(cmd=[sys.executable, 'import time; time.sleep(10)'])
     pty.sendintr()
     assert pty.wait() != 0
 
 
 def test_send_control(pty_fixture):
+    if pty_fixture.backend == 'ConPTY':
+        pytest.xfail('Not supported on ConPTY')
     pty = pty_fixture(cmd=[sys.executable, 'import time; time.sleep(10)'])
     pty.sendcontrol('d')
     assert pty.wait() != 0
@@ -138,6 +143,8 @@ def test_send_control(pty_fixture):
 
 @pytest.mark.skipif(which('cat') is None, reason="Requires cat on the PATH")
 def test_send_eof(pty_fixture):
+    if pty_fixture.backend == 'ConPTY':
+        pytest.xfail('Not supported on ConPTY')
     cat = pty_fixture('cat')
     cat.sendeof()
     assert cat.wait() == 0
@@ -151,6 +158,8 @@ def test_isatty(pty_fixture):
 
 
 def test_wait(pty_fixture):
+    if pty_fixture.backend == 'ConPTY':
+        pytest.xfail('Not supported on ConPTY')
     pty = pty_fixture(cmd=[sys.executable, '--version'])
     assert pty.wait() == 0
 
@@ -212,6 +221,8 @@ def test_terminate_force(pty_fixture):
 
 
 def test_terminate_loop(pty_fixture):
+    if pty_fixture.backend == 'ConPTY':
+        pytest.xfail('Not supported on ConPTY')
     pty = pty_fixture()
     loop = asyncio.SelectorEventLoop()
     asyncio.set_event_loop(loop)
