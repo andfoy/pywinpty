@@ -14,7 +14,7 @@ name = "winpty"
 crate-type = ["cdylib"]
 
 [dependencies]
-winpty-rs = "0.3.3"
+winpty-rs = "0.3.4"
 
 [dependencies.pyo3]
 version = "0.16.0"
