@@ -15,7 +15,7 @@ jobs:
         env:
             PYTHON_VERSION: ${{ matrix.PYTHON_VERSION }}
             RUNNER_OS: "windows"
-            PYWINPTY_BLOCK: "0"
+            PYWINPTY_BLOCK: "1"
             CI_RUNNING: "1"
         strategy:
             fail-fast: false
