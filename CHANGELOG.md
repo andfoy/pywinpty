@@ -1,3 +1,20 @@
+## Version 2.0.4 (2022/03/03)
+
+### Issues Closed
+
+* [Issue 220](https://github.com/spyder-ide/pywinpty/issues/220) - Release v2.0.4
+* [Issue 218](https://github.com/spyder-ide/pywinpty/issues/218) - Build failure on windows py3.6 ([PR 219](https://github.com/spyder-ide/pywinpty/pull/219) by [@andfoy](https://github.com/andfoy))
+* [Issue 217](https://github.com/spyder-ide/pywinpty/issues/217) - ConPTY is not fully working in CI ([PR 219](https://github.com/spyder-ide/pywinpty/pull/219) by [@andfoy](https://github.com/andfoy))
+
+In this release 3 issues were closed.
+
+### Pull Requests Merged
+
+* [PR 219](https://github.com/spyder-ide/pywinpty/pull/219) - PR: Update winpty-rs to v0.3.4, by [@andfoy](https://github.com/andfoy) ([218](https://github.com/spyder-ide/pywinpty/issues/218), [217](https://github.com/spyder-ide/pywinpty/issues/217))
+
+In this release 1 pull request was closed.
+
+
 ## Version 2.0.3 (2022/03/02)
 
 ### Issues Closed
