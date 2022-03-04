@@ -111,10 +111,10 @@ cywinpty.c
 *.orig
 
 # Added by cargo
-
 /target
-Cargo.lock
+# Cargo.lock
 
 # Visual Studio files
 .vs/
+.vscode/
 CppProperties.json
