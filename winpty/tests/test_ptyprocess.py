@@ -102,7 +102,7 @@ def test_readline(pty_fixture):
     pty = pty_fixture(env=env)
 
     # Ensure that the echo print has its own CRLF
-    # pty.write('cls\r\n')
+    pty.write('cls\r\n')
     pty.write('echo %foo%\r\n')
 
     data = ''
