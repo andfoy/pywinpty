@@ -186,7 +186,7 @@ dependencies = [
 
 [[package]]
 name = "pywinpty"
-version = "2.0.5"
+version = "2.1.0-dev0"
 dependencies = [
  "pyo3",
  "winpty-rs",
