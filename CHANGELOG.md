@@ -1,3 +1,18 @@
+## Version 2.0.5 (2022/03/04)
+
+### Issues Closed
+
+* [Issue 227](https://github.com/spyder-ide/pywinpty/issues/227) - Release v2.0.5
+
+In this release 1 issue was closed.
+
+### Pull Requests Merged
+
+* [PR 226](https://github.com/spyder-ide/pywinpty/pull/226) - PR: Update winpty-rs to v0.3.6, by [@andfoy](https://github.com/andfoy)
+
+In this release 1 pull request was closed.
+
+
 ## Version 2.0.4 (2022/03/03)
 
 ### Issues Closed
