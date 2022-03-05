@@ -197,6 +197,7 @@ def test_terminate(pty_fixture):
             break
 
     assert not pty.isalive()
+    assert pty.closed
 
 
 @pytest.mark.timeout(30)
@@ -213,6 +214,7 @@ def test_terminate_force(pty_fixture):
             break
 
     assert not pty.isalive()
+    assert pty.closed
 
 
 def test_terminate_loop(pty_fixture):
@@ -237,6 +239,7 @@ def test_terminate_loop(pty_fixture):
         loop.close()
 
     assert not pty.isalive()
+    assert pty.closed
 
 
 def test_getwinsize(pty_fixture):
