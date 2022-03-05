@@ -262,7 +262,9 @@ class PtyProcess(object):
         exitstatus or signalstatus of the child. This returns True if the child
         process appears to be running or False if not.
         """
-        return self.pty.isalive()
+        alive = self.pty.isalive()
+        self.closed = not alive
+        return alive
 
     def kill(self, sig=None):
         """Kill the process with the given signal.
