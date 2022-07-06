@@ -1,3 +1,20 @@
+## Version 2.0.6 (2022/07/06)
+
+### Issues Closed
+
+* [Issue 253](https://github.com/spyder-ide/pywinpty/issues/253) - Release v2.0.6
+
+In this release 1 issue was closed.
+
+### Pull Requests Merged
+
+* [PR 252](https://github.com/spyder-ide/pywinpty/pull/252) - PR: Update dependencies to latest versions, by [@andfoy](https://github.com/andfoy)
+* [PR 233](https://github.com/spyder-ide/pywinpty/pull/233) - Bump pyo3 from 0.16.1 to 0.16.2, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 229](https://github.com/spyder-ide/pywinpty/pull/229) - Bump pyo3 from 0.16.0 to 0.16.1, by [@dependabot[bot]](https://github.com/apps/dependabot)
+
+In this release 3 pull requests were closed.
+
+
 ## Version 2.0.5 (2022/03/04)
 
 ### Issues Closed
