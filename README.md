@@ -5,12 +5,11 @@
 [![conda version](https://img.shields.io/conda/vn/conda-forge/pywinpty.svg)](https://www.anaconda.com/download/)
 [![download count](https://img.shields.io/conda/dn/conda-forge/pywinpty.svg)](https://www.anaconda.com/download/)
 [![Downloads](https://pepy.tech/badge/pywinpty)](https://pepy.tech/project/pywinpty)
-[![OpenCollective Backers](https://opencollective.com/spyder/backers/badge.svg?color=blue)](#backers)
-[![Join the chat at https://gitter.im/spyder-ide/public](https://badges.gitter.im/spyder-ide/spyder.svg)](https://gitter.im/spyder-ide/public)<br>
 [![PyPI status](https://img.shields.io/pypi/status/pywinpty.svg)](https://github.com/spyder-ide/pywinpty)
-[![Windows tests](https://github.com/spyder-ide/pywinpty/actions/workflows/windows_build.yml/badge.svg)](https://github.com/spyder-ide/pywinpty/actions/workflows/windows_build.yml)
+[![Windows tests](https://github.com/andfoy/pywinpty/actions/workflows/windows_build.yml/badge.svg)](https://github.com/andfoy/pywinpty/actions/workflows/windows_build.yml)
 
-*Copyright © 2017– Spyder Project Contributors*
+*Copyright © 2017–2022 Spyder Project Contributors*
+*Copyright © 2022– Edgar Andrés Margffoy Tuay*
 
 
 ## Overview
@@ -130,17 +129,3 @@ Visit our [CHANGELOG](CHANGELOG.md) file to learn more about our new features an
 
 ## Contribution guidelines
 We follow PEP8 and PEP257 for pure python packages and Rust to compile extensions. We use MyPy type annotations for all functions and classes declared on this package. Feel free to send a PR or create an issue if you have any problem/question.
-
-
-## Backers
-
-Support us with a monthly donation and help us continue our activities.
-
-[![Backers](https://opencollective.com/spyder/backers.svg)](https://opencollective.com/spyder#support)
-
-
-## Sponsors
-
-Become a sponsor to get your logo on our README on Github.
-
-[![Sponsors](https://opencollective.com/spyder/sponsors.svg)](https://opencollective.com/spyder#support)
