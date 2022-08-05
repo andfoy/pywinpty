@@ -1,3 +1,29 @@
+## Version 2.0.7 (2022/08/05)
+
+### Issues Closed
+
+* [Issue 266](https://github.com/andfoy/pywinpty/issues/266) - Release v2.0.7
+
+In this release 1 issue was closed.
+
+### Pull Requests Merged
+
+* [PR 265](https://github.com/andfoy/pywinpty/pull/265) - Bump unicode-ident from 1.0.2 to 1.0.3, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 264](https://github.com/andfoy/pywinpty/pull/264) - Bump quote from 1.0.20 to 1.0.21, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 263](https://github.com/andfoy/pywinpty/pull/263) - Bump libc from 0.2.126 to 0.2.127, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 262](https://github.com/andfoy/pywinpty/pull/262) - Bump syn from 1.0.98 to 1.0.99, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 261](https://github.com/andfoy/pywinpty/pull/261) - Bump proc-macro2 from 1.0.42 to 1.0.43, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 260](https://github.com/andfoy/pywinpty/pull/260) - Bump unindent from 0.1.9 to 0.1.10, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 259](https://github.com/andfoy/pywinpty/pull/259) - Bump indoc from 1.0.6 to 1.0.7, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 258](https://github.com/andfoy/pywinpty/pull/258) - Bump redox_syscall from 0.2.15 to 0.2.16, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 257](https://github.com/andfoy/pywinpty/pull/257) - Bump proc-macro2 from 1.0.40 to 1.0.42, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 256](https://github.com/andfoy/pywinpty/pull/256) - Bump redox_syscall from 0.2.13 to 0.2.15, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 255](https://github.com/andfoy/pywinpty/pull/255) - Bump winpty-rs from 0.3.7 to 0.3.8, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 254](https://github.com/andfoy/pywinpty/pull/254) - Bump unicode-ident from 1.0.1 to 1.0.2, by [@dependabot[bot]](https://github.com/apps/dependabot)
+
+In this release 12 pull requests were closed.
+
+
 ## Version 2.0.6 (2022/07/06)
 
 ### Issues Closed
