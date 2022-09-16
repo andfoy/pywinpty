@@ -1,3 +1,26 @@
+## Version 2.0.8 (2022/09/15)
+
+### Issues Closed
+
+* [Issue 281](https://github.com/andfoy/pywinpty/issues/281) - Release v2.0.8
+
+In this release 1 issue was closed.
+
+### Pull Requests Merged
+
+* [PR 280](https://github.com/andfoy/pywinpty/pull/280) - Bump unicode-ident from 1.0.3 to 1.0.4, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 279](https://github.com/andfoy/pywinpty/pull/279) - Bump once_cell from 1.13.1 to 1.14.0, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 278](https://github.com/andfoy/pywinpty/pull/278) - Bump which from 4.2.5 to 4.3.0, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 277](https://github.com/andfoy/pywinpty/pull/277) - Bump pyo3 from 0.17.0 to 0.17.1, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 276](https://github.com/andfoy/pywinpty/pull/276) - Bump lock_api from 0.4.7 to 0.4.8, by [@dependabot[bot]](https://github.com/apps/dependabot) ([](https://github.com/bounds</issues/))
+* [PR 273](https://github.com/andfoy/pywinpty/pull/273) - Bump pyo3 from 0.16.5 to 0.17.0, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 272](https://github.com/andfoy/pywinpty/pull/272) - Bump either from 1.7.0 to 1.8.0, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 271](https://github.com/andfoy/pywinpty/pull/271) - Bump libc from 0.2.127 to 0.2.132, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 270](https://github.com/andfoy/pywinpty/pull/270) - Bump once_cell from 1.13.0 to 1.13.1, by [@dependabot[bot]](https://github.com/apps/dependabot)
+
+In this release 9 pull requests were closed.
+
+
 ## Version 2.0.7 (2022/08/05)
 
 ### Issues Closed
