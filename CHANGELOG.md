@@ -1,3 +1,20 @@
+## Version 2.0.9 (2022/10/26)
+
+
+### Pull Requests Merged
+
+* [PR 296](https://github.com/andfoy/pywinpty/pull/296) - Enable Python 3.11 support, by [@andfoy](https://github.com/andfoy) ([295](https://github.com/andfoy/pywinpty/issues/295))
+* [PR 294](https://github.com/andfoy/pywinpty/pull/294) - Bump libc from 0.2.133 to 0.2.137, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 292](https://github.com/andfoy/pywinpty/pull/292) - Bump proc-macro2 from 1.0.43 to 1.0.47, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 288](https://github.com/andfoy/pywinpty/pull/288) - Bump syn from 1.0.100 to 1.0.101, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 286](https://github.com/andfoy/pywinpty/pull/286) - Bump once_cell from 1.14.0 to 1.15.0, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 285](https://github.com/andfoy/pywinpty/pull/285) - Bump winpty-rs from 0.3.8 to 0.3.9, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 283](https://github.com/andfoy/pywinpty/pull/283) - Bump libc from 0.2.132 to 0.2.133, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 282](https://github.com/andfoy/pywinpty/pull/282) - Bump syn from 1.0.99 to 1.0.100, by [@dependabot[bot]](https://github.com/apps/dependabot)
+
+In this release 8 pull requests were closed.
+
+
 ## Version 2.0.8 (2022/09/15)
 
 ### Issues Closed
