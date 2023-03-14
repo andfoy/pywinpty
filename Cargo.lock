@@ -177,7 +177,7 @@ dependencies = [
 
 [[package]]
 name = "pywinpty"
-version = "2.1.0-dev0"
+version = "2.1.0-dev"
 dependencies = [
  "pyo3",
  "winpty-rs",
@@ -309,9 +309,9 @@ checksum = "84c12f65daa39dd2babe6e442988fc329d6243fdce47d7d2d155b8d874862246"
 
 [[package]]
 name = "windows_x86_64_gnu"
-version = "0.42.0"
+version = "0.42.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bf7b1b21b5362cbc318f686150e5bcea75ecedc74dd157d874d754a2ca44b0ed"
+checksum = "8de912b8b8feb55c064867cf047dda097f92d51efad5b491dfb98f6bbb70cb36"
 
 [[package]]
 name = "windows_x86_64_gnullvm"
