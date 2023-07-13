@@ -282,7 +282,7 @@ class PtyProcess(object):
         a = ord(char)
         if 97 <= a <= 122:
             a = a - ord('a') + 1
-            byte = str(bytes([a]))
+            byte = bytes([a]).decode("ascii")
             return self.pty.write(byte), byte
         d = {'@': 0, '`': 0,
             '[': 27, '{': 27,
@@ -294,7 +294,7 @@ class PtyProcess(object):
         if char not in d:
             return 0, ''
 
-        byte = str(bytes([d[char]]))
+        byte = bytes([d[char]]).decode("ascii")
         return self.pty.write(byte), byte
 
     def sendeof(self):
