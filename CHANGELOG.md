@@ -1,3 +1,14 @@
+## Version 2.0.11 (2023/07/14)
+
+
+### Pull Requests Merged
+
+* [PR 333](https://github.com/andfoy/pywinpty/pull/333) - Update winpty-rs and PyO3 to the latest versions, by [@andfoy](https://github.com/andfoy)
+* [PR 332](https://github.com/andfoy/pywinpty/pull/332) - Fix an encoding issue in sendcontrol, by [@ddddhm1234](https://github.com/ddddhm1234)
+
+In this release 2 pull requests were closed.
+
+
 ## Version 2.0.10 (2023/01/02)
 
 ### Issues Closed
