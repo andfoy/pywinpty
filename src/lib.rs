@@ -67,12 +67,14 @@ struct PyPTY {
 #[pymethods]
 impl PyPTY {
     #[new]
-    #[args(
-        backend = "None",
-        mouse_mode = "0",
-        timeout = "30000",
-        agent_config = "4"
-    )]
+    #[pyo3(signature = (
+        cols,
+        rows,
+        backend = None,
+        mouse_mode = 0,
+        timeout = 30000,
+        agent_config = 4
+    ))]
     fn new(
         cols: i32,
         rows: i32,
@@ -146,7 +148,7 @@ impl PyPTY {
     /// For a more detailed information about the values of the arguments, see:
     /// https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-createprocessw
     ///
-    #[args(cmdline = "None", cwd = "None", env = "None")]
+    #[pyo3(signature = (appname, cmdline = None, cwd = None, env = None))]
     fn spawn(
         &mut self,
         appname: OsString,
@@ -226,7 +228,7 @@ impl PyPTY {
     /// this call may block your application, which only can be interrupted by killing the
     /// process.
     ///
-    #[args(length = "1000", blocking = "false")]
+    #[pyo3(signature = (length = 1000, blocking = false))]
     fn read<'p>(&self, length: u32, blocking: bool, py: Python<'p>) -> PyResult<OsString> {
         // let result = self.pty.read(length, blocking);
         let result: Result<OsString, OsString> =

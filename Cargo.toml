@@ -14,15 +14,12 @@ name = "winpty"
 crate-type = ["cdylib"]
 
 [dependencies]
-winpty-rs = "0.3.11"
+winpty-rs = "0.3.12"
 
 [dependencies.pyo3]
-version = "0.17.3"
+version = "0.19.1"
 features = ["extension-module"]
 
 [package.metadata.docs.rs]
 default-target = "x86_64-pc-windows-msvc"
 targets = ["x86_64-pc-windows-msvc"]
-
-[package.metadata.maturin]
-requires-python = ">=3.6"
