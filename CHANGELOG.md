@@ -1,3 +1,15 @@
+## Version 2.0.12 (2023/10/06)
+
+
+### Pull Requests Merged
+
+* [PR 360](https://github.com/andfoy/pywinpty/pull/360) - Update core dependencies, by [@andfoy](https://github.com/andfoy) ([345](https://github.com/andfoy/pywinpty/issues/345))
+* [PR 359](https://github.com/andfoy/pywinpty/pull/359) - Enable Python 3.12 support, by [@albertopasqualetto](https://github.com/albertopasqualetto)
+* [PR 358](https://github.com/andfoy/pywinpty/pull/358) - Bump actions/checkout from 3 to 4, by [@dependabot[bot]](https://github.com/apps/dependabot)
+
+In this release 3 pull requests were closed.
+
+
 ## Version 2.0.11 (2023/07/14)
 
 
