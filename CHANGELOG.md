@@ -1,3 +1,30 @@
+## Version 2.0.13 (2024/02/26)
+
+
+### Pull Requests Merged
+
+* [PR 399](https://github.com/andfoy/pywinpty/pull/399) - Bump target-lexicon from 0.12.13 to 0.12.14, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 398](https://github.com/andfoy/pywinpty/pull/398) - Bump winpty-rs from 0.3.14 to 0.3.15, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 397](https://github.com/andfoy/pywinpty/pull/397) - Bump syn from 2.0.43 to 2.0.50, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 396](https://github.com/andfoy/pywinpty/pull/396) - Remove pytest-lazy-fixture from test dependencies, by [@andfoy](https://github.com/andfoy)
+* [PR 395](https://github.com/andfoy/pywinpty/pull/395) - Bump rustix from 0.38.30 to 0.38.31, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 393](https://github.com/andfoy/pywinpty/pull/393) - Bump once_cell from 1.18.0 to 1.19.0, by [@dependabot[bot]](https://github.com/apps/dependabot) ([](https://github.com/CI</issues/), [](https://github.com/CI</issues/), [](https://github.com/CI</issues/))
+* [PR 392](https://github.com/andfoy/pywinpty/pull/392) - Bump smallvec from 1.11.1 to 1.13.1, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 390](https://github.com/andfoy/pywinpty/pull/390) - Bump parking_lot_core from 0.9.8 to 0.9.9, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 388](https://github.com/andfoy/pywinpty/pull/388) - Bump target-lexicon from 0.12.11 to 0.12.13, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 387](https://github.com/andfoy/pywinpty/pull/387) - Bump winpty-rs from 0.3.13 to 0.3.14, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 386](https://github.com/andfoy/pywinpty/pull/386) - Bump pyo3 from 0.19.2 to 0.20.2, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 385](https://github.com/andfoy/pywinpty/pull/385) - Bump proc-macro2 from 1.0.68 to 1.0.78, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 384](https://github.com/andfoy/pywinpty/pull/384) - Bump linux-raw-sys from 0.4.8 to 0.4.13, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 375](https://github.com/andfoy/pywinpty/pull/375) - Bump conda-incubator/setup-miniconda from 2 to 3, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 374](https://github.com/andfoy/pywinpty/pull/374) - Bump errno from 0.3.4 to 0.3.8, by [@dependabot[bot]](https://github.com/apps/dependabot) ([](https://github.com/<code>to_string()</issues/))
+* [PR 369](https://github.com/andfoy/pywinpty/pull/369) - Bump lock_api from 0.4.10 to 0.4.11, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 368](https://github.com/andfoy/pywinpty/pull/368) - Bump rustix from 0.38.17 to 0.38.21, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 362](https://github.com/andfoy/pywinpty/pull/362) - Bump num-traits from 0.2.16 to 0.2.17, by [@dependabot[bot]](https://github.com/apps/dependabot)
+
+In this release 18 pull requests were closed.
+
+
 ## Version 2.0.12 (2023/10/06)
 
 
