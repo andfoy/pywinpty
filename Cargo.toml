@@ -17,7 +17,7 @@ crate-type = ["cdylib"]
 winpty-rs = "0.3.15"
 
 [dependencies.pyo3]
-version = "0.20.2"
+version = "0.20.3"
 features = ["extension-module"]
 
 [package.metadata.docs.rs]
