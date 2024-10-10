@@ -366,9 +366,9 @@ impl PyPTY {
 }
 
 #[pymodule]
-fn winpty(py: Python, m: &PyModule) -> PyResult<()> {
+fn winpty(py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add("__version__", VERSION)?;
-    m.add("WinptyError", py.get_type::<WinptyError>())?;
+    m.add("WinptyError", py.get_type_bound::<WinptyError>())?;
     m.add_class::<PyPTY>()?;
     Ok(())
 }
