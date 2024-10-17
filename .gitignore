@@ -45,6 +45,7 @@ nosetests.xml
 coverage.xml
 *.cover
 .hypothesis/
+.pytest_cache/
 
 # Translations
 *.mo
@@ -118,3 +119,6 @@ cywinpty.c
 .vs/
 .vscode/
 CppProperties.json
+
+# Debug VS files
+*.sln
