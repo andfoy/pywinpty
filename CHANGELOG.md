@@ -1,3 +1,14 @@
+## Version 2.0.14 (2024/10/17)
+
+
+### Pull Requests Merged
+
+* [PR 453](https://github.com/andfoy/pywinpty/pull/453) - Update PyO3 to 0.22.3 and winpty-rs to 0.4.0, by [@andfoy](https://github.com/andfoy)
+* [PR 452](https://github.com/andfoy/pywinpty/pull/452) - Add support for Python 3.13, by [@andfoy](https://github.com/andfoy) ([451](https://github.com/andfoy/pywinpty/issues/451))
+
+In this release 2 pull requests were closed.
+
+
 ## Version 2.0.13 (2024/02/26)
 
 
