@@ -48,6 +48,7 @@ jobs:
             - name: Install miniconda
               uses: conda-incubator/setup-miniconda@v3
               with:
+                mamba-version: "*"
                 auto-update-conda: true
                 activate-environment: test
                 channels: ${{ env.CONDA_CHANNELS }}
