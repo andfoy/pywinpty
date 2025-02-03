@@ -34,6 +34,7 @@ jobs:
             - name: Setup conda channels
               env:
                 PYTHON_VERSION: ${{ matrix.PYTHON_VERSION }}
+              shell: bash -l {0}
               run: |
                 PYTHON_VERSION_NONSUFFIX=$PYTHON_VERSION
                 CONDA_CHANNELS="conda-forge,defaults"
