@@ -37,22 +37,26 @@ jobs:
               shell: bash -l {0}
               run: |
                 PYTHON_VERSION_NONSUFFIX=$PYTHON_VERSION
-                CONDA_CHANNELS="conda-forge"
+                # CONDA_CHANNELS="conda-forge"
                 if [[ $PYTHON_VERSION = *t ]]; then
                   PYTHON_VERSION_NONSUFFIX=${PYTHON_VERSION//t}
                   echo "PYTHON_VERSION_NONSUFFIX=$PYTHON_VERSION_NONSUFFIX" >> $GITHUB_ENV
-                  CONDA_CHANNELS="conda-forge,python-freethreading"
+                  # CONDA_CHANNELS="conda-forge,python-freethreading"
                 fi
                 echo "PYTHON_VERSION_NONSUFFIX=$PYTHON_VERSION_NONSUFFIX" >> $GITHUB_ENV
                 echo "CONDA_CHANNELS=$CONDA_CHANNELS" >> $GITHUB_ENV
             - name: Install miniconda
               uses: conda-incubator/setup-miniconda@v3
               with:
-                mamba-version: "*"
                 auto-update-conda: true
                 activate-environment: test
-                channels: ${{ env.CONDA_CHANNELS }}
+                channels: conda-forge,defaults
                 python-version: ${{ env.PYTHON_VERSION_NONSUFFIX }}
+            - name: Reinstall free-threaded Python
+              if: ${{ endsWith(matrix.PYTHON_VERSION, 't') }}
+              shell: bash -l {0}
+              run: |
+                conda install python=$PYTHON_VERSION_NONSUFFIX --override-channels -c conda-forge python-freethreading
             - name: Conda env info
               shell: bash -l {0}
               run: conda env list
