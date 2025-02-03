@@ -46,7 +46,6 @@ jobs:
                 echo "PYTHON_VERSION_NONSUFFIX=$PYTHON_VERSION_NONSUFFIX" >> $GITHUB_ENV
                 echo "CONDA_CHANNELS=$CONDA_CHANNELS" >> $GITHUB_ENV
             - name: Install miniconda
-              if: ${{ !endsWith(matrix.PYTHON_VERSION, 't') }}
               uses: conda-incubator/setup-miniconda@v3
               with:
                 auto-update-conda: true
