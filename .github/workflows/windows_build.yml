@@ -20,7 +20,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                PYTHON_VERSION: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+                PYTHON_VERSION: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.13t"]
         steps:
             - name: Checkout branch
               uses: actions/checkout@v4
@@ -31,13 +31,27 @@ jobs:
                 target: x86_64-pc-windows-msvc
                 override: true
                 components: rustfmt, clippy
+            - name: Setup conda channels
+              env:
+                PYTHON_VERSION: ${{ matrix.PYTHON_VERSION }}
+              run: |
+                PYTHON_VERSION_NONSUFFIX=$PYTHON_VERSION
+                CONDA_CHANNELS="conda-forge,defaults"
+                if [[ $PYTHON_VERSION = *t ]]; then
+                  PYTHON_VERSION_NONSUFFIX=${PYTHON_VERSION//t}
+                  echo "PYTHON_VERSION_NONSUFFIX=$PYTHON_VERSION_NONSUFFIX" >> $GITHUB_ENV
+                  CONDA_CHANNELS="python-freethreading,$CONDA_CHANNELS"
+                fi
+                echo "PYTHON_VERSION_NONSUFFIX=$PYTHON_VERSION_NONSUFFIX" >> $GITHUB_ENV
+                echo "CONDA_CHANNELS=$CONDA_CHANNELS" >> $GITHUB_ENV
             - name: Install miniconda
+              if: ${{ !endsWith(matrix.PYTHON_VERSION, 't') }}
               uses: conda-incubator/setup-miniconda@v3
               with:
                 auto-update-conda: true
                 activate-environment: test
-                channels: conda-forge,defaults
-                python-version: ${{ matrix.PYTHON_VERSION }}
+                channels: ${{ env.CONDA_CHANNELS }}
+                python-version: ${{ env.PYTHON_VERSION_NONSUFFIX }}
             - name: Conda env info
               shell: bash -l {0}
               run: conda env list
