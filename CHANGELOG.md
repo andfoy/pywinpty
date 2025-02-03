@@ -1,3 +1,14 @@
+## Version 2.0.15 (2025/02/03)
+
+
+### Pull Requests Merged
+
+* [PR 492](https://github.com/andfoy/pywinpty/pull/492) - Add version to pyproject.toml, by [@finnagin](https://github.com/finnagin)
+* [PR 488](https://github.com/andfoy/pywinpty/pull/488) - Bump pyo3 from 0.22.5 to 0.23.4, by [@dependabot[bot]](https://github.com/apps/dependabot) ([491](https://github.com/andfoy/pywinpty/issues/491), [](https://github.com/<code>/issues/))
+
+In this release 2 pull requests were closed.
+
+
 ## Version 2.0.14 (2024/10/17)
 
 
