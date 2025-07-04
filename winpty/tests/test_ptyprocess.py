@@ -34,6 +34,7 @@ def pty_fixture(request):
     def _pty_factory(cmd=None, env=None):
         cmd = cmd or 'cmd'
         return PtyProcess.spawn(cmd, env=env, backend=backend)
+    # time.sleep(10)
     _pty_factory.backend = request.param
     return _pty_factory
 
@@ -78,6 +79,7 @@ def test_write(pty_fixture):
 @flaky(max_runs=40, min_passes=1)
 def test_isalive(pty_fixture):
     pty = pty_fixture()
+    time.sleep(4)
 
     pty.write('echo \"foo\"\r\nexit\r\n')
     data = ''

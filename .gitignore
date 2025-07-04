@@ -107,6 +107,7 @@ cywinpty.c
 # Winpty binaries
 *.exe
 *.dll
+*.lib
 
 # Git giles
 *.orig

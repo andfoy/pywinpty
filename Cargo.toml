@@ -14,10 +14,10 @@ name = "winpty"
 crate-type = ["cdylib"]
 
 [dependencies]
-winpty-rs = "0.4"
+winpty-rs = { path = "../winpty-rs" }
 
 [dependencies.pyo3]
-version = "0.23.4"
+version = "0.25.1"
 features = ["extension-module"]
 
 [package.metadata.docs.rs]
