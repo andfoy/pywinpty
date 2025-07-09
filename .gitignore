@@ -123,3 +123,6 @@ CppProperties.json
 
 # Debug VS files
 *.sln
+
+# NuGet ConPTY package
+Microsoft.Windows.Console.ConPTY*/

@@ -26,6 +26,9 @@ jobs:
                 target: x86_64-pc-windows-msvc
                 override: true
                 components: rustfmt, clippy
+            - uses: nuget/setup-nuget@v2
+              with:
+                nuget-version: '5.x'
             - name: Remove free-threaded suffix from version
               env:
                 PYTHON_VERSION: ${{ matrix.PYTHON_VERSION }}

@@ -13,8 +13,12 @@ edition = "2021"
 name = "winpty"
 crate-type = ["cdylib"]
 
+[build-dependencies]
+glob = "0.3.2"
+
 [dependencies]
-winpty-rs = { path = "../winpty-rs" }
+# winpty-rs = { path = "../winpty-rs" }
+winpty-rs = { git = "https://github.com/andfoy/winpty-rs", branch = "overlapped_io_support"}
 
 [dependencies.pyo3]
 version = "0.25.1"
