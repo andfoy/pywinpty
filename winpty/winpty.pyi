@@ -8,6 +8,10 @@ from typing import Optional
 # Local imports
 from .enums import Backend, Encoding, MouseMode, AgentConfig
 
+__version__: str
+
+class WinptyError(Exception):
+    ...
 
 class PTY:
     def __init__(self, cols: int, rows: int,
@@ -19,25 +23,25 @@ class PTY:
         ...
 
     def spawn(self,
-              appname: bytes,
-              cmdline: Optional[bytes] = None,
-              cwd: Optional[bytes] = None,
-              env: Optional[bytes] = None) -> bool:
+              appname: str,
+              cmdline: Optional[str] = None,
+              cwd: Optional[str] = None,
+              env: Optional[str] = None) -> bool:
         ...
 
     def set_size(self, cols: int, rows: int): ...
 
     def read(self,
              length: Optional[int] = 1000,
-             blocking: bool = False) -> bytes:
+             blocking: bool = False) -> str:
         ...
 
     def read_stderr(self,
              length: Optional[int] = 1000,
-             blocking: bool = False) -> bytes:
+             blocking: bool = False) -> str:
         ...
 
-    def write(self, to_write: bytes) -> int: ...
+    def write(self, to_write: str) -> int: ...
 
     def isalive(self) -> bool: ...
 

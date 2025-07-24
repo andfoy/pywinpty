@@ -26,6 +26,9 @@ class PtyProcess(object):
         self.pty = pty
         self.pid = pty.pid
         # self.fd = pty.fd
+        self.argv = None
+        self.env = None
+        self.launch_dir = None
 
         self.read_blocking = bool(int(os.environ.get('PYWINPTY_BLOCK', 1)))
         self.closed = False
@@ -72,8 +75,8 @@ class PtyProcess(object):
             raise TypeError("Expected a list or tuple for argv, got %r" % argv)
 
         # Shallow copy of argv so we can modify it
-        argv = argv[:]
-        command = argv[0]
+        _argv: list[str] = list(argv[:])
+        command = _argv[0]
         env = env or os.environ
 
         path = env.get('PATH', os.defpath)
@@ -84,8 +87,8 @@ class PtyProcess(object):
                 'executable: %s.' % command
             )
         command = command_with_path
-        argv[0] = command
-        cmdline = ' ' + subprocess.list2cmdline(argv[1:])
+        _argv[0] = command
+        cmdline = ' ' + subprocess.list2cmdline(_argv[1:])
         cwd = cwd or os.getcwd()
 
         backend = backend or os.environ.get('PYWINPTY_BACKEND', None)
@@ -105,7 +108,7 @@ class PtyProcess(object):
         # cmdline = bytes(cmdline, encoding)
         # env = bytes(env, encoding)
 
-        if len(argv) == 1:
+        if len(_argv) == 1:
             proc.spawn(command, cwd=cwd, env=env)
         else:
             proc.spawn(command, cwd=cwd, env=env, cmdline=cmdline)
@@ -114,7 +117,7 @@ class PtyProcess(object):
         inst._winsize = dimensions
 
         # Set some informational attributes
-        inst.argv = argv
+        inst.argv = _argv
         if env is not None:
             inst.env = env
         if cwd is not None:
@@ -194,7 +197,7 @@ class PtyProcess(object):
             raise EOFError('Pty is closed')
 
         if data == b'0011Ignore':
-            data = ''
+            data = b''
 
         err = True
         while err and data:
@@ -270,9 +273,11 @@ class PtyProcess(object):
         self.closed = not alive
         return alive
 
-    def kill(self, sig=None):
+    def kill(self, sig):
         """Kill the process with the given signal.
         """
+        if self.pid is None:
+            return
         os.kill(self.pid, sig)
 
     def sendcontrol(self, char):
@@ -311,13 +316,13 @@ class PtyProcess(object):
         It is the responsibility of the caller to ensure the eof is sent at the
         beginning of a line."""
         # Send control character 4 (Ctrl-D)
-        self.pty.write('\x04'), '\x04'
+        self.pty.write('\x04')
 
     def sendintr(self):
         """This sends a SIGINT to the child. It does not require
         the SIGINT to be the first character on a line. """
         # Send control character 3 (Ctrl-C)
-        self.pty.write('\x03'), '\x03'
+        self.pty.write('\x03')
 
     def eof(self):
         """This returns True if the EOF exception was ever raised.
@@ -336,7 +341,7 @@ class PtyProcess(object):
         self.pty.set_size(cols, rows)
 
 
-def _read_in_thread(address, pty, blocking):
+def _read_in_thread(address, pty: PTY, blocking: bool):
     """Read data from the pty in a thread.
     """
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -347,7 +352,6 @@ def _read_in_thread(address, pty, blocking):
     while 1:
         try:
             data = pty.read(blocking=blocking) or b'0011Ignore'
-            print(f"Got: {repr(data)}")
             try:
                 client.send(bytes(data, 'utf-8'))
             except socket.error:
