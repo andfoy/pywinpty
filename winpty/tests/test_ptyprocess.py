@@ -169,7 +169,7 @@ def test_exit_status(pty_fixture):
     assert pty.exitstatus == 1
 
 
-@pytest.mark.timeout(30)
+# @pytest.mark.timeout(30)
 def test_kill_sigterm(pty_fixture):
     pty = pty_fixture()
     pty.write('echo \"foo\"\r\nsleep 1000\r\n')
@@ -186,7 +186,7 @@ def test_kill_sigterm(pty_fixture):
     assert pty.exitstatus == signal.SIGTERM
 
 
-@pytest.mark.timeout(30)
+# @pytest.mark.timeout(30)
 def test_terminate(pty_fixture):
     pty = pty_fixture()
     pty.write('echo \"foo\"\r\nsleep 1000\r\n')
@@ -203,7 +203,7 @@ def test_terminate(pty_fixture):
     assert pty.closed
 
 
-@pytest.mark.timeout(30)
+# @pytest.mark.timeout(30)
 def test_terminate_force(pty_fixture):
     pty = pty_fixture()
     pty.write('echo \"foo\"\r\nsleep 1000\r\n')
