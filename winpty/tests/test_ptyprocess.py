@@ -33,7 +33,8 @@ def pty_fixture(request):
     backend = getattr(Backend, backend)
     def _pty_factory(cmd=None, env=None):
         cmd = cmd or 'cmd'
-        return PtyProcess.spawn(cmd, env=env, backend=backend)
+        pty = PtyProcess.spawn(cmd, env=env, backend=backend)
+        return pty
     # time.sleep(10)
     _pty_factory.backend = request.param
     return _pty_factory

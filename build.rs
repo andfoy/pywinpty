@@ -67,7 +67,7 @@ fn main() {
 
                         let binaries_path = folder
                             .join("runtimes")
-                            .join(format!("win10-{}", simplified_arch));
+                            .join(format!("win-{}", simplified_arch));
                         let dll_path = binaries_path.join("native").join("conpty.dll");
                         // let lib_orig = binaries_path.join("lib").join("uap10.0").join("conpty.lib");
 

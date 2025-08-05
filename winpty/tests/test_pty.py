@@ -28,6 +28,8 @@ def pty_factory(backend):
         # loc = bytes(os.getcwd(), 'utf8')
         assert pty.spawn(CMD)
         time.sleep(0.3)
+        if backend == Backend.ConPTY:
+            pty.write("\x1b[?1;0c\x1b[0;0R")
         return pty
     return pty_fixture
 
