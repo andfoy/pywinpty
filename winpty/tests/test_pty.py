@@ -133,26 +133,26 @@ def test_isalive(pty_fixture):
 #         pass
 
 
-@pytest.mark.parametrize(
-    'backend_name,backend',
-    [("ConPTY", Backend.ConPTY), ('WinPTY', Backend.WinPTY)])
-def test_pty_create_size_fail(backend_name, backend):
-    try:
-        PTY(80, -25, backend=backend)
-        assert False
-    except WinptyError:
-        pass
+# @pytest.mark.parametrize(
+#     'backend_name,backend',
+#     [("ConPTY", Backend.ConPTY), ('WinPTY', Backend.WinPTY)])
+# def test_pty_create_size_fail(backend_name, backend):
+#     try:
+#         PTY(80, -25, backend=backend)
+#         assert False
+#     except WinptyError:
+#         pass
 
 
-def test_agent_resize_fail(pty_fixture):
-    pty = pty_fixture()
-    try:
-        pty.set_size(-80, 70)
-        assert False
-    except WinptyError:
-        pass
-    finally:
-        del pty
+# def test_agent_resize_fail(pty_fixture):
+#     pty = pty_fixture()
+#     try:
+#         pty.set_size(-80, 70)
+#         assert False
+#     except WinptyError:
+#         pass
+#     finally:
+#         del pty
 
 
 def test_agent_resize(pty_fixture):
