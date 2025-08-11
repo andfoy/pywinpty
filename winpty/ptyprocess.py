@@ -347,6 +347,7 @@ def _read_in_thread(address, pty, blocking):
     while 1:
         try:
             data = pty.read(blocking=blocking) or b'0011Ignore'
+            print(f"Got: {repr(data)}")
             try:
                 client.send(bytes(data, 'utf-8'))
             except socket.error:
