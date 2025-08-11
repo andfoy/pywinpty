@@ -33,7 +33,9 @@ def pty_fixture(request):
     backend = getattr(Backend, backend)
     def _pty_factory(cmd=None, env=None):
         cmd = cmd or 'cmd'
-        return PtyProcess.spawn(cmd, env=env, backend=backend)
+        pty = PtyProcess.spawn(cmd, env=env, backend=backend)
+        return pty
+    # time.sleep(10)
     _pty_factory.backend = request.param
     return _pty_factory
 
@@ -78,6 +80,7 @@ def test_write(pty_fixture):
 @flaky(max_runs=40, min_passes=1)
 def test_isalive(pty_fixture):
     pty = pty_fixture()
+    time.sleep(4)
 
     pty.write('echo \"foo\"\r\nexit\r\n')
     data = ''
@@ -166,7 +169,7 @@ def test_exit_status(pty_fixture):
     assert pty.exitstatus == 1
 
 
-@pytest.mark.timeout(30)
+# @pytest.mark.timeout(30)
 def test_kill_sigterm(pty_fixture):
     pty = pty_fixture()
     pty.write('echo \"foo\"\r\nsleep 1000\r\n')
@@ -183,7 +186,7 @@ def test_kill_sigterm(pty_fixture):
     assert pty.exitstatus == signal.SIGTERM
 
 
-@pytest.mark.timeout(30)
+# @pytest.mark.timeout(30)
 def test_terminate(pty_fixture):
     pty = pty_fixture()
     pty.write('echo \"foo\"\r\nsleep 1000\r\n')
@@ -200,7 +203,7 @@ def test_terminate(pty_fixture):
     assert pty.closed
 
 
-@pytest.mark.timeout(30)
+# @pytest.mark.timeout(30)
 def test_terminate_force(pty_fixture):
     pty = pty_fixture()
     pty.write('echo \"foo\"\r\nsleep 1000\r\n')

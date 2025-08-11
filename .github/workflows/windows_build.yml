@@ -31,6 +31,9 @@ jobs:
                 target: x86_64-pc-windows-msvc
                 override: true
                 components: rustfmt, clippy
+            - uses: nuget/setup-nuget@v2
+              with:
+                nuget-version: '5.x'
             - name: Remove free-threaded suffix from version
               env:
                 PYTHON_VERSION: ${{ matrix.PYTHON_VERSION }}
@@ -72,13 +75,13 @@ jobs:
             # Enable this to get RDP access to the worker.
             # - name: Download
             #   # if: ${{ failure() }}
-            #   run: Invoke-WebRequest https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
+            #   run: Invoke-WebRequest https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-windows-amd64.zip -OutFile ngrok.zip
             # - name: Extract
             #   # if: ${{ failure() }}
             #   run: Expand-Archive ngrok.zip
             # - name: Auth
             #   # if: ${{ failure() }}
-            #   run: .\ngrok\ngrok.exe authtoken 1raaG4z7gsaCRlLw8cRkUWW6ItF_2LWTUFxXwd6UeeJNAAAci
+            #   run: .\ngrok\ngrok.exe config add-authtoken 1raaG4z7gsaCRlLw8cRkUWW6ItF_2LWTUFxXwd6UeeJNAAAci
             # - name: Enable TS
             #   # if: ${{ failure() }}
             #   run: Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server'-name "fDenyTSConnections" -Value 0

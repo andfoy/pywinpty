@@ -237,6 +237,10 @@ class PtyProcess(object):
         if not self.isalive():
             return True
         self.kill(signal.SIGINT)
+        try:
+            self.pty.cancel_io()
+        except Exception:
+            pass
         time.sleep(self.delayafterterminate)
         if not self.isalive():
             return True
@@ -342,7 +346,8 @@ def _read_in_thread(address, pty, blocking):
 
     while 1:
         try:
-            data = pty.read(4096, blocking=blocking) or b'0011Ignore'
+            data = pty.read(blocking=blocking) or b'0011Ignore'
+            print(f"Got: {repr(data)}")
             try:
                 client.send(bytes(data, 'utf-8'))
             except socket.error:

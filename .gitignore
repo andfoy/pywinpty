@@ -107,6 +107,7 @@ cywinpty.c
 # Winpty binaries
 *.exe
 *.dll
+*.lib
 
 # Git giles
 *.orig
@@ -122,3 +123,6 @@ CppProperties.json
 
 # Debug VS files
 *.sln
+
+# NuGet ConPTY package
+Microsoft.Windows.Console.ConPTY*/
