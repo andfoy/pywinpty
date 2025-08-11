@@ -506,7 +506,9 @@ checksum = "271414315aff87387382ec3d271b52d7ae78726f5d44ac98b4f4030c91880486"
 
 [[package]]
 name = "winpty-rs"
-version = "1.0.2"
+version = "1.0.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "540fb3075c343702700c078ca2e8783213f752c40876257d9fc868c54ba37ba9"
 dependencies = [
  "bitflags",
  "crossbeam-channel",
