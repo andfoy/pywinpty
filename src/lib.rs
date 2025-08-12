@@ -120,21 +120,21 @@ impl PyPTY {
     ///
     /// Arguments
     /// ---------
-    /// appname: bytes
-    ///     Byte string that contains the path to the application that will
+    /// appname: str
+    ///     String that contains the path to the application that will
     ///     be started.
-    /// cmdline: Optional[bytes]
-    ///     Byte string that contains the parameters to start the application,
+    /// cmdline: Optional[str]
+    ///     String that contains the parameters to start the application,
     ///     separated by whitespace.
-    /// cwd: Optional[bytes]
-    ///     Byte string that contains the working directory that the application
+    /// cwd: Optional[str]
+    ///     String that contains the working directory that the application
     ///     should have. If None, the application will inherit the current working
     ///     directory of the Python interpreter.
-    /// env: Optional[bytes]
-    ///     Byte string that contains the name and values of the environment
+    /// env: Optional[str]
+    ///     String that contains the name and values of the environment
     ///     variables that the application should have. Each (name, value) pair
     ///     should be declared as `name=value` and each pair must be separated
-    ///     by an empty byte `\0`. If None, then the application will inherit
+    ///     by an empty character `\0`. If None, then the application will inherit
     ///     the environment variables of the Python interpreter.
     ///
     /// Returns
@@ -204,24 +204,24 @@ impl PyPTY {
         }
     }
 
-    /// Read a number of bytes from the pseudoterminal output stream.
+    /// Read a length of text from the pseudoterminal output stream.
     ///
     /// Arguments
     /// ---------
     /// blocking: bool
-    ///     If True, the call will be blocked until the requested number of bytes
+    ///     If True, the call will be blocked until the requested length of string
     ///     are available to read. Otherwise, it will return an empty byte string
-    ///     if there are no available bytes to read.
+    ///     if there are no available string to read.
     ///
     /// Returns
     /// -------
-    /// output: bytes
-    ///     A byte string that contains the output of the pseudoterminal.
+    /// output: str
+    ///     A String that contains the output of the pseudoterminal.
     ///
     /// Raises
     /// ------
     /// WinptyError
-    ///     If there was an error whilst trying to read the requested number of bytes
+    ///     If there was an error whilst trying to read the requested length of string
     ///     from the pseudoterminal.
     ///
     /// Notes
@@ -245,12 +245,12 @@ impl PyPTY {
         }
     }
 
-    /// Write a byte string into the pseudoterminal input stream.
+    /// Write a string into the pseudoterminal input stream.
     ///
     /// Arguments
     /// ---------
-    /// to_write: bytes
-    ///     The byte sequence that is going to be sent to the pseudoterminal.
+    /// to_write: str
+    ///     The character sequence that is going to be sent to the pseudoterminal.
     ///
     /// Returns
     /// -------
@@ -260,7 +260,7 @@ impl PyPTY {
     /// Raises
     /// ------
     /// WinptyError
-    ///     If there was an error whilst trying to write the requested number of bytes
+    ///     If there was an error whilst trying to write the character sequence
     ///     into the pseudoterminal.
     ///
     fn write(&self, to_write: OsString, py: Python) -> PyResult<u32> {
