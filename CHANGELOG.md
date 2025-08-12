@@ -1,3 +1,14 @@
+## Version 3.0.0 (2025/08/12)
+
+
+### Pull Requests Merged
+
+* [PR 517](https://github.com/andfoy/pywinpty/pull/517) - Solve type issues, by [@XY0797](https://github.com/XY0797)
+* [PR 515](https://github.com/andfoy/pywinpty/pull/515) - Update winpty-rs to v1.0.3, by [@andfoy](https://github.com/andfoy)
+
+In this release 2 pull requests were closed.
+
+
 ## Version 2.0.15 (2025/02/03)
 
 
