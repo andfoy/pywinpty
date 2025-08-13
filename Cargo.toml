@@ -14,7 +14,7 @@ name = "winpty"
 crate-type = ["cdylib"]
 
 [build-dependencies]
-glob = "0.3.2"
+glob = "0.3.3"
 
 [dependencies]
 winpty-rs = "1.0.3"
