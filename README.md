@@ -129,3 +129,10 @@ Visit our [CHANGELOG](CHANGELOG.md) file to learn more about our new features an
 
 ## Contribution guidelines
 We follow PEP8 and PEP257 for pure python packages and Rust to compile extensions. We use MyPy type annotations for all functions and classes declared on this package. Feel free to send a PR or create an issue if you have any problem/question.
+
+
+## Security contact information
+
+To report a security vulnerability, please use the
+[Tidelift security contact](https://tidelift.com/security).
+Tidelift will coordinate the fix and disclosure.
