@@ -53,6 +53,7 @@ fn main() {
                         let simplified_arch = match ARCH {
                             "x86_64" => "x64",
                             "arm" => "arm64",
+                            "aarch64" => "arm64",
                             _ => ARCH,
                         };
 
