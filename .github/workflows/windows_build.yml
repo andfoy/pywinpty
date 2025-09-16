@@ -50,7 +50,8 @@ jobs:
               with:
                 auto-update-conda: true
                 activate-environment: test
-                channels: conda-forge,defaults,python_rc
+                channels: conda-forge,defaults
+                channel-priority: flexible
                 python-version: ${{ env.PYTHON_VERSION_NONSUFFIX }}
             - name: Reinstall free-threaded Python
               if: ${{ endsWith(matrix.PYTHON_VERSION, 't') }}
