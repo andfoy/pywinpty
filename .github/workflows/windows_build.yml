@@ -50,7 +50,7 @@ jobs:
               with:
                 auto-update-conda: true
                 miniforge-version: latest
-                channels: conda-forge,conda-forge/labels/python_rc
+                channels: conda-forge/label/python_rc,conda-forge
                 conda-remove-defaults: "true"
                 python-version: ${{ env.PYTHON_VERSION_NONSUFFIX }}
             - name: Reinstall free-threaded Python
