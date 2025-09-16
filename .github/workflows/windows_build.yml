@@ -51,6 +51,8 @@ jobs:
                 auto-update-conda: true
                 activate-environment: test
                 miniforge-version: latest
+                channels: conda-forge
+                conda-remove-defaults: true
                 python-version: ${{ env.PYTHON_VERSION_NONSUFFIX }}
             - name: Reinstall free-threaded Python
               if: ${{ endsWith(matrix.PYTHON_VERSION, 't') }}
