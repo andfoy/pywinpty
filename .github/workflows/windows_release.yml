@@ -44,9 +44,8 @@ jobs:
               uses: conda-incubator/setup-miniconda@v3
               with:
                 auto-update-conda: true
-                activate-environment: test
                 miniforge-version: latest
-                channels: conda-forge
+                channels: conda-forge,conda-forge/labels/python_rc
                 conda-remove-defaults: "true"
                 python-version: ${{ env.PYTHON_VERSION_NONSUFFIX }}
             - name: Reinstall free-threaded Python
