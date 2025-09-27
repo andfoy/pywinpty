@@ -97,7 +97,7 @@ class PtyProcess(object):
         proc = PTY(dimensions[1], dimensions[0],
                    backend=backend)
 
-        # Create the environemnt string.
+        # Create the environment string.
         envStrs = []
         for (key, value) in env.items():
             envStrs.append('%s=%s' % (key, value))

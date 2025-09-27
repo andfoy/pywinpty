@@ -470,7 +470,7 @@ In this release 1 pull request was closed.
 ### Issues Closed
 
 * [Issue 126](https://github.com/spyder-ide/pywinpty/issues/126) - Release v0.5.6
-* [Issue 123](https://github.com/spyder-ide/pywinpty/issues/123) - pip install fails on Python 3.8/Windoes ([PR 125](https://github.com/spyder-ide/pywinpty/pull/125))
+* [Issue 123](https://github.com/spyder-ide/pywinpty/issues/123) - pip install fails on Python 3.8/Windows ([PR 125](https://github.com/spyder-ide/pywinpty/pull/125))
 
 In this release 2 issues were closed.
 
@@ -511,7 +511,7 @@ In this release 4 issues were closed.
 
 ### Pull Requests Merged
 
-* [PR 113](https://github.com/spyder-ide/pywinpty/pull/113) - PR: Add PYWINPTY_BLOCK envirnoment variable to disable ptyprocess read block ([110](https://github.com/spyder-ide/pywinpty/issues/110))
+* [PR 113](https://github.com/spyder-ide/pywinpty/pull/113) - PR: Add PYWINPTY_BLOCK environment variable to disable ptyprocess read block ([110](https://github.com/spyder-ide/pywinpty/issues/110))
 * [PR 112](https://github.com/spyder-ide/pywinpty/pull/112) - PR: Remove import-time verification ([111](https://github.com/spyder-ide/pywinpty/issues/111))
 * [PR 109](https://github.com/spyder-ide/pywinpty/pull/109) - PR: Fix for access violation error ([108](https://github.com/spyder-ide/pywinpty/issues/108))
 

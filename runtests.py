@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""Script used to run pytest programatically."""
+"""Script used to run pytest programmatically."""
 
 # Standard library imports
 import argparse

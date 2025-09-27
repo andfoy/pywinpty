@@ -116,7 +116,7 @@ on pytest-lazy-fixture, which can be installed via pip:
 pip install pytest pytest-lazy-fixture flaky
 ```
 
-All the tests can be exceuted using the following command
+All the tests can be executed using the following command
 
 ```bash
 python runtests.py

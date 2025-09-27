@@ -50,5 +50,5 @@ class AgentConfig:
 
     # Do output color escape sequences.  These escapes are output by default,
     # but are suppressed with WINPTY_FLAG_PLAIN_OUTPUT.
-    # Use this flag to reenable them.
+    # Use this flag to re-enable them.
     WINPTY_FLAG_COLOR_ESCAPES = 0x4
