@@ -1,3 +1,13 @@
+## Version 3.0.2 (2025/10/03)
+
+
+### Pull Requests Merged
+
+* [PR 541](https://github.com/andfoy/pywinpty/pull/541) - Add README section in pyproject.toml, by [@andfoy](https://github.com/andfoy)
+
+In this release 1 pull request was closed.
+
+
 ## Version 3.0.1 (2025/10/03)
 
 
