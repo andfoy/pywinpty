@@ -3,6 +3,26 @@ name = "pywinpty"
 readme = "README.md"
 requires-python = ">=3.9"
 dynamic = ["version", "description"]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Programming Language :: Python",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: Microsoft :: Windows",
+  "Programming Language :: Python :: Free Threading",
+  "Programming Language :: Python :: 3",
+  "Topic :: Terminals",
+  "Topic :: Terminals :: Terminal Emulators/X Terminals",
+  "Programming Language :: Rust"
+
+]
+keywords = ["PTY", "Windows", "pseudo-terminal", "PyO3"]
+authors = [
+  {email = "andfoy@gmail.com"},
+  {name = "Edgar Margffoy"}
+]
+maintainers = [
+  {name = "Edgar Margffoy", email = "andfoy@gmail.com"}
+]
 
 [build-system]
 requires = ["maturin>=1.1,<2.0"]
