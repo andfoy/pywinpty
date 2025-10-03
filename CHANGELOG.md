@@ -1,3 +1,19 @@
+## Version 3.0.1 (2025/10/03)
+
+
+### Pull Requests Merged
+
+* [PR 540](https://github.com/andfoy/pywinpty/pull/540) - Update Rust dependencies ahead of v3.0.1, by [@andfoy](https://github.com/andfoy)
+* [PR 539](https://github.com/andfoy/pywinpty/pull/539) - Fix typos discovered by codespell, by [@cclauss](https://github.com/cclauss)
+* [PR 538](https://github.com/andfoy/pywinpty/pull/538) - Remove deprecated actions-rs/toolchain, by [@cclauss](https://github.com/cclauss)
+* [PR 535](https://github.com/andfoy/pywinpty/pull/535) - Support Python 3.14(t), by [@ngoldbaum](https://github.com/ngoldbaum)
+* [PR 534](https://github.com/andfoy/pywinpty/pull/534) - Bump serde_json from 1.0.142 to 1.0.145, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 533](https://github.com/andfoy/pywinpty/pull/533) - Update build.rs, by [@ImmortalEmperor](https://github.com/ImmortalEmperor)
+* [PR 520](https://github.com/andfoy/pywinpty/pull/520) - Bump actions/checkout from 4 to 5, by [@dependabot[bot]](https://github.com/apps/dependabot)
+
+In this release 7 pull requests were closed.
+
+
 ## Version 3.0.0 (2025/08/12)
 
 
