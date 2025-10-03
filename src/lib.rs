@@ -1,17 +1,11 @@
 
-use std::ops::DerefMut;
-// use cxx::Exception;
-use std::{ffi::OsString, sync::Arc};
-use std::sync::RwLock;
+use std::ffi::OsString;
 
 use pyo3::create_exception;
 use pyo3::exceptions::PyException;
 use pyo3::prelude::*;
-use pyo3::sync::MutexExt;
 
-// use pyo3::types::PyBytes;
 use winptyrs::{PTY, PTYArgs, PTYBackend, MouseMode, AgentConfig};
-// use winptyrs::pty::PTYImpl;
 
 // Package version
 const VERSION: &'static str = env!("CARGO_PKG_VERSION");
@@ -194,7 +188,7 @@ impl PyPTY {
     ///
     fn set_size(&self, cols: i32, rows: i32, py: Python) -> PyResult<()> {
         let result: Result<(), OsString> =
-            py.allow_threads(|| self.pty.set_size(cols, rows));
+            py.detach(|| self.pty.set_size(cols, rows));
         match result {
             Ok(()) => Ok(()),
             Err(error) => {
@@ -234,7 +228,7 @@ impl PyPTY {
     fn read<'p>(&self, blocking: bool, py: Python<'p>) -> PyResult<OsString> {
         // let result = self.pty.read(length, blocking);
         let result: Result<OsString, OsString> =
-            py.allow_threads(move || self.pty.read(blocking));
+            py.detach(move || self.pty.read(blocking));
 
         match result {
             Ok(bytes) => Ok(bytes),
@@ -268,7 +262,7 @@ impl PyPTY {
         // let _guard = borrow_lock.lock_py_attached(py).unwrap();
         //let utf16_str: Vec<u16> = to_write.encode_utf16().collect();
         let result: Result<u32, OsString> =
-            py.allow_threads(move || {
+            py.detach(move || {
                 self.pty.write(to_write)
             });
         match result {
@@ -293,7 +287,7 @@ impl PyPTY {
     ///     If there was an error whilst trying to determine the status of the process.
     ///
     fn isalive(&self) -> PyResult<bool> {
-        // let result: Result<bool, OsString> = py.allow_threads(move || self.pty.is_alive());
+        // let result: Result<bool, OsString> = py.detach(move || self.pty.is_alive());
         match self.pty.is_alive() {
             Ok(alive) => Ok(alive),
             Err(error) => {
@@ -318,7 +312,7 @@ impl PyPTY {
     ///
     fn get_exitstatus(&self, py: Python) -> PyResult<Option<u32>> {
         let result: Result<Option<u32>, OsString> =
-            py.allow_threads(|| self.pty.get_exitstatus());
+            py.detach(|| self.pty.get_exitstatus());
         match result {
             Ok(status) => Ok(status),
             Err(error) => {
@@ -341,7 +335,7 @@ impl PyPTY {
     ///     If there was an error whilst trying to determine the EOF status of the process.
     ///
     fn iseof(&self, py: Python) -> PyResult<bool> {
-        let result: Result<bool, OsString> = py.allow_threads(|| self.pty.is_eof());
+        let result: Result<bool, OsString> = py.detach(|| self.pty.is_eof());
         match result {
             Ok(eof) => Ok(eof),
             Err(error) => {
@@ -372,7 +366,7 @@ impl PyPTY {
 
     /// Cancel all pending I/O.
     fn cancel_io(&self, py: Python) -> PyResult<bool> {
-        let result: Result<bool, OsString> = py.allow_threads(|| self.pty.cancel_io());
+        let result: Result<bool, OsString> = py.detach(|| self.pty.cancel_io());
         match result {
             Ok(cancel) => Ok(cancel),
             Err(error) => {

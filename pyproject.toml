@@ -1,7 +1,7 @@
 [project]
 name = "pywinpty"
 requires-python = ">=3.9"
-dynamic = ["version"]
+dynamic = ["version", "description", "summary", "project_url"]
 
 [build-system]
 requires = ["maturin>=1.1,<2.0"]
