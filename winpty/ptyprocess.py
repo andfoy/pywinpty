@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 # Standard library imports
-import codecs
 import os
 import shlex
 import signal
@@ -351,7 +350,7 @@ def _read_in_thread(address, pty: PTY, blocking: bool):
 
     while 1:
         try:
-            data = pty.read(blocking=blocking) or b'0011Ignore'
+            data = pty.read(blocking=blocking) or '0011Ignore'
             try:
                 client.send(bytes(data, 'utf-8'))
             except socket.error:
