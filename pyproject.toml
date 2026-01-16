@@ -23,6 +23,8 @@ authors = [
 maintainers = [
   {name = "Edgar Margffoy", email = "andfoy@gmail.com"}
 ]
+urls.Changelog = "https://github.com/andfoy/pywinpty/blob/main/CHANGELOG.md"
+urls.Repository = "https://github.com/andfoy/pywinpty"
 
 [build-system]
 requires = ["maturin>=1.1,<2.0"]
