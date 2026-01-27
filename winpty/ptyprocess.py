@@ -362,8 +362,7 @@ def _read_in_thread(address, pty: PTY, blocking: bool):
                     client.send(b'')
                 except socket.error:
                     pass
-                finally:
-                    break
+                break
 
             call += 1
         except Exception as e:
