@@ -32,7 +32,10 @@ jobs:
                 python-version: ${{ matrix.PYTHON_VERSION }}
             - name: Install build/test dependencies
               shell: bash -l {0}
-              run: pip install maturin toml pytest flaky
+              run: pip install maturin toml pytest flaky virtualenv
+            - name: Create virtualenv
+              shell: bash -l {0}
+              run: virtualenv venv
             - name: Build pywinpty
               shell: bash -l {0}
               run: maturin develop
