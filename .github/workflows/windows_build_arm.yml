@@ -27,33 +27,9 @@ jobs:
             - uses: nuget/setup-nuget@v2
               with:
                 nuget-version: '5.x'
-            - name: Remove free-threaded suffix from version
-              env:
-                PYTHON_VERSION: ${{ matrix.PYTHON_VERSION }}
-              shell: bash -l {0}
-              run: |
-                PYTHON_VERSION_NONSUFFIX=$PYTHON_VERSION
-                if [[ $PYTHON_VERSION = *t ]]; then
-                  PYTHON_VERSION_NONSUFFIX=${PYTHON_VERSION//t}
-                  echo "PYTHON_VERSION_NONSUFFIX=$PYTHON_VERSION_NONSUFFIX" >> $GITHUB_ENV
-                fi
-                echo "PYTHON_VERSION_NONSUFFIX=$PYTHON_VERSION_NONSUFFIX" >> $GITHUB_ENV
-            - name: Install miniconda
-              uses: conda-incubator/setup-miniconda@v3
+            - uses: actions/setup-python@v6
               with:
-                auto-update-conda: true
-                miniforge-version: latest
-                channels: conda-forge/label/python_rc,conda-forge
-                conda-remove-defaults: "true"
-                python-version: ${{ env.PYTHON_VERSION_NONSUFFIX }}
-            - name: Reinstall free-threaded Python
-              if: ${{ endsWith(matrix.PYTHON_VERSION, 't') }}
-              shell: bash -l {0}
-              run: |
-                conda install --override-channels -c conda-forge python-freethreading
-            - name: Conda env info
-              shell: bash -l {0}
-              run: conda env list
+                python-version: ${{ matrix.PYTHON_VERSION }}
             - name: Install build/test dependencies
               shell: bash -l {0}
               run: pip install maturin toml pytest flaky
