@@ -20,7 +20,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                PYTHON_VERSION: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.13t", "3.14", "3.14t"]
+                PYTHON_VERSION: ["3.10", "3.11", "3.12", "3.13", "3.13t", "3.14", "3.14t"]
         steps:
             - name: Checkout branch
               uses: actions/checkout@v5
@@ -63,7 +63,7 @@ jobs:
             - name: Run tests
               shell: pwsh
               run: |
-                & "$env:WIN_NUGET_PYTHON runtests.py"
+                & '"$env:WIN_NUGET_PYTHON" runtests.py'
             # Enable this to get RDP access to the worker.
             # - name: Download
             #   # if: ${{ failure() }}
