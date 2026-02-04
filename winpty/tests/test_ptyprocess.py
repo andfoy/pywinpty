@@ -14,6 +14,7 @@ import pytest
 from flaky import flaky
 
 # Local imports
+from winpty import WinptyError
 from winpty.enums import Backend
 from winpty.ptyprocess import PtyProcess, which
 
@@ -33,7 +34,11 @@ def pty_fixture(request):
     backend = getattr(Backend, backend)
     def _pty_factory(cmd=None, env=None):
         cmd = cmd or 'cmd'
-        pty = PtyProcess.spawn(cmd, env=env, backend=backend)
+        try:
+            pty = PtyProcess.spawn(cmd, env=env, backend=backend)
+        except WinptyError:
+            pytest.skip()
+            return None
         return pty
     # time.sleep(10)
     _pty_factory.backend = request.param

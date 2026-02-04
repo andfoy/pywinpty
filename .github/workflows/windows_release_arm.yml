@@ -1,4 +1,4 @@
-name: Windows release
+name: Windows release arm64
 
 on:
     release:
@@ -7,19 +7,19 @@ on:
 
 jobs:
     windows:
-        name: Windows Py${{ matrix.PYTHON_VERSION }}
-        runs-on: windows-latest
+        name: Windows Py${{ matrix.PYTHON_VERSION }} arm64
+        runs-on: windows-11-arm
+        timeout-minutes: 10
         env:
             PYTHON_VERSION: ${{ matrix.PYTHON_VERSION }}
             RUNNER_OS: "windows"
         strategy:
             fail-fast: false
             matrix:
-                PYTHON_VERSION: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.13t", "3.14", "3.14t"]
+                PYTHON_VERSION: ["3.10", "3.11", "3.12", "3.13", "3.13t", "3.14", "3.14t"]
         steps:
             - name: Checkout branch
               uses: actions/checkout@v5
-
             - uses: nuget/setup-nuget@v2
               with:
                 nuget-version: '5.x'
@@ -29,39 +29,30 @@ jobs:
               shell: bash -l {0}
               run: |
                 PYTHON_VERSION_NONSUFFIX=$PYTHON_VERSION
+                PYTHON_PKG="pythonarm64"
                 if [[ $PYTHON_VERSION = *t ]]; then
                   PYTHON_VERSION_NONSUFFIX=${PYTHON_VERSION//t}
                   echo "PYTHON_VERSION_NONSUFFIX=$PYTHON_VERSION_NONSUFFIX" >> $GITHUB_ENV
+                  PYTHON_PKG="pythonarm64-freethreaded"
+                  echo "PYTHON_PKG=$PYTHON_PKG" >> $GITHUB_ENV
                 fi
+                echo "PYTHON_PKG=$PYTHON_PKG" >> $GITHUB_ENV
                 echo "PYTHON_VERSION_NONSUFFIX=$PYTHON_VERSION_NONSUFFIX" >> $GITHUB_ENV
-            - name: Install miniconda
-              uses: conda-incubator/setup-miniconda@v3
-              with:
-                auto-update-conda: true
-                miniforge-version: latest
-                channels: conda-forge/label/python_rc,conda-forge
-                conda-remove-defaults: "true"
-                python-version: ${{ env.PYTHON_VERSION_NONSUFFIX }}
-            - name: Reinstall free-threaded Python
-              if: ${{ endsWith(matrix.PYTHON_VERSION, 't') }}
+            - name: Install Python via NuGet
               shell: bash -l {0}
               run: |
-                conda install --override-channels -c conda-forge python-freethreading
-            - name: Conda env info
-              shell: bash -l {0}
-              run: conda env list
-            - name: Install winpty
-              shell: bash -l {0}
-              run: conda install -y winpty
+                nuget install $PYTHON_PKG -Version $PYTHON_VERSION_NONSUFFIX -Source https://api.nuget.org/v3/index.json -ExcludeVersion
+                ls $PWD/$PYTHON_PKG/tools/
+                NUGET_PYTHON=$PWD/$PYTHON_PKG/tools/python.exe
+                WIN_NUGET_PYTHON=$(cygpath -w $NUGET_PYTHON)
+                echo "NUGET_PYTHON=$NUGET_PYTHON" >> $GITHUB_ENV
+                echo "WIN_NUGET_PYTHON=$WIN_NUGET_PYTHON" >> $GITHUB_ENV
             - name: Install build/test dependencies
               shell: bash -l {0}
-              run: pip install maturin toml
-            - name: Copy winpty binaries to package
-              shell: bash -l {0}
-              run: bash -l .github/scripts/copy_winpty.sh
+              run: $NUGET_PYTHON -m pip install maturin toml
             - name: Build and publish wheels
               env:
                 MATURIN_PASSWORD: ${{secrets.MATURIN_PASSWORD}}
                 MATURIN_USERNAME: ${{secrets.MATURIN_USERNAME}}
               shell: bash -l {0}
-              run: maturin publish -i $(which python) -u $MATURIN_USERNAME --no-sdist
+              run: $NUGET_PYTHON -m maturin publish -i $NUGET_PYTHON -u $MATURIN_USERNAME --no-sdist

@@ -51,12 +51,15 @@ def pty_fixture(request):
 
     backend = getattr(Backend, backend)
     def _pty_factory():
-        pty = PTY(80, 25, backend=backend)
+        try:
+            pty = PTY(80, 25, backend=backend)
+        except WinptyError:
+            pytest.skip()
+            return None
         assert pty.spawn(CMD)
         time.sleep(0.3)
         return pty
     return _pty_factory
-
 
 
 # @pytest.fixture(scope='function', params=[
