@@ -203,7 +203,7 @@ dependencies = [
 
 [[package]]
 name = "pywinpty"
-version = "3.0.3-dev"
+version = "3.0.3-pre0"
 dependencies = [
  "glob",
  "pyo3",
