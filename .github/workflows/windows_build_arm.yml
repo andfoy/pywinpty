@@ -63,7 +63,7 @@ jobs:
             - name: Run tests
               shell: pwsh
               run: |
-                $env:WIN_NUGET_PYTHON runtests.py
+                "$env:WIN_NUGET_PYTHON runtests.py"
             # Enable this to get RDP access to the worker.
             # - name: Download
             #   # if: ${{ failure() }}
