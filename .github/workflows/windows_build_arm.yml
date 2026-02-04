@@ -48,7 +48,7 @@ jobs:
                 nuget install $PYTHON_PKG -Version $PYTHON_VERSION_NONSUFFIX -Source https://api.nuget.org/v3/index.json -ExcludeVersion
                 ls $PWD/$PYTHON_PKG/tools/
                 NUGET_PYTHON=$PWD/$PYTHON_PKG/tools/python.exe
-                WIN_NUGET_PYTHON=$(cygpath -m NUGET_PYTHON)
+                WIN_NUGET_PYTHON=$(cygpath -w NUGET_PYTHON)
                 echo "NUGET_PYTHON=$NUGET_PYTHON" >> $GITHUB_ENV
                 echo "WIN_NUGET_PYTHON=$WIN_NUGET_PYTHON" >> $GITHUB_ENV
             - name: Install build/test dependencies
