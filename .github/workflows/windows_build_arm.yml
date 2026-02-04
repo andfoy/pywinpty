@@ -60,7 +60,8 @@ jobs:
             - name: Run tests
               shell: pwsh
               run: |
-                ".\${env:PYTHON_PKG}\tools\python.exe" runtests.py
+                .\.env\Scripts\activate
+                python runtests.py
             # Enable this to get RDP access to the worker.
             # - name: Download
             #   # if: ${{ failure() }}
