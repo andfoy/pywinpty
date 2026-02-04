@@ -1,3 +1,18 @@
+## Version 3.0.3 (2026/02/04)
+
+
+### Pull Requests Merged
+
+* [PR 558](https://github.com/andfoy/pywinpty/pull/558) - Add arm64 testing workflow, by [@andfoy](https://github.com/andfoy) ([550](https://github.com/andfoy/pywinpty/issues/550))
+* [PR 555](https://github.com/andfoy/pywinpty/pull/555) - Remove unnecessary finally statement, by [@zedzhen](https://github.com/zedzhen) ([554](https://github.com/andfoy/pywinpty/issues/554))
+* [PR 552](https://github.com/andfoy/pywinpty/pull/552) - Add PyPI links, by [@adamchainz](https://github.com/adamchainz)
+* [PR 551](https://github.com/andfoy/pywinpty/pull/551) - Resolve the issue of outdated winpty.pyi, by [@XY0797](https://github.com/XY0797)
+* [PR 549](https://github.com/andfoy/pywinpty/pull/549) - Bump actions/checkout from 5 to 6, by [@dependabot[bot]](https://github.com/apps/dependabot)
+* [PR 548](https://github.com/andfoy/pywinpty/pull/548) - Bump pyo3 from 0.26.0 to 0.27.1, by [@dependabot[bot]](https://github.com/apps/dependabot)
+
+In this release 6 pull requests were closed.
+
+
 ## Version 3.0.2 (2025/10/03)
 
 
