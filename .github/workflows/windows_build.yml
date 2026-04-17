@@ -24,7 +24,7 @@ jobs:
         steps:
             - name: Checkout branch
               uses: actions/checkout@v6
-            - uses: nuget/setup-nuget@v2
+            - uses: nuget/setup-nuget@v4
               with:
                 nuget-version: '5.x'
             - name: Remove free-threaded suffix from version
