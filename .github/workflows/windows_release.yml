@@ -35,7 +35,7 @@ jobs:
                 fi
                 echo "PYTHON_VERSION_NONSUFFIX=$PYTHON_VERSION_NONSUFFIX" >> $GITHUB_ENV
             - name: Install miniconda
-              uses: conda-incubator/setup-miniconda@v3
+              uses: conda-incubator/setup-miniconda@v4
               with:
                 auto-update-conda: true
                 miniforge-version: latest
