@@ -58,10 +58,6 @@ jobs:
             - uses: nuget/setup-nuget@v4
               with:
                 nuget-version: '5.x'
-            - name: Cache cargo + target
-              uses: Swatinem/rust-cache@v2
-              with:
-                key: preflight-x64-${{ matrix.PYTHON_VERSION }}
             - name: Install miniconda
               uses: conda-incubator/setup-miniconda@v4
               with:
@@ -111,10 +107,6 @@ jobs:
             - uses: nuget/setup-nuget@v4
               with:
                 nuget-version: '5.x'
-            - name: Cache cargo + target
-              uses: Swatinem/rust-cache@v2
-              with:
-                key: preflight-arm64-${{ matrix.PYTHON_VERSION }}
             - name: Install Python via NuGet
               shell: bash -l {0}
               run: |
