@@ -24,9 +24,16 @@ jobs:
         steps:
             - name: Checkout branch
               uses: actions/checkout@v6
-            - uses: nuget/setup-nuget@v2
+            - uses: nuget/setup-nuget@v4
               with:
                 nuget-version: '5.x'
+
+            # Cache cargo registry/git index and target/ between runs.
+            - name: Cache cargo + target
+              uses: Swatinem/rust-cache@v2
+              with:
+                key: ${{ matrix.PYTHON_VERSION }}
+
             - name: Remove free-threaded suffix from version
               env:
                 PYTHON_VERSION: ${{ matrix.PYTHON_VERSION }}
@@ -39,13 +46,22 @@ jobs:
                 fi
                 echo "PYTHON_VERSION_NONSUFFIX=$PYTHON_VERSION_NONSUFFIX" >> $GITHUB_ENV
             - name: Install miniconda
-              uses: conda-incubator/setup-miniconda@v3
+              uses: conda-incubator/setup-miniconda@v4
               with:
-                auto-update-conda: true
+                auto-update-conda: false
                 miniforge-version: latest
                 channels: conda-forge/label/python_rc,conda-forge
                 conda-remove-defaults: "true"
                 python-version: ${{ env.PYTHON_VERSION_NONSUFFIX }}
+                use-mamba: true
+            # Cache the conda env so `conda install winpty` becomes a no-op
+            # on warm cache hits. Key on the Python variant so free-threaded
+            # builds don't collide with the regular ones.
+            - name: Cache conda env
+              uses: actions/cache@v4
+              with:
+                path: ~/miniconda3/envs/test
+                key: ${{ runner.os }}-conda-test-py${{ matrix.PYTHON_VERSION }}-winpty-v1
             - name: Reinstall free-threaded Python
               if: ${{ endsWith(matrix.PYTHON_VERSION, 't') }}
               shell: bash -l {0}
@@ -57,6 +73,13 @@ jobs:
             - name: Install winpty
               shell: bash -l {0}
               run: conda install -y winpty
+            # Cache pip's wheel cache so re-downloading maturin/pytest/etc
+            # short-circuits to the wheel cache.
+            - name: Cache pip wheels
+              uses: actions/cache@v4
+              with:
+                path: ~/AppData/Local/pip/Cache
+                key: ${{ runner.os }}-pip-py${{ matrix.PYTHON_VERSION }}-v1
             - name: Install build/test dependencies
               shell: bash -l {0}
               run: pip install maturin toml pytest flaky
