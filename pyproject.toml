@@ -1,7 +1,7 @@
 [project]
 name = "pywinpty"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dynamic = ["version", "description"]
 classifiers = [
   "Development Status :: 5 - Production/Stable",
