@@ -1,3 +1,15 @@
+## Version 3.0.4 (2026/06/10)
+
+
+### Pull Requests Merged
+
+* [PR 572](https://github.com/andfoy/pywinpty/pull/572) - CI: bump action versions and add cargo/conda/pip caches, by [@andfoy](https://github.com/andfoy)
+* [PR 571](https://github.com/andfoy/pywinpty/pull/571) - Bump cargo deps and drop Python 3.9 from CI, by [@andfoy](https://github.com/andfoy)
+* [PR 567](https://github.com/andfoy/pywinpty/pull/567) - Use public NuGet sources to get ConPTY; bump winpty-rs to 1.0.6, by [@andfoy](https://github.com/andfoy)
+
+In this release 3 pull requests were closed.
+
+
 ## Version 3.0.3 (2026/02/04)
 
 
