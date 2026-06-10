@@ -7,7 +7,7 @@ pseudo terminals in Windows.
 """
 
 # Local imports
-from .winpty import PTY, WinptyError, __version__
+from ._winpty import PTY, WinptyError, __version__
 from .ptyprocess import PtyProcess
 from .enums import Backend, Encoding, MouseMode, AgentConfig
 

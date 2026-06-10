@@ -29,7 +29,11 @@ jobs:
               python-version: ${{ matrix.PYTHON_VERSION }}
           - name: Install twine/maturin
             shell: bash -l {0}
-            run: pip install twine maturin
+            # Pin twine >= 6.1 (and pkginfo >= 1.12) so the upload accepts
+            # the `license-file` field that maturin emits per Metadata 2.4
+            # (PEP 639). Older twine errors out with
+            # "unrecognized or malformed field 'license-file'".
+            run: pip install "twine>=6.1" "pkginfo>=1.12" maturin
           - name: Build sdist distribution
             shell: bash -l {0}
             run: maturin sdist

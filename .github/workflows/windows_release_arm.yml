@@ -49,10 +49,28 @@ jobs:
                 echo "WIN_NUGET_PYTHON=$WIN_NUGET_PYTHON" >> $GITHUB_ENV
             - name: Install build/test dependencies
               shell: bash -l {0}
-              run: $NUGET_PYTHON -m pip install maturin toml
-            - name: Build and publish wheels
-              env:
-                MATURIN_PASSWORD: ${{secrets.MATURIN_PASSWORD}}
-                MATURIN_USERNAME: ${{secrets.MATURIN_USERNAME}}
+              # Pin twine >= 6.1 / pkginfo >= 1.12 to handle the Metadata 2.4
+              # `license-file` field emitted by current maturin.
+              run: $NUGET_PYTHON -m pip install maturin toml "twine>=6.1" "pkginfo>=1.12"
+            - name: Strip binary patterns from .gitignore
               shell: bash -l {0}
-              run: $NUGET_PYTHON -m maturin publish -i $NUGET_PYTHON -u $MATURIN_USERNAME --no-sdist
+              # `.gitignore` blanket-excludes *.dll/*.exe so they stay out of
+              # git, but maturin honours .gitignore when packaging the python
+              # source directory. Strip those lines here so the ConPTY binaries
+              # that build.rs downloads from NuGet (arm64 build) actually land
+              # in the wheel.
+              run: |
+                sed -i '/[.]exe/c\' .gitignore
+                sed -i '/[.]dll/c\' .gitignore
+            - name: Build wheel
+              shell: bash -l {0}
+              run: $NUGET_PYTHON -m maturin build --release -i $NUGET_PYTHON
+            - name: Sanity check wheel contents
+              shell: bash -l {0}
+              run: $NUGET_PYTHON .github/scripts/check_wheel.py 'target/wheels/*.whl' --has-conpty
+            - name: Publish wheel
+              env:
+                TWINE_PASSWORD: ${{secrets.MATURIN_PASSWORD}}
+                TWINE_USERNAME: ${{secrets.MATURIN_USERNAME}}
+              shell: bash -l {0}
+              run: $NUGET_PYTHON -m twine upload target/wheels/*.whl

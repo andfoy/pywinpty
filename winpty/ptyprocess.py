@@ -11,7 +11,7 @@ import time
 from shutil import which
 
 # Local imports
-from .winpty import PTY
+from ._winpty import PTY
 
 
 class PtyProcess(object):

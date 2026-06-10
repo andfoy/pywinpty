@@ -55,13 +55,23 @@ jobs:
               run: conda install -y winpty
             - name: Install build/test dependencies
               shell: bash -l {0}
-              run: pip install maturin toml
+              # Pin twine >= 6.1 (and pkginfo >= 1.12) so the upload accepts
+              # the `license-file` field that maturin emits per Metadata 2.4
+              # (PEP 639). Older twine errors out with
+              # "unrecognized or malformed field 'license-file'".
+              run: pip install maturin toml "twine>=6.1" "pkginfo>=1.12"
             - name: Copy winpty binaries to package
               shell: bash -l {0}
               run: bash -l .github/scripts/copy_winpty.sh
-            - name: Build and publish wheels
-              env:
-                MATURIN_PASSWORD: ${{secrets.MATURIN_PASSWORD}}
-                MATURIN_USERNAME: ${{secrets.MATURIN_USERNAME}}
+            - name: Build wheel
               shell: bash -l {0}
-              run: maturin publish -i $(which python) -u $MATURIN_USERNAME --no-sdist
+              run: maturin build --release -i $(which python)
+            - name: Sanity check wheel contents
+              shell: bash -l {0}
+              run: python .github/scripts/check_wheel.py 'target/wheels/*.whl' --has-conpty --has-winpty
+            - name: Publish wheel
+              env:
+                TWINE_PASSWORD: ${{secrets.MATURIN_PASSWORD}}
+                TWINE_USERNAME: ${{secrets.MATURIN_USERNAME}}
+              shell: bash -l {0}
+              run: twine upload target/wheels/*.whl

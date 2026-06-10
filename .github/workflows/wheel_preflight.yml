@@ -1,0 +1,144 @@
+name: Wheel preflight
+
+# Dry-run of the release wheel build: exercises the same `maturin build` +
+# sanity-check pipeline as the release workflows but never uploads. Catches
+# packaging regressions (missing DLLs, broken renames, .gitignore filtering)
+# before a tag is cut.
+
+on:
+    push:
+        branches:
+            - main
+        paths:
+            - 'Cargo.toml'
+            - 'Cargo.lock'
+            - 'pyproject.toml'
+            - 'build.rs'
+            - 'src/**'
+            - 'winpty/**'
+            - '.gitignore'
+            - '.github/workflows/windows_release.yml'
+            - '.github/workflows/windows_release_arm.yml'
+            - '.github/workflows/wheel_preflight.yml'
+            - '.github/scripts/check_wheel.py'
+            - '.github/scripts/copy_winpty.sh'
+    pull_request:
+        branches:
+            - main
+        paths:
+            - 'Cargo.toml'
+            - 'Cargo.lock'
+            - 'pyproject.toml'
+            - 'build.rs'
+            - 'src/**'
+            - 'winpty/**'
+            - '.gitignore'
+            - '.github/workflows/windows_release.yml'
+            - '.github/workflows/windows_release_arm.yml'
+            - '.github/workflows/wheel_preflight.yml'
+            - '.github/scripts/check_wheel.py'
+            - '.github/scripts/copy_winpty.sh'
+    workflow_dispatch:
+
+jobs:
+    x64:
+        name: x64 wheel preflight (Py${{ matrix.PYTHON_VERSION }})
+        runs-on: windows-latest
+        timeout-minutes: 15
+        env:
+            PYTHON_VERSION: ${{ matrix.PYTHON_VERSION }}
+            RUNNER_OS: "windows"
+        strategy:
+            fail-fast: false
+            matrix:
+                PYTHON_VERSION: ["3.13"]
+        steps:
+            - name: Checkout branch
+              uses: actions/checkout@v6
+            - uses: nuget/setup-nuget@v4
+              with:
+                nuget-version: '5.x'
+            - name: Cache cargo + target
+              uses: Swatinem/rust-cache@v2
+              with:
+                key: preflight-x64-${{ matrix.PYTHON_VERSION }}
+            - name: Install miniconda
+              uses: conda-incubator/setup-miniconda@v4
+              with:
+                auto-update-conda: false
+                miniforge-version: latest
+                channels: conda-forge
+                conda-remove-defaults: "true"
+                python-version: ${{ matrix.PYTHON_VERSION }}
+                use-mamba: true
+            - name: Install winpty
+              shell: bash -l {0}
+              run: conda install -y winpty
+            - name: Install build dependencies
+              shell: bash -l {0}
+              run: pip install maturin toml
+            - name: Copy winpty binaries to package
+              shell: bash -l {0}
+              run: bash -l .github/scripts/copy_winpty.sh
+            - name: Build wheel
+              shell: bash -l {0}
+              run: maturin build --release -i $(which python)
+            - name: Sanity check wheel contents
+              shell: bash -l {0}
+              run: python .github/scripts/check_wheel.py 'target/wheels/*.whl' --has-conpty --has-winpty
+            - name: Upload preflight wheel artifact
+              uses: actions/upload-artifact@v4
+              with:
+                name: preflight-x64-py${{ matrix.PYTHON_VERSION }}
+                path: target/wheels/*.whl
+                if-no-files-found: error
+                retention-days: 7
+
+    arm64:
+        name: arm64 wheel preflight (Py${{ matrix.PYTHON_VERSION }})
+        runs-on: windows-11-arm
+        timeout-minutes: 15
+        env:
+            PYTHON_VERSION: ${{ matrix.PYTHON_VERSION }}
+            RUNNER_OS: "windows"
+        strategy:
+            fail-fast: false
+            matrix:
+                PYTHON_VERSION: ["3.13"]
+        steps:
+            - name: Checkout branch
+              uses: actions/checkout@v6
+            - uses: nuget/setup-nuget@v4
+              with:
+                nuget-version: '5.x'
+            - name: Cache cargo + target
+              uses: Swatinem/rust-cache@v2
+              with:
+                key: preflight-arm64-${{ matrix.PYTHON_VERSION }}
+            - name: Install Python via NuGet
+              shell: bash -l {0}
+              run: |
+                nuget install pythonarm64 -Version ${{ matrix.PYTHON_VERSION }} -Source https://api.nuget.org/v3/index.json -ExcludeVersion
+                NUGET_PYTHON=$PWD/pythonarm64/tools/python.exe
+                echo "NUGET_PYTHON=$NUGET_PYTHON" >> $GITHUB_ENV
+            - name: Install build dependencies
+              shell: bash -l {0}
+              run: $NUGET_PYTHON -m pip install maturin toml
+            - name: Strip binary patterns from .gitignore
+              shell: bash -l {0}
+              run: |
+                sed -i '/[.]exe/c\' .gitignore
+                sed -i '/[.]dll/c\' .gitignore
+            - name: Build wheel
+              shell: bash -l {0}
+              run: $NUGET_PYTHON -m maturin build --release -i $NUGET_PYTHON
+            - name: Sanity check wheel contents
+              shell: bash -l {0}
+              run: $NUGET_PYTHON .github/scripts/check_wheel.py 'target/wheels/*.whl' --has-conpty
+            - name: Upload preflight wheel artifact
+              uses: actions/upload-artifact@v4
+              with:
+                name: preflight-arm64-py${{ matrix.PYTHON_VERSION }}
+                path: target/wheels/*.whl
+                if-no-files-found: error
+                retention-days: 7

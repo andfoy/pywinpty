@@ -29,3 +29,10 @@ urls.Repository = "https://github.com/andfoy/pywinpty"
 [build-system]
 requires = ["maturin>=1.1,<2.0"]
 build-backend = "maturin"
+
+[tool.maturin]
+# The python package lives under `winpty/`, while the rust cdylib is named
+# `_winpty` (renamed from `winpty` to avoid a collision with the bundled
+# `winpty.dll` C library that maturin would otherwise de-dupe).
+python-source = "."
+module-name = "winpty._winpty"

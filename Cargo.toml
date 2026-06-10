@@ -10,7 +10,7 @@ readme = "README.md"
 edition = "2024"
 
 [lib]
-name = "winpty"
+name = "_winpty"
 crate-type = ["cdylib"]
 
 [build-dependencies]
