@@ -1,3 +1,19 @@
+## Version 3.0.5 (2026/06/10)
+
+Re-release of 3.0.4 with a build-pipeline fix: the published 3.0.4 wheels
+shipped without the WinPTY DLL (x64) and without any native binaries at all
+(arm64), making them unusable. The rust cdylib was renamed `winpty` → `_winpty`
+to avoid maturin de-duping the colliding `winpty.dll`, the arm64 release job
+now strips `*.dll`/`*.exe` from `.gitignore` so the NuGet-downloaded ConPTY
+binaries land in the wheel, and a pre-upload sanity check verifies every
+expected binary is present.
+
+### Issues fixed in this release
+
+* Published 3.0.4 wheels were missing `winpty.dll` (x64) and all native
+  binaries (arm64).
+
+
 ## Version 3.0.4 (2026/06/10)
 
 
