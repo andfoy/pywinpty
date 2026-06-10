@@ -4,6 +4,12 @@ on:
     release:
       types:
         - created
+    workflow_dispatch:
+      inputs:
+        ref:
+          description: 'Git ref (tag/branch/SHA) to build the sdist from. Defaults to the branch the workflow was dispatched on.'
+          required: false
+          default: ''
 
 jobs:
     linux:
@@ -19,6 +25,8 @@ jobs:
         steps:
           - name: Checkout branch
             uses: actions/checkout@v6
+            with:
+              ref: ${{ inputs.ref || github.ref }}
 
           - name: Install miniconda
             uses: conda-incubator/setup-miniconda@v3
@@ -33,13 +41,21 @@ jobs:
             # the `license-file` field that maturin emits per Metadata 2.4
             # (PEP 639). Older twine errors out with
             # "unrecognized or malformed field 'license-file'".
-            run: pip install "twine>=6.1" "pkginfo>=1.12" maturin
+            #
+            # `python -m pip` so the install lands in the active conda env
+            # rather than the system Python — otherwise `twine`/`pkginfo`
+            # below may resolve to the Ubuntu-packaged versions and reject
+            # the Metadata 2.4 `license-file` field.
+            run: python -m pip install "twine>=6.1" "pkginfo>=1.12" maturin
           - name: Build sdist distribution
             shell: bash -l {0}
-            run: maturin sdist
+            run: python -m maturin sdist
           - name: Upload to PyPi
             shell: bash -l {0}
             env:
                 TWINE_PASSWORD: ${{secrets.MATURIN_PASSWORD}}
                 TWINE_USERNAME: ${{secrets.MATURIN_USERNAME}}
-            run: twine upload target/wheels/*.tar.gz
+            # `python -m twine` (not bare `twine`) so we use the env-installed
+            # twine, not whichever twine binary `bash -l` happens to find on
+            # PATH first.
+            run: python -m twine upload target/wheels/*.tar.gz
