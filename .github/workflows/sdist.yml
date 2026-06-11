@@ -1,4 +1,12 @@
-name: Linux sdist
+name: sdist
+
+# Builds and uploads the source distribution. Originally lived on Linux as a
+# workaround for early maturin versions that failed to produce sdists on
+# Windows; that's long since fixed, and the conda env activation on
+# `ubuntu-latest` keeps tripping `python -m pip` (`No module named pip`).
+# Run on `windows-11-arm` with the same NuGet-installed `pythonarm64` we use
+# for the arm64 release - sidesteps the miniconda activation entirely and
+# keeps build env identical to that release.
 
 on:
     release:
@@ -12,12 +20,12 @@ on:
           default: ''
 
 jobs:
-    linux:
-        name: Linux Py${{ matrix.PYTHON_VERSION }}
-        runs-on: ubuntu-latest
+    sdist:
+        name: sdist Py${{ matrix.PYTHON_VERSION }}
+        runs-on: windows-11-arm
+        timeout-minutes: 10
         env:
             PYTHON_VERSION: ${{ matrix.PYTHON_VERSION }}
-            RUNNER_OS: "linux"
         strategy:
             fail-fast: false
             matrix:
@@ -27,35 +35,29 @@ jobs:
             uses: actions/checkout@v6
             with:
               ref: ${{ inputs.ref || github.ref }}
-
-          - name: Install miniconda
-            uses: conda-incubator/setup-miniconda@v3
+          - uses: nuget/setup-nuget@v4
             with:
-              auto-update-conda: true
-              activate-environment: test
-              channels: conda-forge,defaults
-              python-version: ${{ matrix.PYTHON_VERSION }}
+              nuget-version: '5.x'
+          - name: Install Python via NuGet
+            shell: bash -l {0}
+            run: |
+              nuget install pythonarm64 -Version $PYTHON_VERSION -Source https://api.nuget.org/v3/index.json -ExcludeVersion
+              NUGET_PYTHON=$PWD/pythonarm64/tools/python.exe
+              echo "NUGET_PYTHON=$NUGET_PYTHON" >> $GITHUB_ENV
           - name: Install twine/maturin
             shell: bash -l {0}
-            # Pin twine >= 6.1 (and pkginfo >= 1.12) so the upload accepts
-            # the `license-file` field that maturin emits per Metadata 2.4
-            # (PEP 639). Older twine errors out with
-            # "unrecognized or malformed field 'license-file'".
-            #
-            # `python -m pip` so the install lands in the active conda env
-            # rather than the system Python — otherwise `twine`/`pkginfo`
-            # below may resolve to the Ubuntu-packaged versions and reject
-            # the Metadata 2.4 `license-file` field.
-            run: python -m pip install "twine>=6.1" "pkginfo>=1.12" maturin
+            # Pin twine >= 6.1 / pkginfo >= 1.12 so the upload accepts the
+            # Metadata 2.4 `license-file` field emitted by current maturin.
+            run: $NUGET_PYTHON -m pip install "twine>=6.1" "pkginfo>=1.12" maturin
           - name: Build sdist distribution
             shell: bash -l {0}
-            run: python -m maturin sdist
+            run: $NUGET_PYTHON -m maturin sdist
+          - name: Sanity check sdist
+            shell: bash -l {0}
+            run: $NUGET_PYTHON -m twine check target/wheels/*.tar.gz
           - name: Upload to PyPi
             shell: bash -l {0}
             env:
                 TWINE_PASSWORD: ${{secrets.MATURIN_PASSWORD}}
                 TWINE_USERNAME: ${{secrets.MATURIN_USERNAME}}
-            # `python -m twine` (not bare `twine`) so we use the env-installed
-            # twine, not whichever twine binary `bash -l` happens to find on
-            # PATH first.
-            run: python -m twine upload target/wheels/*.tar.gz
+            run: $NUGET_PYTHON -m twine upload target/wheels/*.tar.gz
