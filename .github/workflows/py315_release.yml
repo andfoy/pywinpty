@@ -1,0 +1,167 @@
+name: Python 3.15 release
+
+# Builds a single Windows x64 wheel against CPython 3.15 and publishes it as a
+# GitHub release asset on this repository.
+#
+# This is a fork-local release path: the wheel carries a PEP 440 local version
+# (3.0.5+py315), which PyPI rejects by design, so nothing here uploads to PyPI.
+#
+# The release is created by this workflow using the default GITHUB_TOKEN.
+# GitHub deliberately does not start new workflow runs from events triggered by
+# GITHUB_TOKEN, so the `release: created` workflows (windows_release.yml,
+# windows_release_arm.yml, sdist.yml) do NOT fire and do NOT fail for want of
+# PyPI credentials. Creating the release by hand in the UI would trigger them.
+
+on:
+    workflow_dispatch:
+        inputs:
+            tag:
+                description: 'Tag to create for the release'
+                required: true
+                default: 'v3.0.5+py315'
+            python_version:
+                description: 'CPython version to build against'
+                required: true
+                default: '3.15'
+
+permissions:
+    contents: write
+
+jobs:
+    build-and-release:
+        name: Windows x64 wheel (Py${{ inputs.python_version }})
+        runs-on: windows-latest
+        timeout-minutes: 20
+        steps:
+            - name: Checkout branch
+              uses: actions/checkout@v6
+
+            - uses: nuget/setup-nuget@v4
+              with:
+                nuget-version: '5.x'
+
+            # 3.15 is still a prerelease, so allow-prereleases is required.
+            # conda-forge only carries 3.15 betas under a `python_dev` label,
+            # which is why the interpreter comes from setup-python here rather
+            # than from conda as in the other release workflows.
+            - name: Install CPython ${{ inputs.python_version }}
+              id: py315
+              uses: actions/setup-python@v6
+              with:
+                python-version: ${{ inputs.python_version }}
+                allow-prereleases: true
+                architecture: x64
+
+            - name: Record interpreter path
+              shell: bash
+              run: echo "PY315=${{ steps.py315.outputs.python-path }}" >> $GITHUB_ENV
+
+            - name: Verify interpreter is 3.15
+              shell: pwsh
+              run: |
+                & $env:PY315 -VV
+                & $env:PY315 -c "import sys; assert sys.version_info[:2] == (3, 15), sys.version"
+                $full = & $env:PY315 -c "import sys; print(sys.version.split()[0])"
+                Write-Host "CPython $full"
+                "PY_FULL=$full" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+            # conda is still the source of the WinPTY runtime binaries
+            # (winpty.dll / winpty-agent.exe). Its own Python is irrelevant to
+            # the build; only $CONDA_PREFIX/Library/bin is used.
+            - name: Install miniconda (for winpty binaries only)
+              uses: conda-incubator/setup-miniconda@v4
+              with:
+                auto-update-conda: false
+                miniforge-version: latest
+                channels: conda-forge
+                conda-remove-defaults: "true"
+                python-version: "3.13"
+
+            - name: Install winpty
+              shell: bash -l {0}
+              run: conda install -y winpty
+
+            # Also strips *.dll / *.exe from .gitignore, which maturin honours
+            # when packaging the python source dir.
+            - name: Copy winpty binaries to package
+              shell: bash -l {0}
+              run: bash -l .github/scripts/copy_winpty.sh
+
+            - name: Install build dependencies
+              shell: pwsh
+              run: |
+                & $env:PY315 -m pip install --upgrade pip
+                & $env:PY315 -m pip install maturin toml
+
+            - name: Build wheel
+              shell: pwsh
+              run: |
+                & $env:PY315 -m maturin build --release -i $env:PY315
+
+            - name: Sanity check wheel contents
+              shell: pwsh
+              run: |
+                & $env:PY315 .github/scripts/check_wheel.py 'target/wheels/*.whl' --has-conpty --has-winpty
+
+            - name: Verify wheel version and ABI tag
+              shell: pwsh
+              run: |
+                $wheel = Get-ChildItem target/wheels/*.whl | Select-Object -First 1
+                Write-Host "Built: $($wheel.Name)"
+                if ($wheel.Name -notmatch '^pywinpty-3\.0\.5\+py315-cp315-cp315-win_amd64\.whl$') {
+                    Write-Error "Unexpected wheel name: $($wheel.Name)"
+                    exit 1
+                }
+
+            - name: Upload wheel artifact
+              uses: actions/upload-artifact@v4
+              with:
+                name: pywinpty-py315-win_amd64
+                path: target/wheels/*.whl
+                if-no-files-found: error
+
+            # Notes go through a heredoc rather than an inline --notes string:
+            # YAML strips the block's common indentation, so the heredoc body
+            # and its EOF terminator both land at column 0. An inline --notes
+            # would keep the leading whitespace and render as code blocks.
+            - name: Write release notes
+              env:
+                TAG: ${{ inputs.tag }}
+              shell: bash
+              run: |
+                set -eu
+                cat > release_notes.md <<EOF
+                Unofficial fork build of pywinpty 3.0.5 for CPython 3.15 on Windows x64.
+
+                Built from \`${GITHUB_SHA}\` on \`windows-latest\` against CPython \`${PY_FULL}\`.
+
+                ### Contents
+                - \`pywinpty-3.0.5+py315-cp315-cp315-win_amd64.whl\` — ConPTY and WinPTY backends.
+
+                ### Differences from upstream 3.0.5
+                - pyo3 bumped 0.28 → 0.29; 0.29.0 is the first release supporting CPython 3.15, and 0.28's build script rejects any interpreter newer than 3.14.
+                - Version carries the PEP 440 local segment \`+py315\`. Local versions are un-uploadable to PyPI by design, which is intended for a fork build.
+
+                ### Caveat
+                Built against a CPython 3.15 **prerelease** (\`${PY_FULL}\`). The 3.15 ABI is not final until 3.15.0 ships, so this wheel may fail to load against the final interpreter.
+
+                ### Install
+                \`\`\`
+                pip install https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/pywinpty-3.0.5+py315-cp315-cp315-win_amd64.whl
+                \`\`\`
+                EOF
+                cat release_notes.md
+
+            - name: Create GitHub release
+              env:
+                GH_TOKEN: ${{ github.token }}
+                TAG: ${{ inputs.tag }}
+              shell: bash
+              run: |
+                set -eux
+                gh release create "$TAG" target/wheels/*.whl \
+                  --repo "$GITHUB_REPOSITORY" \
+                  --target "$GITHUB_SHA" \
+                  --title "pywinpty 3.0.5+py315 (CPython 3.15 / Windows x64)" \
+                  --prerelease \
+                  --notes-file release_notes.md
