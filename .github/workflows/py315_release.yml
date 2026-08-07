@@ -12,7 +12,15 @@ name: Python 3.15 release
 # windows_release_arm.yml, sdist.yml) do NOT fire and do NOT fail for want of
 # PyPI credentials. Creating the release by hand in the UI would trigger them.
 
+# Triggered by pushing a `v*+py315` tag. A tag push reads the workflow from
+# the tagged commit, so this works from a topic branch; workflow_dispatch by
+# contrast requires the file to live on the default branch, which would mean
+# diverging this fork's `main` from upstream. The dispatch trigger is kept for
+# convenience if this ever lands on the default branch.
 on:
+    push:
+        tags:
+            - 'v*+py315'
     workflow_dispatch:
         inputs:
             tag:
@@ -29,7 +37,7 @@ permissions:
 
 jobs:
     build-and-release:
-        name: Windows x64 wheel (Py${{ inputs.python_version }})
+        name: Windows x64 wheel (Py${{ inputs.python_version || '3.15' }})
         runs-on: windows-latest
         timeout-minutes: 20
         steps:
@@ -44,11 +52,11 @@ jobs:
             # conda-forge only carries 3.15 betas under a `python_dev` label,
             # which is why the interpreter comes from setup-python here rather
             # than from conda as in the other release workflows.
-            - name: Install CPython ${{ inputs.python_version }}
+            - name: Install CPython ${{ inputs.python_version || '3.15' }}
               id: py315
               uses: actions/setup-python@v6
               with:
-                python-version: ${{ inputs.python_version }}
+                python-version: ${{ inputs.python_version || '3.15' }}
                 allow-prereleases: true
                 architecture: x64
 
@@ -126,7 +134,7 @@ jobs:
             # would keep the leading whitespace and render as code blocks.
             - name: Write release notes
               env:
-                TAG: ${{ inputs.tag }}
+                TAG: ${{ inputs.tag || github.ref_name }}
               shell: bash
               run: |
                 set -eu
@@ -155,7 +163,7 @@ jobs:
             - name: Create GitHub release
               env:
                 GH_TOKEN: ${{ github.token }}
-                TAG: ${{ inputs.tag }}
+                TAG: ${{ inputs.tag || github.ref_name }}
               shell: bash
               run: |
                 set -eux
