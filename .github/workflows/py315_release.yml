@@ -20,7 +20,9 @@ name: Python 3.15 release
 on:
     push:
         tags:
-            - 'v*+py315'
+            # `+` is a special character in GitHub filter patterns ("one or
+            # more of the preceding character") and must be escaped.
+            - 'v*\+py315'
     workflow_dispatch:
         inputs:
             tag:
