@@ -36,6 +36,7 @@ on:
 
 permissions:
     contents: write
+    actions: write # dispatch pages.yml after the release exists
 
 jobs:
     build-and-release:
@@ -175,3 +176,16 @@ jobs:
                   --title "pywinpty 3.0.5+py315 (CPython 3.15 / Windows x64)" \
                   --prerelease \
                   --notes-file release_notes.md
+
+            # The release above was created with GITHUB_TOKEN, so it fires no
+            # `release` event (GitHub suppresses those to prevent recursion) —
+            # which is exactly why the PyPI upload workflows stay quiet. The
+            # same suppression means pages.yml would never see the new release,
+            # so trigger the index rebuild explicitly. pages.yml lives on the
+            # default branch, which is where workflow_dispatch resolves.
+            - name: Rebuild the Pages package index
+              env:
+                GH_TOKEN: ${{ github.token }}
+                GH_REPO: ${{ github.repository }}
+              shell: bash
+              run: gh workflow run pages.yml
