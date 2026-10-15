@@ -1,3 +1,10 @@
+## Version 3.0.6 (unreleased)
+
+* Build and test Python 3.15 and 3.15t wheels on Windows x64 and ARM64.
+* Upgrade PyO3 to 0.30.1 for Python 3.15 support. Python 3.13t wheels are
+  no longer built because PyO3 dropped support for that experimental version.
+
+
 ## Version 3.0.5 (2026/06/10)
 
 Re-release of 3.0.4 with a build-pipeline fix: the published 3.0.4 wheels

@@ -51,7 +51,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                PYTHON_VERSION: ["3.13"]
+                PYTHON_VERSION: ["3.13", "3.15"]
         steps:
             - name: Checkout branch
               uses: actions/checkout@v6
@@ -63,7 +63,7 @@ jobs:
               with:
                 auto-update-conda: false
                 miniforge-version: latest
-                channels: conda-forge
+                channels: conda-forge/label/python_rc,conda-forge
                 conda-remove-defaults: "true"
                 python-version: ${{ matrix.PYTHON_VERSION }}
                 use-mamba: true
@@ -100,7 +100,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                PYTHON_VERSION: ["3.13"]
+                PYTHON_VERSION: ["3.13", "3.15"]
         steps:
             - name: Checkout branch
               uses: actions/checkout@v6
