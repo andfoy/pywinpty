@@ -2,7 +2,7 @@
 use std::ffi::OsString;
 
 use pyo3::create_exception;
-use pyo3::exceptions::PyException;
+use pyo3::exceptions::{PyDeprecationWarning, PyException};
 use pyo3::prelude::*;
 
 use winptyrs::{PTY, PTYArgs, PTYBackend, MouseMode, AgentConfig};
@@ -47,13 +47,17 @@ create_exception!(pywinpty, WinptyError, PyException);
 ///
 /// Notes
 /// -----
-/// 1. Optional argument values will take effect if and only if the backend is set to
+/// 1. The WinPTY backend is deprecated and will be removed in pywinpty 4.0. Creating a
+/// PTY that uses it, either explicitly or through the automatic fallback, emits a
+/// `DeprecationWarning`.
+///
+/// 2. Optional argument values will take effect if and only if the backend is set to
 /// `winpty.Backend.Winpty`, either automatically or manually.
 ///
-/// 2. ConPTY backend will take precedence over WinPTY, as it is native to Windows
+/// 3. ConPTY backend will take precedence over WinPTY, as it is native to Windows
 /// and therefore is faster.
 ///
-/// 3. Automatic backend selection will be determined based on both the compilation
+/// 4. Automatic backend selection will be determined based on both the compilation
 /// flags used to compile pywinpty and the availability of the APIs on the runtime
 /// system.
 ///
@@ -74,6 +78,7 @@ impl PyPTY {
         agent_config = 4
     ))]
     fn new(
+        py: Python<'_>,
         cols: i32,
         rows: i32,
         backend: Option<i32>,
@@ -102,7 +107,20 @@ impl PyPTY {
         }
 
         match pty {
-            Ok(pty) => Ok(PyPTY { pty: pty }),
+            Ok(pty) => {
+                if matches!(pty.get_backend(), PTYBackend::WinPTY) {
+                    let message = if backend.is_some() {
+                        c"The WinPTY backend is deprecated and will be removed in \
+                          pywinpty 4.0. Use the ConPTY backend (winpty.Backend.ConPTY) instead."
+                    } else {
+                        c"ConPTY is not available, so pywinpty fell back to the WinPTY \
+                          backend, which is deprecated and will be removed in pywinpty 4.0. \
+                          ConPTY requires Windows 10 version 1809 or later."
+                    };
+                    PyErr::warn(py, py.get_type::<PyDeprecationWarning>().as_any(), message, 1)?;
+                }
+                Ok(PyPTY { pty: pty })
+            }
             Err(error) => {
                 let error_str: String = error.to_str().unwrap().to_owned();
                 Err(WinptyError::new_err(string_to_static_str(error_str)))

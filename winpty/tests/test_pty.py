@@ -162,3 +162,22 @@ def test_agent_resize(pty_fixture):
     pty = pty_fixture()
     pty.set_size(80, 70)
     del pty
+
+
+def test_winpty_backend_deprecated():
+    with pytest.warns(DeprecationWarning, match='WinPTY backend is deprecated'):
+        try:
+            PTY(80, 25, backend=Backend.WinPTY)
+        except WinptyError:
+            # WinPTY isn't bundled (e.g. arm64), so there is nothing to warn about.
+            pytest.skip('WinPTY backend is not available')
+
+
+def test_conpty_backend_not_deprecated():
+    import warnings
+    with warnings.catch_warnings():
+        warnings.simplefilter('error', DeprecationWarning)
+        try:
+            PTY(80, 25, backend=Backend.ConPTY)
+        except WinptyError:
+            pytest.skip('ConPTY backend is not available')

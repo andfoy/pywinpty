@@ -16,6 +16,9 @@
 
 PyWinpty allows creating and communicating with Windows processes that receive input and print outputs via console input and output pipes. PyWinpty supports both the native [ConPTY](https://devblogs.microsoft.com/commandline/windows-command-line-introducing-the-windows-pseudo-console-conpty/) interface and the previous, fallback [winpty](https://github.com/rprichard/winpty) library.
 
+> [!WARNING]
+> The winpty backend is deprecated and will be removed in pywinpty 4.0. Use the ConPTY backend instead; it is built into Windows 10 version 1809 and later.
+
 
 ## Dependencies
 To compile pywinpty sources, you must have [Rust](https://rustup.rs/) installed.
