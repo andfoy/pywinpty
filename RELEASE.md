@@ -13,7 +13,9 @@ To release a new version of pywinpty:
 13. git push upstream master
 14. git push upstream --tags
 15. Create release in GitHub
-16. Wait for GitHub actions to publish the wheels and the sdist distribution
+16. Wait for the `Release` workflow to build all wheels and the sdist; it only
+    publishes to PyPI (via Trusted Publishing, `pypi` environment) once every
+    build job has succeeded
 
 [<a name="explanation">1</a>] We need to append '-dev0', as Cargo does not support the '.dev0'
 syntax.
