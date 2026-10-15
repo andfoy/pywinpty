@@ -20,165 +20,20 @@ on:
           required: false
           default: ''
 
-# Pin the build tooling so a release is never the first run on a new version.
 env:
-    MATURIN_SPEC: "maturin>=1.15,<2"
     TWINE_SPEC: "twine>=6.1,<8"
 
 jobs:
-    x64:
-        name: Wheel x64 Py${{ matrix.PYTHON_VERSION }}
-        runs-on: windows-latest
-        timeout-minutes: 20
-        env:
-            PYTHON_VERSION: ${{ matrix.PYTHON_VERSION }}
-            RUNNER_OS: "windows"
-        strategy:
-            fail-fast: false
-            matrix:
-                # "3.10" builds the abi3 wheel that covers every regular CPython
-                # >= 3.10. Free-threaded interpreters can't use the limited API,
-                # so they still get one version-specific wheel each.
-                PYTHON_VERSION: ["3.10", "3.14t", "3.15t"]
-        steps:
-            - name: Checkout branch
-              uses: actions/checkout@v6
-              with:
-                ref: ${{ inputs.ref || github.ref }}
-            - uses: nuget/setup-nuget@v4
-              with:
-                nuget-version: '5.x'
-            - name: Remove free-threaded suffix from version
-              shell: bash -l {0}
-              run: echo "PYTHON_VERSION_NONSUFFIX=${PYTHON_VERSION//t}" >> $GITHUB_ENV
-            - name: Install miniconda
-              uses: conda-incubator/setup-miniconda@v4
-              with:
-                auto-update-conda: true
-                miniforge-version: latest
-                channels: conda-forge/label/python_rc,conda-forge
-                conda-remove-defaults: "true"
-                python-version: ${{ env.PYTHON_VERSION_NONSUFFIX }}
-            - name: Reinstall free-threaded Python
-              if: ${{ endsWith(matrix.PYTHON_VERSION, 't') }}
-              shell: bash -l {0}
-              run: conda install --override-channels -c conda-forge python-freethreading
-            - name: Install winpty
-              shell: bash -l {0}
-              run: conda install -y winpty
-            - name: Install build dependencies
-              shell: bash -l {0}
-              run: pip install "$MATURIN_SPEC" toml
-            - name: Copy winpty binaries to package
-              shell: bash -l {0}
-              run: bash -l .github/scripts/copy_winpty.sh
-            - name: Build wheel
-              shell: bash -l {0}
-              run: maturin build --release -i $(which python)
-            - name: Sanity check wheel contents
-              shell: bash -l {0}
-              run: python .github/scripts/check_wheel.py 'target/wheels/*.whl' --has-conpty --has-winpty ${{ endsWith(matrix.PYTHON_VERSION, 't') && '--no-abi3' || '--abi3' }}
-            - name: Upload wheel artifact
-              uses: actions/upload-artifact@v4
-              with:
-                name: dist-x64-py${{ matrix.PYTHON_VERSION }}
-                path: target/wheels/*.whl
-                if-no-files-found: error
-
-    arm64:
-        name: Wheel arm64 Py${{ matrix.PYTHON_VERSION }}
-        runs-on: windows-11-arm
-        timeout-minutes: 15
-        env:
-            PYTHON_VERSION: ${{ matrix.PYTHON_VERSION }}
-            RUNNER_OS: "windows"
-        strategy:
-            fail-fast: false
-            matrix:
-                # "3.10" builds the abi3 wheel that covers every regular CPython
-                # >= 3.10. Free-threaded interpreters can't use the limited API,
-                # so they still get one version-specific wheel each.
-                PYTHON_VERSION: ["3.10", "3.14t", "3.15t"]
-        steps:
-            - name: Checkout branch
-              uses: actions/checkout@v6
-              with:
-                ref: ${{ inputs.ref || github.ref }}
-            - uses: nuget/setup-nuget@v4
-              with:
-                nuget-version: '5.x'
-            - name: Select NuGet Python package
-              shell: bash -l {0}
-              run: |
-                PYTHON_PKG="pythonarm64"
-                if [[ $PYTHON_VERSION = *t ]]; then
-                  PYTHON_PKG="pythonarm64-freethreaded"
-                fi
-                echo "PYTHON_PKG=$PYTHON_PKG" >> $GITHUB_ENV
-                echo "PYTHON_VERSION_NONSUFFIX=${PYTHON_VERSION//t}" >> $GITHUB_ENV
-            - name: Install Python via NuGet
-              shell: bash -l {0}
-              run: |
-                nuget install $PYTHON_PKG -Version $PYTHON_VERSION_NONSUFFIX -Source https://api.nuget.org/v3/index.json -ExcludeVersion
-                echo "NUGET_PYTHON=$PWD/$PYTHON_PKG/tools/python.exe" >> $GITHUB_ENV
-            - name: Install build dependencies
-              shell: bash -l {0}
-              run: $NUGET_PYTHON -m pip install "$MATURIN_SPEC" toml
-            - name: Strip binary patterns from .gitignore
-              shell: bash -l {0}
-              # `.gitignore` blanket-excludes *.dll/*.exe so they stay out of
-              # git, but maturin honours .gitignore when packaging the python
-              # source directory. Strip those lines here so the ConPTY binaries
-              # that build.rs downloads from NuGet actually land in the wheel.
-              run: |
-                sed -i '/[.]exe/c\' .gitignore
-                sed -i '/[.]dll/c\' .gitignore
-            - name: Build wheel
-              shell: bash -l {0}
-              run: $NUGET_PYTHON -m maturin build --release -i $NUGET_PYTHON
-            - name: Sanity check wheel contents
-              shell: bash -l {0}
-              run: $NUGET_PYTHON .github/scripts/check_wheel.py 'target/wheels/*.whl' --has-conpty ${{ endsWith(matrix.PYTHON_VERSION, 't') && '--no-abi3' || '--abi3' }}
-            - name: Upload wheel artifact
-              uses: actions/upload-artifact@v4
-              with:
-                name: dist-arm64-py${{ matrix.PYTHON_VERSION }}
-                path: target/wheels/*.whl
-                if-no-files-found: error
-
-    sdist:
-        name: sdist
-        runs-on: windows-11-arm
-        timeout-minutes: 10
-        steps:
-            - name: Checkout branch
-              uses: actions/checkout@v6
-              with:
-                ref: ${{ inputs.ref || github.ref }}
-            - uses: nuget/setup-nuget@v4
-              with:
-                nuget-version: '5.x'
-            - name: Install Python via NuGet
-              shell: bash -l {0}
-              run: |
-                nuget install pythonarm64 -Version 3.11 -Source https://api.nuget.org/v3/index.json -ExcludeVersion
-                echo "NUGET_PYTHON=$PWD/pythonarm64/tools/python.exe" >> $GITHUB_ENV
-            - name: Install build dependencies
-              shell: bash -l {0}
-              run: $NUGET_PYTHON -m pip install "$MATURIN_SPEC"
-            - name: Build sdist
-              shell: bash -l {0}
-              run: $NUGET_PYTHON -m maturin sdist
-            - name: Upload sdist artifact
-              uses: actions/upload-artifact@v4
-              with:
-                name: dist-sdist
-                path: target/wheels/*.tar.gz
-                if-no-files-found: error
+    build:
+        name: Build
+        uses: ./.github/workflows/build_wheels.yml
+        with:
+          ref: ${{ inputs.ref }}
+          sdist: true
 
     publish:
         name: Publish to PyPI
-        needs: [x64, arm64, sdist]
+        needs: [build]
         if: github.event_name == 'release'
         runs-on: ubuntu-latest
         timeout-minutes: 10
