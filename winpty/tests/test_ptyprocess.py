@@ -45,18 +45,35 @@ def pty_fixture(request):
     return _pty_factory
 
 
+def _read_until(pty, needle, timeout=30):
+    """Read from ``pty`` until ``needle`` shows up or ``timeout`` expires.
+
+    The reader thread sends empty keep-alive chunks when there is no output,
+    so a fixed number of reads can run out long before a slow runner prints
+    anything. Use a wall-clock deadline instead, with a socket timeout so a
+    blocking read can't hang past it.
+    """
+    data = ''
+    deadline = time.monotonic() + timeout
+    pty.fileobj.settimeout(1)
+    try:
+        while needle not in data and time.monotonic() < deadline:
+            try:
+                data += pty.read()
+            except TimeoutError:
+                pass
+            except EOFError:
+                break
+    finally:
+        pty.fileobj.settimeout(None)
+    return data
+
+
 @flaky(max_runs=40, min_passes=1)
 def test_read(pty_fixture):
     pty = pty_fixture()
     loc = os.getcwd()
-    data = ''
-    tries = 0
-    while loc not in data and tries < 10:
-        try:
-            data += pty.read()
-        except EOFError:
-            pass
-        tries += 1
+    data = _read_until(pty, loc)
     assert loc in data
     pty.terminate()
     time.sleep(2)
@@ -66,17 +83,14 @@ def test_read(pty_fixture):
 def test_write(pty_fixture):
     pty = pty_fixture()
 
+    # Wait for the cmd prompt, so the input isn't written before the shell
+    # is ready to echo it back.
+    _read_until(pty, os.getcwd())
+
     text = 'Eggs, ham and spam ünicode'
     pty.write(text)
 
-    data = ''
-    tries = 0
-    while text not in data and tries < 10:
-        try:
-            data += pty.read()
-        except EOFError:
-            pass
-        tries += 1
+    data = _read_until(pty, text)
     assert text in data
     pty.terminate()
 
