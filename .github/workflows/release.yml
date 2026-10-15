@@ -36,7 +36,10 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                PYTHON_VERSION: ["3.10", "3.11", "3.12", "3.13", "3.14", "3.14t", "3.15", "3.15t"]
+                # "3.10" builds the abi3 wheel that covers every regular CPython
+                # >= 3.10. Free-threaded interpreters can't use the limited API,
+                # so they still get one version-specific wheel each.
+                PYTHON_VERSION: ["3.10", "3.14t", "3.15t"]
         steps:
             - name: Checkout branch
               uses: actions/checkout@v6
@@ -74,7 +77,7 @@ jobs:
               run: maturin build --release -i $(which python)
             - name: Sanity check wheel contents
               shell: bash -l {0}
-              run: python .github/scripts/check_wheel.py 'target/wheels/*.whl' --has-conpty --has-winpty
+              run: python .github/scripts/check_wheel.py 'target/wheels/*.whl' --has-conpty --has-winpty ${{ endsWith(matrix.PYTHON_VERSION, 't') && '--no-abi3' || '--abi3' }}
             - name: Upload wheel artifact
               uses: actions/upload-artifact@v4
               with:
@@ -92,7 +95,10 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                PYTHON_VERSION: ["3.10", "3.11", "3.12", "3.13", "3.14", "3.14t", "3.15", "3.15t"]
+                # "3.10" builds the abi3 wheel that covers every regular CPython
+                # >= 3.10. Free-threaded interpreters can't use the limited API,
+                # so they still get one version-specific wheel each.
+                PYTHON_VERSION: ["3.10", "3.14t", "3.15t"]
         steps:
             - name: Checkout branch
               uses: actions/checkout@v6
@@ -132,7 +138,7 @@ jobs:
               run: $NUGET_PYTHON -m maturin build --release -i $NUGET_PYTHON
             - name: Sanity check wheel contents
               shell: bash -l {0}
-              run: $NUGET_PYTHON .github/scripts/check_wheel.py 'target/wheels/*.whl' --has-conpty
+              run: $NUGET_PYTHON .github/scripts/check_wheel.py 'target/wheels/*.whl' --has-conpty ${{ endsWith(matrix.PYTHON_VERSION, 't') && '--no-abi3' || '--abi3' }}
             - name: Upload wheel artifact
               uses: actions/upload-artifact@v4
               with:
@@ -188,8 +194,13 @@ jobs:
                 pattern: dist-*
                 path: dist
                 merge-multiple: true
-            - name: List distributions
-              run: ls -l dist
+            - name: Check distribution set
+              # 3 wheels (abi3, 3.14t, 3.15t) per architecture + the sdist.
+              run: |
+                ls -l dist
+                test "$(ls dist/*-abi3-win_amd64.whl dist/*-abi3-win_arm64.whl | wc -l)" -eq 2
+                test "$(ls dist/*.whl | wc -l)" -eq 6
+                test "$(ls dist/*.tar.gz | wc -l)" -eq 1
             - name: Check distribution metadata
               run: pipx run --spec "$TWINE_SPEC" twine check dist/*
             - name: Publish
