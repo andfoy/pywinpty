@@ -132,3 +132,155 @@ jobs:
                 path: target/wheels/*.whl
                 if-no-files-found: error
                 retention-days: 7
+
+    # abi3: build a single stable-ABI wheel per architecture on the oldest
+    # supported Python, then install that exact wheel on every supported
+    # (GIL) Python and run the test suite against the installed package.
+    abi3-build-x64:
+        name: abi3 wheel build (x64)
+        runs-on: windows-latest
+        timeout-minutes: 15
+        steps:
+            - name: Checkout branch
+              uses: actions/checkout@v6
+            - uses: nuget/setup-nuget@v4
+              with:
+                nuget-version: '5.x'
+            - name: Install miniconda
+              uses: conda-incubator/setup-miniconda@v4
+              with:
+                auto-update-conda: false
+                miniforge-version: latest
+                channels: conda-forge
+                conda-remove-defaults: "true"
+                python-version: "3.10"
+                use-mamba: true
+            - name: Install winpty
+              shell: bash -l {0}
+              run: conda install -y winpty
+            - name: Install build dependencies
+              shell: bash -l {0}
+              run: pip install maturin toml
+            - name: Copy winpty binaries to package
+              shell: bash -l {0}
+              run: bash -l .github/scripts/copy_winpty.sh
+            - name: Build wheel
+              shell: bash -l {0}
+              run: maturin build --release -i $(which python)
+            - name: Sanity check wheel contents
+              shell: bash -l {0}
+              run: python .github/scripts/check_wheel.py 'target/wheels/*.whl' --has-conpty --has-winpty --abi3
+            - name: Upload abi3 wheel artifact
+              uses: actions/upload-artifact@v4
+              with:
+                name: abi3-x64
+                path: target/wheels/*.whl
+                if-no-files-found: error
+                retention-days: 7
+
+    abi3-build-arm64:
+        name: abi3 wheel build (arm64)
+        runs-on: windows-11-arm
+        timeout-minutes: 15
+        steps:
+            - name: Checkout branch
+              uses: actions/checkout@v6
+            - uses: nuget/setup-nuget@v4
+              with:
+                nuget-version: '5.x'
+            - name: Install Python via NuGet
+              shell: bash -l {0}
+              run: |
+                nuget install pythonarm64 -Version 3.10 -Source https://api.nuget.org/v3/index.json -ExcludeVersion
+                echo "NUGET_PYTHON=$PWD/pythonarm64/tools/python.exe" >> $GITHUB_ENV
+            - name: Install build dependencies
+              shell: bash -l {0}
+              run: $NUGET_PYTHON -m pip install maturin toml
+            - name: Strip binary patterns from .gitignore
+              shell: bash -l {0}
+              run: |
+                sed -i '/[.]exe/c\' .gitignore
+                sed -i '/[.]dll/c\' .gitignore
+            - name: Build wheel
+              shell: bash -l {0}
+              run: $NUGET_PYTHON -m maturin build --release -i $NUGET_PYTHON
+            - name: Sanity check wheel contents
+              shell: bash -l {0}
+              run: $NUGET_PYTHON .github/scripts/check_wheel.py 'target/wheels/*.whl' --has-conpty --abi3
+            - name: Upload abi3 wheel artifact
+              uses: actions/upload-artifact@v4
+              with:
+                name: abi3-arm64
+                path: target/wheels/*.whl
+                if-no-files-found: error
+                retention-days: 7
+
+    abi3-test:
+        name: abi3 wheel test (${{ matrix.ARCH }} Py${{ matrix.PYTHON_VERSION }})
+        needs: [abi3-build-x64, abi3-build-arm64]
+        runs-on: ${{ matrix.ARCH == 'arm64' && 'windows-11-arm' || 'windows-latest' }}
+        timeout-minutes: 15
+        env:
+            PYWINPTY_BLOCK: "1"
+            CI_RUNNING: "1"
+        strategy:
+            fail-fast: false
+            matrix:
+                ARCH: ["x64", "arm64"]
+                PYTHON_VERSION: ["3.10", "3.11", "3.12", "3.13", "3.14", "3.15"]
+        steps:
+            - uses: nuget/setup-nuget@v4
+              with:
+                nuget-version: '5.x'
+            - name: Install Python via NuGet
+              shell: bash -l {0}
+              run: |
+                PYTHON_PKG=$([[ "${{ matrix.ARCH }}" == arm64 ]] && echo pythonarm64 || echo python)
+                nuget install $PYTHON_PKG -Version ${{ matrix.PYTHON_VERSION }} -Source https://api.nuget.org/v3/index.json -ExcludeVersion -OutputDirectory "$RUNNER_TEMP"
+                echo "NUGET_PYTHON=$RUNNER_TEMP/$PYTHON_PKG/tools/python.exe" >> $GITHUB_ENV
+            - name: Download abi3 wheel
+              uses: actions/download-artifact@v4
+              with:
+                name: abi3-${{ matrix.ARCH }}
+                path: dist
+            - name: Install wheel and test dependencies
+              shell: bash -l {0}
+              run: $NUGET_PYTHON -m pip install dist/*.whl pytest flaky
+            - name: Run tests against the installed wheel
+              shell: bash -l {0}
+              # Run outside the checkout (there is none here) so `winpty` is
+              # imported from site-packages, i.e. from the abi3 wheel.
+              working-directory: ${{ runner.temp }}
+              run: $NUGET_PYTHON -m pytest -v -x --pyargs winpty.tests
+
+    # Free-threaded interpreters cannot use the limited API: make sure the
+    # abi3 feature falls back to a version-specific wheel there.
+    freethreaded-build:
+        name: free-threaded wheel build (arm64 Py3.15t)
+        runs-on: windows-11-arm
+        timeout-minutes: 15
+        steps:
+            - name: Checkout branch
+              uses: actions/checkout@v6
+            - uses: nuget/setup-nuget@v4
+              with:
+                nuget-version: '5.x'
+            - name: Install Python via NuGet
+              shell: bash -l {0}
+              run: |
+                nuget install pythonarm64-freethreaded -Version 3.15 -Source https://api.nuget.org/v3/index.json -ExcludeVersion
+                echo "NUGET_PYTHON=$PWD/pythonarm64-freethreaded/tools/python.exe" >> $GITHUB_ENV
+            - name: Install build dependencies
+              shell: bash -l {0}
+              run: $NUGET_PYTHON -m pip install maturin toml
+            - name: Strip binary patterns from .gitignore
+              shell: bash -l {0}
+              run: |
+                sed -i '/[.]exe/c\' .gitignore
+                sed -i '/[.]dll/c\' .gitignore
+            - name: Build wheel
+              shell: bash -l {0}
+              run: $NUGET_PYTHON -m maturin build --release -i $NUGET_PYTHON
+            - name: Sanity check wheel contents
+              shell: bash -l {0}
+              run: $NUGET_PYTHON .github/scripts/check_wheel.py 'target/wheels/*.whl' --has-conpty --no-abi3

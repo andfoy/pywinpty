@@ -3,6 +3,7 @@
 import argparse
 import fnmatch
 import glob
+import os
 import sys
 import zipfile
 
@@ -25,9 +26,22 @@ def main():
         action="store_true",
         help="Require WinPTY runtime binaries (winpty.dll, winpty-agent.exe)",
     )
+    abi = parser.add_mutually_exclusive_group()
+    abi.add_argument(
+        "--abi3",
+        action="store_true",
+        help="Require a stable-ABI (abi3) wheel",
+    )
+    abi.add_argument(
+        "--no-abi3",
+        action="store_true",
+        help="Require a version-specific (non-abi3) wheel, e.g. free-threaded",
+    )
     parser.add_argument(
         "--extension-pattern",
-        default="winpty/_winpty.*.pyd",
+        # abi3 builds name the extension `_winpty.pyd`, version-specific
+        # builds `_winpty.cp3XX-win_*.pyd`.
+        default="winpty/_winpty*.pyd",
         help="Glob the rust extension file must match",
     )
     args = parser.parse_args()
@@ -52,6 +66,13 @@ def main():
         ext_match = any(fnmatch.fnmatch(n, args.extension_pattern) for n in names)
         if not ext_match:
             missing.append(args.extension_pattern)
+
+        # Wheel filename: {name}-{version}-{python tag}-{abi tag}-{platform}.whl
+        abi_tag = os.path.basename(wheel_path)[:-len(".whl")].split("-")[-2]
+        if args.abi3 and abi_tag != "abi3":
+            missing.append(f"abi3 tag (got {abi_tag!r})")
+        if args.no_abi3 and abi_tag == "abi3":
+            missing.append("version-specific abi tag (got 'abi3')")
 
         if missing:
             failed = True
