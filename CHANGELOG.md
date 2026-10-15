@@ -1,3 +1,14 @@
+## Version 3.2.0 (unreleased)
+
+### Deprecations
+
+* The WinPTY backend is deprecated and will be removed in pywinpty 4.0.
+  Creating a `PTY` that uses it, either explicitly (`backend=Backend.WinPTY`,
+  `PYWINPTY_BACKEND=1`) or through the automatic fallback when ConPTY is not
+  available, now emits a `DeprecationWarning`. ConPTY is built into Windows 10
+  version 1809 and later, and pywinpty already bundles it in every wheel.
+
+
 ## Version 3.1.0 (2026/10/15)
 
 * Build and test Python 3.15 and 3.15t wheels on Windows x64 and ARM64.
