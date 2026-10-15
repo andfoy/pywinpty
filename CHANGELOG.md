@@ -1,8 +1,20 @@
-## Version 3.0.6 (unreleased)
+## Version 3.1.0 (2026/10/15)
 
 * Build and test Python 3.15 and 3.15t wheels on Windows x64 and ARM64.
 * Upgrade PyO3 to 0.30.1 for Python 3.15 support. Python 3.13t wheels are
   no longer built because PyO3 dropped support for that experimental version.
+
+### Issues Closed
+
+* [Issue 582](https://github.com/andfoy/pywinpty/issues/582) - time for python 3.15 wheels ? ([PR 584](https://github.com/andfoy/pywinpty/pull/584))
+
+In this release 1 issue was closed.
+
+### Pull Requests Merged
+
+* [PR 584](https://github.com/andfoy/pywinpty/pull/584) - Add Python 3.15 wheel builds, by [@davidbrochart](https://github.com/davidbrochart) ([582](https://github.com/andfoy/pywinpty/issues/582))
+
+In this release 1 pull request was closed.
 
 
 ## Version 3.0.5 (2026/06/10)
