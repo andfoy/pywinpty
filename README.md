@@ -6,7 +6,7 @@
 [![download count](https://img.shields.io/conda/dn/conda-forge/pywinpty.svg)](https://www.anaconda.com/download/)
 [![Downloads](https://pepy.tech/badge/pywinpty)](https://pepy.tech/project/pywinpty)
 [![PyPI status](https://img.shields.io/pypi/status/pywinpty.svg)](https://github.com/spyder-ide/pywinpty)
-[![Windows tests](https://github.com/andfoy/pywinpty/actions/workflows/windows_build.yml/badge.svg)](https://github.com/andfoy/pywinpty/actions/workflows/windows_build.yml)
+[![Tests](https://github.com/andfoy/pywinpty/actions/workflows/tests.yml/badge.svg)](https://github.com/andfoy/pywinpty/actions/workflows/tests.yml)
 
 *Copyright © 2017–2022 Spyder Project Contributors*
 *Copyright © 2022– Edgar Andrés Margffoy Tuay*
