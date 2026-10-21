@@ -83,7 +83,7 @@ jobs:
               shell: bash -l {0}
               run: python .github/scripts/check_wheel.py 'target/wheels/*.whl' --has-conpty --has-winpty
             - name: Upload preflight wheel artifact
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v7
               with:
                 name: preflight-x64-py${{ matrix.PYTHON_VERSION }}
                 path: target/wheels/*.whl
@@ -128,7 +128,7 @@ jobs:
               shell: bash -l {0}
               run: $NUGET_PYTHON .github/scripts/check_wheel.py 'target/wheels/*.whl' --has-conpty
             - name: Upload preflight wheel artifact
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v7
               with:
                 name: preflight-arm64-py${{ matrix.PYTHON_VERSION }}
                 path: target/wheels/*.whl
