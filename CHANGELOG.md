@@ -1,3 +1,27 @@
+## Version 3.1.1 (2026/10/27)
+
+* Pin the ConPTY NuGet package to 1.25.260930003 rather than resolving
+  `latest` at build time, so an upstream ConPTY release can no longer change
+  what the wheels contain without a pywinpty release.
+* Require winpty-rs 1.0.7, which fixes three user-facing bugs: a teardown
+  deadlock against ConPTY 1.25 that made closing a PTY hang and left the child
+  process orphaned, the loss of the first argument on the WinPTY backend, and
+  `PTY.write()` returning 0 for payloads the child received in full.
+
+### Issues Closed
+
+* [Issue 518](https://github.com/andfoy/pywinpty/issues/518) - Arguments to the WinPTY backend don't work ([PR 591](https://github.com/andfoy/pywinpty/pull/591))
+
+In this release 1 issue was closed.
+
+### Pull Requests Merged
+
+* [PR 591](https://github.com/andfoy/pywinpty/pull/591) - Require winpty-rs 1.0.7, by [@andfoy](https://github.com/andfoy) ([518](https://github.com/andfoy/pywinpty/issues/518))
+* [PR 590](https://github.com/andfoy/pywinpty/pull/590) - Pin the ConPTY NuGet version, by [@andfoy](https://github.com/andfoy)
+
+In this release 2 pull requests were closed.
+
+
 ## Version 3.1.0 (2026/10/15)
 
 * Build and test Python 3.15 and 3.15t wheels on Windows x64 and ARM64.
