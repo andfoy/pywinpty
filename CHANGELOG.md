@@ -7,6 +7,16 @@
   deadlock against ConPTY 1.25 that made closing a PTY hang and left the child
   process orphaned, the loss of the first argument on the WinPTY backend, and
   `PTY.write()` returning 0 for payloads the child received in full.
+* Large ConPTY output is no longer truncated after the child exits. A producer
+  writing 3.9 MB and exiting cleanly now drains in full (50000 of 50000 lines)
+  and reaches EOF, where previously only a fraction of the output became
+  readable. Note that `PTY.iseof()` itself still does not report EOF on the
+  ConPTY backend; that part is tracked separately.
+* Stop publishing the vendored NuGet CPython inside the source distribution.
+  The 3.0.5 and 3.1.0 sdists were ~16.2 MB because the `pythonarm64` NuGet
+  install landed in the same checkout that `maturin sdist` archives, and
+  `twine check` never inspects archive contents. The sdist is back to ~30 KB
+  and a content check now gates the upload.
 
 ### Issues Closed
 
