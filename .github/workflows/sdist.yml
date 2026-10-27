@@ -40,10 +40,17 @@ jobs:
               nuget-version: '5.x'
           - name: Install Python via NuGet
             shell: bash -l {0}
+            # Install *outside* the checkout. `maturin sdist` archives the
+            # working tree, so a NuGet install landing in the repo root is
+            # published inside the sdist: 3.0.5 and 3.1.0 both shipped ~16 MB
+            # of vendored CPython this way (284 of 315 members), against ~31 KB
+            # for 3.0.3. Resolved via `pwd` rather than `$RUNNER_TEMP` so the
+            # path stays POSIX-style and safe to use unquoted in bash.
             run: |
-              nuget install pythonarm64 -Version $PYTHON_VERSION -Source https://api.nuget.org/v3/index.json -ExcludeVersion
-              NUGET_PYTHON=$PWD/pythonarm64/tools/python.exe
-              echo "NUGET_PYTHON=$NUGET_PYTHON" >> $GITHUB_ENV
+              NUGET_DIR="$(cd .. && pwd)/nugetpy"
+              mkdir -p "$NUGET_DIR"
+              nuget install pythonarm64 -Version $PYTHON_VERSION -Source https://api.nuget.org/v3/index.json -ExcludeVersion -OutputDirectory "$NUGET_DIR"
+              echo "NUGET_PYTHON=$NUGET_DIR/pythonarm64/tools/python.exe" >> $GITHUB_ENV
           - name: Install twine/maturin
             shell: bash -l {0}
             # Pin twine >= 6.1 / pkginfo >= 1.12 so the upload accepts the
@@ -54,7 +61,13 @@ jobs:
             run: $NUGET_PYTHON -m maturin sdist
           - name: Sanity check sdist
             shell: bash -l {0}
-            run: $NUGET_PYTHON -m twine check target/wheels/*.tar.gz
+            # `twine check` validates metadata only - it never inspects the
+            # archive contents, which is why the oversized 3.0.5 and 3.1.0
+            # sdists sailed through. check_sdist.py asserts no vendored
+            # directories and a sane size.
+            run: |
+              $NUGET_PYTHON -m twine check target/wheels/*.tar.gz
+              $NUGET_PYTHON .github/scripts/check_sdist.py 'target/wheels/*.tar.gz'
           - name: Upload to PyPi
             shell: bash -l {0}
             env:

@@ -126,3 +126,6 @@ CppProperties.json
 
 # NuGet ConPTY package
 Microsoft.Windows.Console.ConPTY*/
+
+# NuGet Python install used by the sdist/arm64 release jobs
+pythonarm64/
