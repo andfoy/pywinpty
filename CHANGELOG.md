@@ -7,11 +7,19 @@
   deadlock against ConPTY 1.25 that made closing a PTY hang and left the child
   process orphaned, the loss of the first argument on the WinPTY backend, and
   `PTY.write()` returning 0 for payloads the child received in full.
-* Large ConPTY output is no longer truncated after the child exits. A producer
-  writing 3.9 MB and exiting cleanly now drains in full (50000 of 50000 lines)
-  and reaches EOF, where previously only a fraction of the output became
-  readable. Note that `PTY.iseof()` itself still does not report EOF on the
-  ConPTY backend; that part is tracked separately.
+* **Correction, 2026/10/28.** These notes originally claimed that large ConPTY
+  output was no longer truncated after the child exits, and that such output
+  now reaches EOF. Both halves were wrong and nothing in 3.1.1 changed either.
+  The truncation reported in
+  [#565](https://github.com/andfoy/pywinpty/issues/565) is
+  [cpython#86210](https://github.com/python/cpython/issues/86210), where an
+  unbuffered `_textiowrapper_writeflush` ignores a partial write and silently
+  drops the remainder - a producer-side CPython bug, not a pywinpty one. The
+  measurement behind the original claim used a *buffered* producer writing
+  line-sized chunks, so it never exercised the reported condition. EOF
+  detection was also still broken on the ConPTY backend in 3.1.1:
+  `PTY.iseof()` could never return `True`. That half is fixed in 3.1.2 by
+  winpty-rs 1.0.8; the CPython bug remains upstream.
 * Stop publishing the vendored NuGet CPython inside the source distribution.
   The 3.0.5 and 3.1.0 sdists were ~16.2 MB because the `pythonarm64` NuGet
   install landed in the same checkout that `maturin sdist` archives, and
