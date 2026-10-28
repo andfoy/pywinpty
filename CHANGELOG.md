@@ -1,3 +1,91 @@
+## Version 3.1.2 (2026/10/28)
+
+* Require winpty-rs 1.0.8, which makes EOF detection work and fixes spawning
+  an executable whose path contains a space. Measured through this package's
+  own API:
+
+  |                                      | 3.1.1                     | 3.1.2             |
+  | ------------------------------------ | ------------------------- | ----------------- |
+  | `while not pty.iseof(): pty.read()`  | never terminates          | exits via `iseof()` |
+  | ...time to exit, ConPTY              | 5.07 s, `WinptyError('')` | 0.20 s, no error  |
+  | `PTY.iseof()`, both backends         | always `False`            | `True` once drained |
+  | spawn from a path containing a space | fails, bad-image error    | spawns, `argv[0]` intact |
+  | errors with an empty message         | 1                         | 0                 |
+
+* **Behavioural change.** `PTY.iseof()` could never return `True` before, so
+  code written around that behaves differently now. A loop of the shape
+
+  ```python
+  while not data and not pty.iseof():
+      data = pty.read()
+  ```
+
+  - stop when there is nothing to read *and* we are not at EOF - used to end
+  on its first empty read and will now run forever; the condition wants
+  inverting. There is no API change, so nothing gates the upgrade.
+
+* Spawning from a path containing a space failed differently on each backend.
+  The WinPTY backend ran the right executable but split `argv`, so
+  `C:\Program Files\Python\python.exe` arrived as `argv[0] = "C:\Program"`
+  with the remainder shifted into the caller's arguments. The ConPTY backend
+  left `argv[0]` intact but let `CreateProcessW` guess which file to run,
+  which could fail the spawn outright with a bad-image error whose `%1`
+  placeholder was never substituted - reported in
+  [#583](https://github.com/andfoy/pywinpty/issues/583) as being related to
+  path length, though what actually decided it was whether a shorter candidate
+  existed on disk.
+
+* Closing a PTY no longer waits out a fixed five seconds. A blocking read
+  after the child exits now returns in about 175 ms rather than 5.1 s, and
+  teardown no longer cancels I/O that has stopped belonging to it, which could
+  abort a read owned by the host application.
+
+* **Still not fixed:** the output *truncation* half of
+  [#565](https://github.com/andfoy/pywinpty/issues/565) is
+  [cpython#86210](https://github.com/python/cpython/issues/86210), where an
+  unbuffered `_textiowrapper_writeflush` ignores a partial write and drops the
+  remainder. That is a CPython bug on the producer side and is unaffected by
+  this release; a buffered producer, or one that checks the return value of
+  `write`, is not affected. The EOF half of that report is fixed. See also the
+  dated correction added to the 3.1.1 notes.
+
+### Issues Closed
+
+Fixed in this release:
+
+* [Issue 583](https://github.com/andfoy/pywinpty/issues/583) - spawn() fails with "is not a valid Win32 application" when the executable path contains a space ([PR 592](https://github.com/andfoy/pywinpty/pull/592) by [@andfoy](https://github.com/andfoy))
+* [Issue 565](https://github.com/andfoy/pywinpty/issues/565) - ConPTY may fail to reach EOF after child exit ([PR 592](https://github.com/andfoy/pywinpty/pull/592) by [@andfoy](https://github.com/andfoy))
+* [Issue 519](https://github.com/andfoy/pywinpty/issues/519) - How to properly read until EOF using the WinPTY backend ([PR 592](https://github.com/andfoy/pywinpty/pull/592) by [@andfoy](https://github.com/andfoy))
+* [Issue 423](https://github.com/andfoy/pywinpty/issues/423) - Freeze on process.iseof() ([PR 592](https://github.com/andfoy/pywinpty/pull/592) by [@andfoy](https://github.com/andfoy))
+
+Closed during triage after 3.1.1 - already fixed in an earlier release, not
+reproducible, or answered:
+
+* [Issue 553](https://github.com/andfoy/pywinpty/issues/553) - pty.write() panics on strings containing UTF-16 surrogate pairs
+* [Issue 545](https://github.com/andfoy/pywinpty/issues/545) - process read and write not working as expected
+* [Issue 536](https://github.com/andfoy/pywinpty/issues/536) - Resource files are not correctly attached while building
+* [Issue 529](https://github.com/andfoy/pywinpty/issues/529) - unexpected behavior in case of 'command not found'
+* [Issue 516](https://github.com/andfoy/pywinpty/issues/516) - ModuleNotFoundError: No module named 'winpty.winpty'
+* [Issue 510](https://github.com/andfoy/pywinpty/issues/510) - Documented encoding parameter does not work
+* [Issue 486](https://github.com/andfoy/pywinpty/issues/486) - Build fails because of missing project.version in pyproject.toml
+* [Issue 463](https://github.com/andfoy/pywinpty/issues/463) - After the program sends a character, it takes at least 300 ms to read it
+* [Issue 461](https://github.com/andfoy/pywinpty/issues/461) - break in finally swallows exceptions
+* [Issue 458](https://github.com/andfoy/pywinpty/issues/458) - Installing v2.0.14 requires Rust
+* [Issue 329](https://github.com/andfoy/pywinpty/issues/329) - ssh connection establish failed.
+* [Issue 304](https://github.com/andfoy/pywinpty/issues/304) - 'Pty is closed.' BUG
+* [Issue 269](https://github.com/andfoy/pywinpty/issues/269) - Garbled output on Telnet Client
+* [Issue 197](https://github.com/andfoy/pywinpty/issues/197) - test_ptyprocess.py terminating early due to child process
+* [Issue 183](https://github.com/andfoy/pywinpty/issues/183) - Constructing PTY instance kills terminal
+
+In this release 19 issues were closed.
+
+### Pull Requests Merged
+
+* [PR 592](https://github.com/andfoy/pywinpty/pull/592) - Bump winpty-rs to 1.0.8, by [@andfoy](https://github.com/andfoy) ([583](https://github.com/andfoy/pywinpty/issues/583), [565](https://github.com/andfoy/pywinpty/issues/565), [519](https://github.com/andfoy/pywinpty/issues/519), [423](https://github.com/andfoy/pywinpty/issues/423))
+
+In this release 1 pull request was closed.
+
+
 ## Version 3.1.1 (2026/10/27)
 
 * Pin the ConPTY NuGet package to 1.25.260930003 rather than resolving
